@@ -1,11 +1,34 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
+import emailjs from '@emailjs/browser'
 import './App.css'
 
 function App() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
-  const [revealedAreas, setRevealedAreas] = useState([])
+  const [revealedAreas, setRevealedAreas] = useState(new Set())
+  const [revealedSecrets, setRevealedSecrets] = useState(new Set())
   const [documentOpen, setDocumentOpen] = useState(false)
   const [currentPage, setCurrentPage] = useState(0)
+  const [exploreClicked, setExploreClicked] = useState(false)
+  const [formData, setFormData] = useState({ name: '', email: '', message: '' })
+  const [formStatus, setFormStatus] = useState({ loading: false, success: false, error: '' })
+  const rafRef = useRef(null)
+  const elementCacheRef = useRef({})
+  
+  // Clear cache when document opens/closes
+  useEffect(() => {
+    if (documentOpen) {
+      elementCacheRef.current = {}
+    }
+  }, [documentOpen])
+
+  // EmailJS configuration
+  // Option 1: Use environment variables (recommended for production)
+  // Create a .env file with: VITE_EMAILJS_SERVICE_ID, VITE_EMAILJS_TEMPLATE_ID, VITE_EMAILJS_PUBLIC_KEY
+  // Option 2: Replace the values below with your actual EmailJS credentials
+  // Get them from: https://dashboard.emailjs.com/admin
+  const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID || 'service_ci8h64h'
+  const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID || 'template_sipb9ui'
+  const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY || 'i0dQLe27a4mA6Or6D'
 
   useEffect(() => {
     const handleMouseMove = (e) => {
@@ -17,6 +40,68 @@ function App() {
   }, [])
 
   const spotlightSize = 200
+
+  // Track revealed secrets and content with requestAnimationFrame for smooth performance
+  useEffect(() => {
+    if (documentOpen) return
+    if (mousePosition.x === 0 && mousePosition.y === 0) return // Skip initial position
+
+    // Cancel previous frame
+    if (rafRef.current) {
+      cancelAnimationFrame(rafRef.current)
+    }
+
+    // Use requestAnimationFrame for smooth, performant updates
+    rafRef.current = requestAnimationFrame(() => {
+      // Check which secrets are currently in spotlight
+      hiddenSecrets.forEach(secret => {
+        const secretXPx = (parseFloat(secret.x) / 100) * window.innerWidth
+        const secretYPx = (parseFloat(secret.y) / 100) * window.innerHeight
+        const distance = Math.sqrt(
+          Math.pow(mousePosition.x - secretXPx, 2) + 
+          Math.pow(mousePosition.y - secretYPx, 2)
+        )
+        if (distance < spotlightSize / 2) {
+          setRevealedSecrets(prev => {
+            if (prev.has(secret.id)) return prev // Already revealed
+            return new Set([...prev, secret.id])
+          })
+        }
+      })
+
+      // Check if main content is in spotlight - cache elements for performance
+      const contentElements = ['mystery-title', 'mystery-subtitle', 'mystery-description', 'mystery-location', 'mystery-citizenship']
+      contentElements.forEach(elementId => {
+        // Cache element lookups
+        if (!elementCacheRef.current[elementId]) {
+          elementCacheRef.current[elementId] = document.querySelector(`.spotlight-content .${elementId}`)
+        }
+        const element = elementCacheRef.current[elementId]
+        
+        if (element && !element.classList.contains('hidden')) {
+          const rect = element.getBoundingClientRect()
+          const elementCenterX = rect.left + rect.width / 2
+          const elementCenterY = rect.top + rect.height / 2
+          const distance = Math.sqrt(
+            Math.pow(mousePosition.x - elementCenterX, 2) + 
+            Math.pow(mousePosition.y - elementCenterY, 2)
+          )
+          if (distance < spotlightSize / 2) {
+            setRevealedAreas(prev => {
+              if (prev.has(elementId)) return prev // Already revealed
+              return new Set([...prev, elementId])
+            })
+          }
+        }
+      })
+    })
+
+    return () => {
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current)
+      }
+    }
+  }, [mousePosition, documentOpen])
 
   // Document pages content
   const pages = [
@@ -180,25 +265,24 @@ function App() {
         "I believe the best work happens",
         "when diverse perspectives come together.",
         "",
-        "Let's build something meaningful together.",
-        "",
-        "josephayinde64@gmail.com"
+        "Let's build something meaningful together."
       ],
       images: [],
       videos: []
     }
   ]
 
-  // Hidden content areas - mysterious elements scattered across the page
+  // Hidden content areas - fun facts about Joseph scattered across the page
+  // Positioned to avoid overlap with centered main content (center area ~35-65% x, ~35-65% y)
   const hiddenSecrets = [
-    { id: 1, x: '20%', y: '30%', text: 'The journey begins...' },
-    { id: 2, x: '60%', y: '15%', text: 'Curiosity leads the way' },
-    { id: 3, x: '80%', y: '50%', text: 'Secrets await discovery' },
-    { id: 4, x: '40%', y: '70%', text: 'Hidden treasures' },
-    { id: 5, x: '10%', y: '80%', text: 'The mystery deepens' },
-    { id: 6, x: '90%', y: '25%', text: 'Stars guide the path' },
-    { id: 7, x: '50%', y: '10%', text: 'The crystal reveals all' },
-    { id: 8, x: '30%', y: '60%', text: 'Masks hide truth' },
+    { id: 1, x: '15%', y: '25%', text: 'Ex-OpenAI Member of Technical Staff' },
+    { id: 2, x: '75%', y: '20%', text: "World's first intern in the world's first computational neurosurgery lab" },
+    { id: 3, x: '85%', y: '55%', text: 'Computational Neuroscience Scholar at Carnegie Mellon University' },
+    { id: 4, x: '25%', y: '75%', text: 'UNC Chapel Hill - Honors Biology, Neuroscience, Chemistry Graduate' },
+    { id: 5, x: '8%', y: '85%', text: "Chancellor's Science Scholar - 1 of 25 selected worldwide" },
+    { id: 6, x: '92%', y: '30%', text: 'The Residency Delta Finalist' },
+    { id: 7, x: '20%', y: '12%', text: 'CEO and Founder of Cognition' },
+    { id: 8, x: '15%', y: '55%', text: 'LAUNCH Chapel Hill Startup Accelerator Cohort 25 Recipient' },
   ]
 
   const isInSpotlight = (secretX, secretY) => {
@@ -221,6 +305,7 @@ function App() {
   const handleCloseDocument = () => {
     setDocumentOpen(false)
     setCurrentPage(0)
+    setExploreClicked(false)
   }
 
   const handleNextPage = (e) => {
@@ -228,6 +313,7 @@ function App() {
     e.stopPropagation()
     if (currentPage < pages.length - 1) {
       setCurrentPage(currentPage + 1)
+      setExploreClicked(false)
       // Scroll to top of page
       const pageElement = document.querySelector('.document-page')
       if (pageElement) {
@@ -241,11 +327,72 @@ function App() {
     e.stopPropagation()
     if (currentPage > 0) {
       setCurrentPage(currentPage - 1)
+      setExploreClicked(false)
       // Scroll to top of page
       const pageElement = document.querySelector('.document-page')
       if (pageElement) {
         pageElement.scrollTo({ top: 0, behavior: 'smooth' })
       }
+    }
+  }
+
+  const handleExploreClick = () => {
+    setExploreClicked(true)
+  }
+
+  const handleFormChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    })
+  }
+
+  const handleFormSubmit = async (e) => {
+    e.preventDefault()
+    setFormStatus({ loading: true, success: false, error: '' })
+
+    // Check if EmailJS is configured
+    if (EMAILJS_SERVICE_ID === 'YOUR_SERVICE_ID' || 
+        EMAILJS_TEMPLATE_ID === 'YOUR_TEMPLATE_ID' || 
+        EMAILJS_PUBLIC_KEY === 'YOUR_PUBLIC_KEY') {
+      setFormStatus({ 
+        loading: false, 
+        success: false, 
+        error: 'Email service not configured. Please set up EmailJS credentials.' 
+      })
+      return
+    }
+
+    try {
+      const templateParams = {
+        from_name: formData.name,
+        from_email: formData.email,
+        message: formData.message,
+        to_email: 'josephayinde64@gmail.com'
+      }
+
+      await emailjs.send(
+        EMAILJS_SERVICE_ID,
+        EMAILJS_TEMPLATE_ID,
+        templateParams,
+        EMAILJS_PUBLIC_KEY
+      )
+
+      setFormStatus({ loading: false, success: true, error: '' })
+      setFormData({ name: '', email: '', message: '' })
+      
+      // Reset form after 3 seconds
+      setTimeout(() => {
+        setExploreClicked(false)
+        setFormStatus({ loading: false, success: false, error: '' })
+      }, 3000)
+    } catch (error) {
+      console.error('EmailJS error:', error)
+      setFormStatus({ 
+        loading: false, 
+        success: false, 
+        error: 'Failed to send message. Please try again later.' 
+      })
     }
   }
 
@@ -273,21 +420,70 @@ function App() {
             }}
           />
           
-          {/* Hidden secrets layer */}
+          {/* Permanently revealed content layer */}
+          <div className="permanent-reveal-layer">
+            {/* Permanently revealed secrets */}
+            <div className="secrets-layer">
+              {hiddenSecrets.map(secret => {
+                const isPermanentlyRevealed = revealedSecrets.has(secret.id)
+                return (
+                  <div
+                    key={secret.id}
+                    className={`secret-item ${isPermanentlyRevealed ? 'revealed permanent' : ''}`}
+                    style={{
+                      left: secret.x,
+                      top: secret.y,
+                      transform: 'translate(-50%, -50%)'
+                    }}
+                  >
+                    {isPermanentlyRevealed && (
+                      <div className="secret-text">{secret.text}</div>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+
+            {/* Permanently revealed main content - exact same positioning, only shows revealed items */}
+            <div className="main-content permanent-content">
+              <div className="content-wrapper permanent-content-wrapper">
+                <h1 className={`mystery-title permanent-reveal ${!revealedAreas.has('mystery-title') ? 'hidden' : ''}`}>
+                  hey i'm Joseph Ayinde
+                </h1>
+                <p className={`mystery-subtitle permanent-reveal ${!revealedAreas.has('mystery-subtitle') ? 'hidden' : ''}`}>
+                  aka j0
+                </p>
+                <p className={`mystery-description permanent-reveal ${!revealedAreas.has('mystery-description') ? 'hidden' : ''}`}>
+                  and i am a polymath (builder, thinker, dreamer)
+                </p>
+                <p className={`mystery-location permanent-reveal ${!revealedAreas.has('mystery-location') ? 'hidden' : ''}`}>
+                  from greensboro north carolina
+                </p>
+                <p className={`mystery-citizenship permanent-reveal ${!revealedAreas.has('mystery-citizenship') ? 'hidden' : ''}`}>
+                  i am a dual citizen of both the united states and nigeria
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Hidden secrets layer (for spotlight discovery) */}
           <div className="secrets-layer">
             {hiddenSecrets.map(secret => {
-              const revealed = isInSpotlight(secret.x, secret.y)
+              const currentlyRevealed = isInSpotlight(secret.x, secret.y)
+              const isPermanentlyRevealed = revealedSecrets.has(secret.id)
+              // Only show if currently in spotlight and not already permanently revealed
+              if (isPermanentlyRevealed) return null
               return (
                 <div
-                  key={secret.id}
-                  className={`secret-item ${revealed ? 'revealed' : ''}`}
+                  key={`spotlight-${secret.id}`}
+                  className={`secret-item ${currentlyRevealed ? 'revealed' : ''}`}
                   style={{
                     left: secret.x,
                     top: secret.y,
                     transform: 'translate(-50%, -50%)'
                   }}
                 >
-                  {revealed && (
+                  {currentlyRevealed && (
                     <div className="secret-text">{secret.text}</div>
                   )}
                 </div>
@@ -295,20 +491,22 @@ function App() {
             })}
           </div>
 
-          {/* Main content (visible in spotlight) */}
-          <div className="main-content">
-            <div className="content-wrapper">
-              <h1 className="mystery-title">hey i'm Joseph Ayinde</h1>
-              <p className="mystery-subtitle">
+          {/* Main content (visible in spotlight for discovery) - always render for consistent layout */}
+          <div className="main-content spotlight-content">
+            <div className="content-wrapper spotlight-content-wrapper">
+              <h1 className={`mystery-title ${revealedAreas.has('mystery-title') ? 'hidden' : ''}`}>
+                hey i'm Joseph Ayinde
+              </h1>
+              <p className={`mystery-subtitle ${revealedAreas.has('mystery-subtitle') ? 'hidden' : ''}`}>
                 aka j0
               </p>
-              <p className="mystery-description">
+              <p className={`mystery-description ${revealedAreas.has('mystery-description') ? 'hidden' : ''}`}>
                 and i am a polymath (builder, thinker, dreamer)
               </p>
-              <p className="mystery-location">
+              <p className={`mystery-location ${revealedAreas.has('mystery-location') ? 'hidden' : ''}`}>
                 from greensboro north carolina
               </p>
-              <p className="mystery-citizenship">
+              <p className={`mystery-citizenship ${revealedAreas.has('mystery-citizenship') ? 'hidden' : ''}`}>
                 i am a dual citizen of both the united states and nigeria
               </p>
             </div>
@@ -400,6 +598,71 @@ function App() {
                     }
                     return <p key={index}>{line}</p>
                   })}
+                  
+                  {/* Special handling for Connect page */}
+                  {pages[currentPage].title === "Connect" && (
+                    <div className="connect-section">
+                      {!exploreClicked ? (
+                        <button className="explore-button" onClick={handleExploreClick}>
+                          explore more
+                        </button>
+                      ) : (
+                        <div className="access-locked">
+                          <p className="locked-message">access locked, fill out contact form to gain full access</p>
+                          {formStatus.success ? (
+                            <div className="form-success">
+                              <p>Thank you! Your message has been sent. I'll get back to you soon.</p>
+                            </div>
+                          ) : (
+                            <form className="contact-form" onSubmit={handleFormSubmit}>
+                              {formStatus.error && (
+                                <div className="form-error">
+                                  <p>{formStatus.error}</p>
+                                </div>
+                              )}
+                              <input
+                                type="text"
+                                name="name"
+                                placeholder="Name"
+                                value={formData.name}
+                                onChange={handleFormChange}
+                                required
+                                className="form-input"
+                                disabled={formStatus.loading}
+                              />
+                              <input
+                                type="email"
+                                name="email"
+                                placeholder="Email"
+                                value={formData.email}
+                                onChange={handleFormChange}
+                                required
+                                className="form-input"
+                                disabled={formStatus.loading}
+                              />
+                              <textarea
+                                name="message"
+                                placeholder="Message"
+                                value={formData.message}
+                                onChange={handleFormChange}
+                                required
+                                className="form-textarea"
+                                rows="5"
+                                disabled={formStatus.loading}
+                              />
+                              <button 
+                                type="submit" 
+                                className="form-submit-button"
+                                disabled={formStatus.loading}
+                              >
+                                {formStatus.loading ? 'Sending...' : 'Submit'}
+                              </button>
+                            </form>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
                 
                 {/* Images */}
