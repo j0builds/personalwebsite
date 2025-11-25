@@ -635,11 +635,6 @@ function App() {
                 </div>
               </div>
             </div>
-
-            {/* Close button */}
-            <button className="close-button" onClick={handleCloseDocument}>
-              close
-            </button>
           </div>
         </div>
       )}
