@@ -680,6 +680,8 @@ html {
 
 .essay-content {
   width: 100%;
+  position: relative;
+  z-index: 3;
 }
 
 .essay-text {
@@ -734,7 +736,7 @@ html {
       #1a4a0f 100%
     );
   pointer-events: none;
-  z-index: 0;
+  z-index: 1;
   overflow: hidden;
 }
 
@@ -746,6 +748,8 @@ html {
   top: 0;
   width: 140px;
   height: 100%;
+  z-index: 2;
+  pointer-events: none;
   background-image: 
     /* Grass blade patterns - cleaner individual blades */
     linear-gradient(82deg, transparent 48%, #2d5016 48%, #2d5016 49.5%, transparent 49.5%),
@@ -1049,13 +1053,14 @@ html {
 /* Essay mobile styles */
 @media (max-width: 768px) {
   .essay-container {
-    padding: 50px 100px 100px 20px;
+    padding: 50px 80px 100px 20px;
     max-width: 100%;
   }
 
   .essay-container::before,
   .essay-container::after {
     width: 80px;
+    display: block;
   }
 
   .essay-text {
@@ -1082,12 +1087,13 @@ html {
 /* Small mobile devices */
 @media (max-width: 480px) {
   .essay-container {
-    padding: 40px 70px 80px 16px;
+    padding: 40px 60px 80px 16px;
   }
 
   .essay-container::before,
   .essay-container::after {
     width: 60px;
+    display: block;
   }
 
   .essay-text {
