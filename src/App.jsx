@@ -34,17 +34,30 @@ function App() {
       setMousePosition({ x: e.clientX, y: e.clientY })
     }
 
-    const handleTouchMove = (e) => {
+    // Enhanced touch handling for finer control on mobile
+    const handleTouchStart = (e) => {
       if (e.touches.length > 0) {
         const touch = e.touches[0]
         setMousePosition({ x: touch.clientX, y: touch.clientY })
       }
     }
 
+    const handleTouchMove = (e) => {
+      if (e.touches.length > 0) {
+        const touch = e.touches[0]
+        // Use requestAnimationFrame for smoother updates
+        requestAnimationFrame(() => {
+          setMousePosition({ x: touch.clientX, y: touch.clientY })
+        })
+      }
+    }
+
     window.addEventListener('mousemove', handleMouseMove)
+    window.addEventListener('touchstart', handleTouchStart, { passive: true })
     window.addEventListener('touchmove', handleTouchMove, { passive: true })
     return () => {
       window.removeEventListener('mousemove', handleMouseMove)
+      window.removeEventListener('touchstart', handleTouchStart)
       window.removeEventListener('touchmove', handleTouchMove)
     }
   }, [])
