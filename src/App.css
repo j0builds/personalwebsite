@@ -944,33 +944,6 @@ html {
   right: 20px;
 }
 
-/* Close button - fixed for essay */
-.close-button {
-  position: fixed;
-  top: 30px;
-  right: 30px;
-  padding: 10px 24px;
-  background: rgba(20, 20, 20, 0.6);
-  border: 1px solid rgba(180, 140, 255, 0.15);
-  color: rgba(240, 240, 240, 0.9);
-  font-family: 'Space Mono', monospace;
-  font-size: 0.85rem;
-  letter-spacing: 0.12em;
-  cursor: pointer;
-  z-index: 100;
-  transition: all 0.2s ease;
-  text-transform: lowercase;
-  backdrop-filter: blur(8px);
-  transform: rotate(-0.5deg);
-  font-weight: 400;
-}
-
-.close-button:hover {
-  background: rgba(30, 30, 30, 0.8);
-  border-color: rgba(180, 140, 255, 0.3);
-  color: rgba(255, 255, 255, 1);
-  transform: rotate(0deg) translateY(-1px);
-}
 
 /* Essay mobile styles */
 @media (max-width: 768px) {
@@ -1021,16 +994,11 @@ html {
     font-size: clamp(1.8rem, 10vw, 2.5rem);
   }
 
-  .open-button,
-  .close-button {
+  .open-button {
     padding: 10px 16px;
     font-size: 0.75rem;
     bottom: 16px;
     right: 16px;
-  }
-
-  .close-button {
-    top: 16px;
   }
 }
 
