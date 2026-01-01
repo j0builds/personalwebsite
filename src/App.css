@@ -96,13 +96,15 @@ button.secret-modal-close {
   z-index: 10003 !important; /* Higher than everything */
   pointer-events: auto !important;
   cursor: pointer !important;
-  /* Ensure touch events work */
-  touch-action: manipulation;
+  /* Ensure touch events work - manipulation allows single-finger panning and zooming */
+  touch-action: auto !important; /* Changed from manipulation to auto for better touch handling */
   -webkit-tap-highlight-color: rgba(180, 140, 255, 0.2);
   /* Make sure it's interactive */
   user-select: none;
   /* Ensure it's above all other layers */
   position: relative;
+  /* Ensure it captures touch events */
+  -webkit-touch-callout: none;
 }
 
 /* Optimize for mobile - reduce will-change usage */

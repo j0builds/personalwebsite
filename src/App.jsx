@@ -159,11 +159,15 @@ function App() {
     updateMousePosition(e.clientX, e.clientY)
   }, [documentOpen, updateMousePosition])
 
-  // Touch handlers - optimized
+  // Touch handlers - optimized for mobile
   const handleTouchStart = useCallback((e) => {
-    // Check if touching a secret item first - don't prevent default
-    if (isInteractiveElement(e.target)) {
-      return // Let the secret item handle its own events
+    const target = e.target
+    // Check if touching a secret item or any interactive element FIRST
+    if (target.closest('.secret-item.clickable') || 
+        target.closest('.secret-item.revealed') ||
+        isInteractiveElement(target)) {
+      // Don't prevent default - let the element handle its own touch events
+      return
     }
     if (documentOpen) return
     if (e.touches.length > 0) {
@@ -175,9 +179,13 @@ function App() {
 
   const touchMoveRafRef = useRef(null)
   const handleTouchMove = useCallback((e) => {
-    // Check if touching a secret item first - don't prevent default
-    if (isInteractiveElement(e.target)) {
-      return // Let the secret item handle its own events
+    const target = e.target
+    // Check if touching a secret item or any interactive element FIRST
+    if (target.closest('.secret-item.clickable') || 
+        target.closest('.secret-item.revealed') ||
+        isInteractiveElement(target)) {
+      // Don't prevent default - let the element handle its own touch events
+      return
     }
     if (documentOpen) return
     if (e.touches.length > 0) {
@@ -190,15 +198,16 @@ function App() {
     }
   }, [documentOpen, isInteractiveElement, updateMousePosition])
 
-  // Event listeners setup
+  // Event listeners setup - use capture phase for better control
   useEffect(() => {
     window.addEventListener('mousemove', handleMouseMove, { passive: true })
-    document.addEventListener('touchstart', handleTouchStart, { passive: false })
-    document.addEventListener('touchmove', handleTouchMove, { passive: false })
+    // Use capture phase to check before other handlers
+    document.addEventListener('touchstart', handleTouchStart, { passive: false, capture: true })
+    document.addEventListener('touchmove', handleTouchMove, { passive: false, capture: true })
     return () => {
       window.removeEventListener('mousemove', handleMouseMove)
-      document.removeEventListener('touchstart', handleTouchStart)
-      document.removeEventListener('touchmove', handleTouchMove)
+      document.removeEventListener('touchstart', handleTouchStart, { capture: true })
+      document.removeEventListener('touchmove', handleTouchMove, { capture: true })
       if (touchMoveRafRef.current) cancelAnimationFrame(touchMoveRafRef.current)
     }
   }, [handleMouseMove, handleTouchStart, handleTouchMove])
@@ -345,21 +354,25 @@ function App() {
                     onClick={(e) => {
                       e.preventDefault()
                       e.stopPropagation()
-                      console.log('Secret clicked:', secret.id)
+                      console.log('Secret clicked (desktop):', secret.id)
                       handleSecretClick(secret)
-                    }}
-                    onMouseDown={(e) => {
-                      e.preventDefault()
-                      e.stopPropagation()
                     }}
                     onTouchStart={(e) => {
+                      // Stop propagation to prevent document handlers from interfering
                       e.stopPropagation()
+                      console.log('Secret touch start:', secret.id)
                     }}
                     onTouchEnd={(e) => {
-                      e.preventDefault()
+                      // Prevent default to avoid double-firing, but allow the click
                       e.stopPropagation()
-                      console.log('Secret touched:', secret.id)
-                      handleSecretClick(secret)
+                      console.log('Secret touch end:', secret.id)
+                      // Use setTimeout to ensure click fires after touch
+                      setTimeout(() => {
+                        handleSecretClick(secret)
+                      }, 0)
+                    }}
+                    onTouchCancel={(e) => {
+                      e.stopPropagation()
                     }}
                     role="button"
                     tabIndex={0}
@@ -416,21 +429,25 @@ function App() {
                   onClick={(e) => {
                     e.preventDefault()
                     e.stopPropagation()
-                    console.log('Secret clicked:', secret.id)
+                    console.log('Secret clicked (desktop):', secret.id)
                     handleSecretClick(secret)
-                  }}
-                  onMouseDown={(e) => {
-                    e.preventDefault()
-                    e.stopPropagation()
                   }}
                   onTouchStart={(e) => {
+                    // Stop propagation to prevent document handlers from interfering
                     e.stopPropagation()
+                    console.log('Secret touch start:', secret.id)
                   }}
                   onTouchEnd={(e) => {
-                    e.preventDefault()
+                    // Prevent default to avoid double-firing, but allow the click
                     e.stopPropagation()
-                    console.log('Secret touched:', secret.id)
-                    handleSecretClick(secret)
+                    console.log('Secret touch end:', secret.id)
+                    // Use setTimeout to ensure click fires after touch
+                    setTimeout(() => {
+                      handleSecretClick(secret)
+                    }, 0)
+                  }}
+                  onTouchCancel={(e) => {
+                    e.stopPropagation()
                   }}
                   role="button"
                   tabIndex={0}
