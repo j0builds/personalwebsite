@@ -141,8 +141,15 @@ function App() {
   // Check if element is interactive
   const isInteractiveElement = useCallback((target) => {
     if (!target) return false
+    // Check for secret items (both clickable class and revealed state)
+    if (target.closest('.secret-item.clickable') || 
+        target.closest('.secret-item.revealed') ||
+        target.classList?.contains('secret-item') ||
+        target.closest('.secret-text')) {
+      return true
+    }
     return target.closest('button') || target.closest('a') || target.closest('input') || 
-           target.closest('textarea') || target.closest('form') || target.closest('.secret-item.clickable') ||
+           target.closest('textarea') || target.closest('form') ||
            ['BUTTON', 'A', 'INPUT', 'TEXTAREA'].includes(target.tagName)
   }, [])
 
@@ -322,7 +329,18 @@ function App() {
                   key={secret.id}
                     className="secret-item revealed permanent clickable"
                     style={{ left: secret.x, top: secret.y, transform: 'translate(-50%, -50%)' }}
-                    onClick={() => handleSecretClick(secret)}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleSecretClick(secret)
+                    }}
+                    onTouchStart={(e) => {
+                      e.stopPropagation()
+                    }}
+                    onTouchEnd={(e) => {
+                      e.stopPropagation()
+                      e.preventDefault()
+                      handleSecretClick(secret)
+                    }}
                   >
                       <div className="secret-text">{secret.text}</div>
                   </div>
@@ -362,7 +380,18 @@ function App() {
                   key={`spotlight-${secret.id}`}
                   className="secret-item revealed clickable"
                   style={{ left: secret.x, top: secret.y, transform: 'translate(-50%, -50%)' }}
-                  onClick={() => handleSecretClick(secret)}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    handleSecretClick(secret)
+                  }}
+                  onTouchStart={(e) => {
+                    e.stopPropagation()
+                  }}
+                  onTouchEnd={(e) => {
+                    e.stopPropagation()
+                    e.preventDefault()
+                    handleSecretClick(secret)
+                  }}
                 >
                     <div className="secret-text">{secret.text}</div>
                 </div>
