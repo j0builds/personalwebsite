@@ -73,7 +73,7 @@ html {
   width: 100%;
   height: 100%;
   pointer-events: none !important;
-  z-index: 10;
+  z-index: 10; /* Below secrets (20) */
   contain: layout style paint;
 }
 
@@ -118,14 +118,19 @@ button.secret-modal-close {
   -webkit-tap-highlight-color: rgba(180, 140, 255, 0.2);
 }
 
-/* Secret items - base styles */
+/* Secret items - base styles - FORCE visibility */
 .secret-item.clickable,
+.secret-item.revealed,
 .secret-item.revealed.clickable,
+.secret-item.revealed.permanent,
 .secret-item.revealed.permanent.clickable {
-  z-index: 10003 !important;
+  z-index: 10006 !important; /* Above everything */
   pointer-events: auto !important;
   user-select: none;
-  position: relative;
+  position: absolute !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
 }
 
 /* Desktop secret item styles */
@@ -385,11 +390,21 @@ button.secret-modal-close {
   pointer-events: auto !important;
 }
 
-/* All secrets in permanent layer should be visible */
-.permanent-reveal-layer .secret-item.permanent {
+/* All secrets in permanent layer MUST be visible */
+.permanent-reveal-layer .secret-item,
+.permanent-reveal-layer .secret-item.permanent,
+.permanent-reveal-layer .secret-item.revealed {
   opacity: 1 !important;
   visibility: visible !important;
   display: block !important;
+  pointer-events: auto !important;
+  z-index: 10003 !important;
+}
+
+.permanent-reveal-layer .secret-item .secret-text {
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: inline-block !important;
 }
 
 .permanent-reveal-layer .secret-item.permanent .secret-text {
@@ -442,22 +457,40 @@ button.secret-modal-close {
   clip: rect(0, 0, 0, 0) !important;
 }
 
-/* Secrets layer - hidden content */
+/* Secrets layer - all secrets visible */
 .secrets-layer {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: 5;
-  /* Don't block interactions - let children handle their own */
+  z-index: 20; /* Well above spotlight overlay (10) and cursor (10001) */
   pointer-events: none;
 }
 
-/* But allow clickable items to receive events */
+/* Permanent secrets layer - always visible */
+.secrets-layer.permanent-secrets {
+  z-index: 20;
+  pointer-events: none;
+}
+
+/* All clickable secret items receive events - FORCE visibility */
 .secrets-layer .secret-item.clickable,
-.secrets-layer .secret-item.revealed.clickable {
+.secrets-layer .secret-item.revealed,
+.secrets-layer .secret-item.revealed.clickable,
+.secrets-layer .secret-item.revealed.permanent,
+.secrets-layer .secret-item.revealed.permanent.clickable {
   pointer-events: auto !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
+}
+
+/* Ensure secret text is visible */
+.secrets-layer .secret-item.revealed .secret-text {
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: inline-block !important;
 }
 
 .secret-item {
@@ -469,6 +502,14 @@ button.secret-modal-close {
   min-width: 200px;
   min-height: 50px;
   isolation: isolate;
+}
+
+/* Revealed secrets MUST be visible */
+.secret-item.revealed {
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
+  pointer-events: auto !important;
 }
 
 /* Hidden secrets - visible but subtle, clickable to reveal */
@@ -512,12 +553,12 @@ button.secret-modal-close {
   padding: 10px; /* Add padding for larger click area */
 }
 
-.secret-item.revealed {
-  opacity: 1;
+/* Pulse animation - desktop only */
+.app.desktop .secret-item.revealed {
   animation: pulse 1s ease-in-out infinite;
 }
 
-/* Disable pulse on mobile for performance */
+/* No animation on mobile for performance */
 .app.mobile .secret-item.revealed {
   animation: none;
 }

@@ -168,27 +168,27 @@ function App() {
   const handleTouchStart = useCallback((e) => {
     if (documentOpen) return
     
-    const target = e.target
+        const target = e.target
     // Allow interactive elements to handle their own events
     if (isInteractiveElement(target) || target.closest('.secret-item')) {
-      return
-    }
+          return
+        }
     
     if (e.touches.length > 0) {
-      const touch = e.touches[0]
+        const touch = e.touches[0]
       updateMousePosition(touch.clientX, touch.clientY)
-      e.preventDefault()
+        e.preventDefault()
     }
   }, [documentOpen, isInteractiveElement, updateMousePosition])
 
   const handleTouchMove = useCallback((e) => {
     if (documentOpen) return
     
-    const target = e.target
+        const target = e.target
     // Allow interactive elements to handle their own events
     if (isInteractiveElement(target) || target.closest('.secret-item')) {
-      return
-    }
+          return
+        }
     
     if (e.touches.length > 0) {
       e.preventDefault()
@@ -214,8 +214,8 @@ function App() {
     return () => {
       window.removeEventListener('mousemove', handleMouseMove)
       if (isMobile) {
-        document.removeEventListener('touchstart', handleTouchStart)
-        document.removeEventListener('touchmove', handleTouchMove)
+      document.removeEventListener('touchstart', handleTouchStart)
+      document.removeEventListener('touchmove', handleTouchMove)
       }
       if (touchMoveRafRef.current) cancelAnimationFrame(touchMoveRafRef.current)
     }
@@ -363,34 +363,39 @@ function App() {
           {/* Spotlight overlay */}
           <div className="spotlight-overlay" style={spotlightStyle} />
 
-          {/* All secrets layer - all visible and clickable */}
+          {/* All secrets layer - all 10 bubbles visible and clickable */}
+          <div className="secrets-layer permanent-secrets">
+            {hiddenSecrets.map(secret => (
+              <div
+                key={`secret-${secret.id}`}
+                className="secret-item revealed permanent clickable"
+                style={{ 
+                  left: secret.x, 
+                  top: secret.y, 
+                  transform: 'translate(-50%, -50%)',
+                  zIndex: 10006,
+                  opacity: 1,
+                  visibility: 'visible',
+                  display: 'block'
+                }}
+                onClick={(e) => handleSecretInteraction(secret, e)}
+                onTouchEnd={isMobile ? (e) => handleSecretTouch(secret, e) : undefined}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault()
+                    handleSecretClick(secret)
+                  }
+                }}
+              >
+                <div className="secret-text">{secret.text}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* Permanent content layer */}
           <div className="permanent-reveal-layer">
-            <div className="secrets-layer">
-              {hiddenSecrets.map(secret => (
-                <div
-                  key={secret.id}
-                  className="secret-item revealed permanent clickable"
-                  style={{ 
-                    left: secret.x, 
-                    top: secret.y, 
-                    transform: 'translate(-50%, -50%)',
-                    zIndex: 10003
-                  }}
-                  onClick={(e) => handleSecretInteraction(secret, e)}
-                  onTouchEnd={isMobile ? (e) => handleSecretTouch(secret, e) : undefined}
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault()
-                      handleSecretClick(secret)
-                    }
-                  }}
-                >
-                  <div className="secret-text">{secret.text}</div>
-                </div>
-              ))}
-            </div>
             <div className="main-content permanent-content">
               <div className="content-wrapper permanent-content-wrapper">
                 {CONTENT_ELEMENTS.map(id => (
@@ -424,8 +429,8 @@ function App() {
           {/* Cursor glow - desktop only */}
           {!isMobile && (
             <div className="cursor-glow" style={{ transform: `translate(${mousePosition.x}px, ${mousePosition.y}px) translate(-50%, -50%)` }}>
-              <div className="glow-core"></div>
-            </div>
+            <div className="glow-core"></div>
+          </div>
           )}
         </>
       )}
