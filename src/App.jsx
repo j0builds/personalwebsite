@@ -360,26 +360,38 @@ function App() {
 
       {!documentOpen && (
         <>
-          {/* Spotlight overlay */}
+          {/* Spotlight overlay - render FIRST so secrets are on top */}
           <div className="spotlight-overlay" style={spotlightStyle} />
 
-          {/* All secrets layer - all 10 bubbles visible and clickable */}
+          {/* All secrets layer - ALL 10 BUBBLES - OUTSIDE permanent-reveal-layer */}
           <div className="secrets-layer permanent-secrets">
             {hiddenSecrets.map(secret => (
               <div
                 key={`secret-${secret.id}`}
                 className="secret-item revealed permanent clickable"
                 style={{ 
+                  position: 'absolute',
                   left: secret.x, 
                   top: secret.y, 
                   transform: 'translate(-50%, -50%)',
-                  zIndex: 10006,
+                  zIndex: 10010,
                   opacity: 1,
                   visibility: 'visible',
-                  display: 'block'
+                  display: 'block',
+                  pointerEvents: 'auto',
+                  minWidth: '200px',
+                  minHeight: '50px'
                 }}
-                onClick={(e) => handleSecretInteraction(secret, e)}
-                onTouchEnd={isMobile ? (e) => handleSecretTouch(secret, e) : undefined}
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  handleSecretClick(secret)
+                }}
+                onTouchEnd={isMobile ? (e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  handleSecretClick(secret)
+                } : undefined}
                 role="button"
                 tabIndex={0}
                 onKeyDown={(e) => {
@@ -389,7 +401,17 @@ function App() {
                   }
                 }}
               >
-                <div className="secret-text">{secret.text}</div>
+                <div 
+                  className="secret-text" 
+                  style={{ 
+                    opacity: 1, 
+                    visibility: 'visible', 
+                    display: 'inline-block',
+                    pointerEvents: 'none'
+                  }}
+                >
+                  {secret.text}
+                </div>
               </div>
             ))}
           </div>
