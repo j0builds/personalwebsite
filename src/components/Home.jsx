@@ -235,45 +235,6 @@ function Home() {
       return
     }
 
-    // Reset and reinitialize positions when showing bubbles
-    initialBubblePositions.current = hiddenSecrets.map((secret, index) => {
-      const startPos = getRandomOffScreenPosition()
-      const targetX = parseFloat(secret.x)
-      const targetY = parseFloat(secret.y)
-      
-      // Create curved path with random waypoints
-      const waypoint1 = {
-        x: startPos.x + (targetX - startPos.x) * 0.3 + (Math.random() - 0.5) * 30,
-        y: startPos.y + (targetY - startPos.y) * 0.3 + (Math.random() - 0.5) * 30
-      }
-      const waypoint2 = {
-        x: startPos.x + (targetX - startPos.x) * 0.7 + (Math.random() - 0.5) * 30,
-        y: startPos.y + (targetY - startPos.y) * 0.7 + (Math.random() - 0.5) * 30
-      }
-      
-      return {
-        id: secret.id,
-        x: startPos.x,
-        y: startPos.y,
-        vx: 0,
-        vy: 0,
-        baseX: targetX,
-        baseY: targetY,
-        startX: startPos.x,
-        startY: startPos.y,
-        waypoint1,
-        waypoint2,
-        startTime: null,
-        animationDelay: index * 150 + Math.random() * 200,
-        isAnimating: false,
-        hasArrived: false
-      }
-    })
-    
-    // Initialize positions ref with initial positions
-    bubblePositionsRef.current = initialBubblePositions.current.map(b => ({ ...b }))
-    startTimeRef.current = Date.now()
-    
     // Easing function for smooth animation
     const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3)
     
