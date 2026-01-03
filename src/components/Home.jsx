@@ -189,21 +189,45 @@ function Home() {
     // Reset state when showing bubbles
     setAllBubblesArrived(false)
     
-    // TEMPORARILY DISABLE COMPLEX ANIMATION - JUST SET POSITIONS
+    // Reset and reinitialize positions when showing bubbles
     try {
-      bubblePositionsRef.current = hiddenSecrets.map((secret) => ({
-        id: secret.id,
-        x: parseFloat(secret.x) || 50,
-        y: parseFloat(secret.y) || 50,
-        vx: 0,
-        vy: 0,
-        baseX: parseFloat(secret.x) || 50,
-        baseY: parseFloat(secret.y) || 50,
-        hasArrived: true
-      }))
+      initialBubblePositions.current = hiddenSecrets.map((secret, index) => {
+        const startPos = getRandomOffScreenPosition()
+        const targetX = parseFloat(secret.x) || 50
+        const targetY = parseFloat(secret.y) || 50
+        
+        // Create curved path with random waypoints
+        const waypoint1 = {
+          x: startPos.x + (targetX - startPos.x) * 0.3 + (Math.random() - 0.5) * 30,
+          y: startPos.y + (targetY - startPos.y) * 0.3 + (Math.random() - 0.5) * 30
+        }
+        const waypoint2 = {
+          x: startPos.x + (targetX - startPos.x) * 0.7 + (Math.random() - 0.5) * 30,
+          y: startPos.y + (targetY - startPos.y) * 0.7 + (Math.random() - 0.5) * 30
+        }
+        
+        return {
+          id: secret.id,
+          x: startPos.x,
+          y: startPos.y,
+          vx: 0,
+          vy: 0,
+          baseX: targetX,
+          baseY: targetY,
+          startX: startPos.x,
+          startY: startPos.y,
+          waypoint1,
+          waypoint2,
+          startTime: null,
+          animationDelay: index * 150 + Math.random() * 200,
+          isAnimating: false,
+          hasArrived: false
+        }
+      })
+      
+      // Initialize positions ref with initial positions
+      bubblePositionsRef.current = initialBubblePositions.current.map(b => ({ ...b }))
       startTimeRef.current = Date.now()
-      setAllBubblesArrived(true)
-      return // Skip the complex animation for now
     } catch (error) {
       console.error('Error initializing bubbles:', error)
       bubblePositionsRef.current = []
@@ -250,7 +274,212 @@ function Home() {
     bubblePositionsRef.current = initialBubblePositions.current.map(b => ({ ...b }))
     startTimeRef.current = Date.now()
     
-    // DISABLED - Complex animation loop temporarily removed
+    // Easing function for smooth animation
+    const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3)
+    
+    // Cubic bezier interpolation for curved paths
+    const cubicBezier = (t, p0, p1, p2, p3) => {
+      const u = 1 - t
+      const tt = t * t
+      const uu = u * u
+      const uuu = uu * u
+      const ttt = tt * t
+      
+      return {
+        x: uuu * p0.x + 3 * uu * t * p1.x + 3 * u * tt * p2.x + ttt * p3.x,
+        y: uuu * p0.y + 3 * uu * t * p1.y + 3 * u * tt * p2.y + ttt * p3.y
+      }
+    }
+    
+    let frameCount = 0
+    const updateBubbles = () => {
+      const positions = bubblePositionsRef.current
+      if (!positions || !Array.isArray(positions) || positions.length === 0) {
+        return
+      }
+      if (!startTimeRef.current) {
+        startTimeRef.current = Date.now()
+        return
+      }
+      const currentTime = Date.now()
+      const elapsed = currentTime - startTimeRef.current
+      let allArrived = true
+      frameCount++
+      
+      // Update physics for each bubble
+      positions.forEach(bubble => {
+        if (!bubble) return
+        
+        const { baseX, baseY, startX, startY, waypoint1, waypoint2, animationDelay, isAnimating, hasArrived } = bubble
+        
+        // Safety check - ensure waypoints exist, skip this bubble if not
+        if (!waypoint1 || !waypoint2) {
+          return
+        }
+        
+        // Check if it's time to start animating this bubble
+        if (!isAnimating && elapsed >= animationDelay) {
+          bubble.isAnimating = true
+          bubble.startTime = currentTime
+        }
+        
+        // Animate bubble from off-screen to target position with curved path
+        if (bubble.isAnimating && !hasArrived && bubble.startTime !== null) {
+          const animationElapsed = currentTime - bubble.startTime
+          const animationDuration = 2500 // 2.5 seconds for curved path
+          const progress = Math.min(animationElapsed / animationDuration, 1)
+          const easedProgress = easeOutCubic(progress)
+          
+          // Use cubic bezier for curved path: start -> waypoint1 -> waypoint2 -> target
+          const point = cubicBezier(
+            easedProgress,
+            { x: startX, y: startY },
+            waypoint1,
+            waypoint2,
+            { x: baseX, y: baseY }
+          )
+          
+          bubble.x = point.x
+          bubble.y = point.y
+          
+          // Check if arrived at target
+          if (progress >= 1) {
+            bubble.hasArrived = true
+            bubble.x = baseX
+            bubble.y = baseY
+            // Start physics movement after arrival
+            bubble.vx = (Math.random() - 0.5) * 0.3
+            bubble.vy = (Math.random() - 0.5) * 0.3
+          } else {
+            allArrived = false
+          }
+        } else if (!hasArrived) {
+          allArrived = false
+        }
+        
+        // After arriving, apply lava lamp physics
+        if (bubble.hasArrived) {
+          let { x, y, vx, vy } = bubble
+          
+          // Update position
+          x += vx
+          y += vy
+          
+          // Gentle drift back toward base position (lava lamp effect)
+          const driftX = (baseX - x) * 0.01
+          const driftY = (baseY - y) * 0.01
+          // Reduce random calculations - only add random drift every 3rd frame
+          if (frameCount % 3 === 0) {
+            vx += driftX + (Math.random() - 0.5) * 0.02
+            vy += driftY + (Math.random() - 0.5) * 0.02
+          } else {
+            vx += driftX
+            vy += driftY
+          }
+          
+          // Damping for smooth movement
+          vx *= 0.98
+          vy *= 0.98
+          
+          // Boundary constraints (keep bubbles on screen)
+          if (x < 5) {
+            x = 5
+            vx *= -0.8 // Bounce off edge
+          } else if (x > 95) {
+            x = 95
+            vx *= -0.8
+          }
+          
+          if (y < 5) {
+            y = 5
+            vy *= -0.8
+          } else if (y > 95) {
+            y = 95
+            vy *= -0.8
+          }
+          
+          bubble.x = x
+          bubble.y = y
+          bubble.vx = vx
+          bubble.vy = vy
+        }
+      })
+      
+      // Collision detection between bubbles (only after they've arrived) - OPTIMIZED: only check every 5th frame
+      if (frameCount % 5 === 0) {
+        for (let i = 0; i < positions.length; i++) {
+          for (let j = i + 1; j < positions.length; j++) {
+            const b1 = positions[i]
+            const b2 = positions[j]
+            
+            if (!b1 || !b2) continue
+            // Only check collisions if both bubbles have arrived
+            if (!b1.hasArrived || !b2.hasArrived) continue
+            
+            const dx = b2.x - b1.x
+            const dy = b2.y - b1.y
+            const distanceSquared = dx * dx + dy * dy
+            const minDistanceSquared = 144 // 12^2
+            
+            if (distanceSquared < minDistanceSquared && distanceSquared > 0) {
+              const distance = Math.sqrt(distanceSquared)
+              // Collision detected - bounce off each other
+              const angle = Math.atan2(dy, dx)
+              const sin = Math.sin(angle)
+              const cos = Math.cos(angle)
+              
+              // Rotate velocities
+              const vx1 = b1.vx * cos + b1.vy * sin
+              const vy1 = b1.vy * cos - b1.vx * sin
+              const vx2 = b2.vx * cos + b2.vy * sin
+              const vy2 = b2.vy * cos - b2.vx * sin
+              
+              // Swap velocities (elastic collision)
+              const swap = vx1
+              const newVx1 = vx2 * 0.9
+              const newVx2 = swap * 0.9
+              
+              // Rotate back
+              b1.vx = newVx1 * cos - vy1 * sin
+              b1.vy = vy1 * cos + newVx1 * sin
+              b2.vx = newVx2 * cos - vy2 * sin
+              b2.vy = vy2 * cos + newVx2 * sin
+              
+              // Separate bubbles
+              const overlap = 12 - distance
+              const separationX = (dx / distance) * overlap * 0.5
+              const separationY = (dy / distance) * overlap * 0.5
+              
+              b1.x -= separationX
+              b1.y -= separationY
+              b2.x += separationX
+              b2.y += separationY
+            }
+          }
+        }
+      }
+      
+      // Update DOM directly for smooth performance - batch DOM updates
+      // Only update DOM every other frame for better performance
+      if (frameCount % 2 === 0) {
+        positions.forEach(bubble => {
+          const element = bubbleElementsRef.current[bubble.id]
+          if (element) {
+            // Use transform instead of left/top for GPU acceleration
+            element.style.transform = `translate(${bubble.x}%, ${bubble.y}%) translate(-50%, -50%)`
+          }
+        })
+      }
+      
+      // Check if all bubbles have arrived
+      if (allArrived && !allBubblesArrived) {
+        setAllBubblesArrived(true)
+      }
+      
+      animationFrameRef.current = requestAnimationFrame(updateBubbles)
+    }
+    
+    animationFrameRef.current = requestAnimationFrame(updateBubbles)
     
     return () => {
       if (animationFrameRef.current) {
@@ -451,13 +680,13 @@ function Home() {
 
       {!documentOpen && (
         <>
-          {/* Metaballs WebGL renderer - lava lamp effect - TEMPORARILY DISABLED */}
-          {/* {showBubbles && bubblePositionsRef.current && Array.isArray(bubblePositionsRef.current) && bubblePositionsRef.current.length > 0 && (
+          {/* Metaballs WebGL renderer - lava lamp effect */}
+          {showBubbles && bubblePositionsRef.current && Array.isArray(bubblePositionsRef.current) && bubblePositionsRef.current.length > 0 && (
             <Metaballs 
               bubbles={bubblePositionsRef.current} 
               showBubbles={showBubbles}
             />
-          )} */}
+          )}
           
 
           {/* Quotes on main page - centered with bubbles */}
