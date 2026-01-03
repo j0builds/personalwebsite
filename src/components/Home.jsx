@@ -411,14 +411,17 @@ function Home() {
         }
       }
       
-      // Update DOM directly for smooth performance - use transform instead of left/top for better performance
-      positions.forEach(bubble => {
-        const element = bubbleElementsRef.current[bubble.id]
-        if (element) {
-          // Use transform instead of left/top for GPU acceleration
-          element.style.transform = `translate(${bubble.x}%, ${bubble.y}%) translate(-50%, -50%)`
-        }
-      })
+      // Update DOM directly for smooth performance - batch DOM updates
+      // Only update DOM every other frame for better performance
+      if (frameCount % 2 === 0) {
+        positions.forEach(bubble => {
+          const element = bubbleElementsRef.current[bubble.id]
+          if (element) {
+            // Use transform instead of left/top for GPU acceleration
+            element.style.transform = `translate(${bubble.x}%, ${bubble.y}%) translate(-50%, -50%)`
+          }
+        })
+      }
       
       // Check if all bubbles have arrived
       if (allArrived && !allBubblesArrived) {
