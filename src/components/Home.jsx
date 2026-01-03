@@ -291,9 +291,15 @@ function Home() {
       }
     }
     
-    let frameCount = 0
-    
-    const updateBubbles = (now) => {
+      let frameCount = 0
+      let collisionFrameCount = 0
+      let pillSeparationFrameCount = 0
+      
+      // Cache expensive calculations
+      const viewport = viewportRef.current
+      const dampPowCache = {} // Cache Math.pow results
+      
+      const updateBubbles = (now) => {
       const positions = bubblePositionsRef.current
       if (!positions || !Array.isArray(positions) || positions.length === 0) {
         // Keep animation loop running even if positions aren't ready yet
@@ -424,8 +430,8 @@ function Home() {
           // Gentle drift back toward base position (lava lamp effect) - ENHANCED
           const driftX = (baseX - x) * 0.015
           const driftY = (baseY - y) * 0.015
-          // Add more random drift for lava lamp effect
-          if (frameCount % 2 === 0) {
+          // Add more random drift for lava lamp effect - THROTTLED (every 4 frames)
+          if (frameCount % 4 === 0) {
             vx += (driftX + (Math.random() - 0.5) * 0.04) * dt
             vy += (driftY + (Math.random() - 0.5) * 0.04) * dt
           } else {
@@ -433,10 +439,12 @@ function Home() {
             vy += driftY * dt
           }
           
-          // Less damping for more movement - use dt-aware damping
+          // Less damping for more movement - use dt-aware damping (cached for performance)
           const damp = 0.985
-          vx *= Math.pow(damp, dt)
-          vy *= Math.pow(damp, dt)
+          const dampKey = `${damp}_${dt.toFixed(3)}`
+          const dampValue = dampPowCache[dampKey] || (dampPowCache[dampKey] = Math.pow(damp, dt))
+          vx *= dampValue
+          vy *= dampValue
           
           // Boundary constraints (keep bubbles on screen)
           if (x < 5) {
@@ -462,8 +470,10 @@ function Home() {
         }
       })
       
-      // Collision detection between bubbles (only after they've arrived) - Check every frame for responsive collisions
-      {
+      // Collision detection between bubbles - THROTTLED for performance (every 3 frames)
+      collisionFrameCount++
+      if (collisionFrameCount >= 3) {
+        collisionFrameCount = 0
         for (let i = 0; i < positions.length; i++) {
           for (let j = i + 1; j < positions.length; j++) {
             const b1 = positions[i]
@@ -476,7 +486,7 @@ function Home() {
             const dx = b2.x - b1.x
             const dy = b2.y - b1.y
             const distanceSquared = dx * dx + dy * dy
-            const minDistanceSquared = 256 // 16^2 (increased from 12^2 for more visible collisions)
+            const minDistanceSquared = 256 // 16^2
             
             if (distanceSquared < minDistanceSquared && distanceSquared > 0) {
               const distance = Math.sqrt(distanceSquared)
@@ -493,7 +503,7 @@ function Home() {
               
               // Swap velocities (elastic collision) - more bounce
               const swap = vx1
-              const newVx1 = vx2 * 1.1 // Increased bounce from 0.9
+              const newVx1 = vx2 * 1.1
               const newVx2 = swap * 1.1
               
               // Rotate back
@@ -504,7 +514,7 @@ function Home() {
               
               // Separate bubbles more aggressively
               const overlap = 16 - distance
-              const separationX = (dx / distance) * overlap * 0.6 // Increased from 0.5
+              const separationX = (dx / distance) * overlap * 0.6
               const separationY = (dy / distance) * overlap * 0.6
               
               b1.x -= separationX
@@ -519,15 +529,20 @@ function Home() {
       // Update pill positions using spring-follow physics (pills tethered to bubbles)
       const pills = pillPositionsRef.current
       if (pills && Array.isArray(pills)) {
+        // OPTIMIZED: Use direct array indexing instead of find() - O(1) instead of O(n)
+        const viewport = viewportRef.current
+        const k = 0.08  // spring strength
+        const damp = 0.82  // damping
+        const dampKey = `${damp}_${dt.toFixed(3)}`
+        const dampValue = dampPowCache[dampKey] || (dampPowCache[dampKey] = Math.pow(damp, dt))
+        
         positions.forEach((bubble, idx) => {
-          const pill = pills.find(p => p?.id === bubble?.id) || pills[idx]
+          const pill = pills[idx] // Direct access - much faster than find()
           if (!pill || !bubble) return
           
           // CRITICAL: Check for NaN values
           if (!Number.isFinite(pill.x) || !Number.isFinite(pill.y) || !Number.isFinite(pill.vx) || !Number.isFinite(pill.vy)) {
-            console.error('PILL NaN detected:', { id: pill.id, x: pill.x, y: pill.y, vx: pill.vx, vy: pill.vy })
             // Reset to safe values based on bubble position
-            const viewport = viewportRef.current
             pill.x = (bubble.x / 100) * viewport.w
             pill.y = (bubble.y / 100) * viewport.h
             pill.vx = 0
@@ -535,13 +550,10 @@ function Home() {
           }
           
           // Calculate anchor point (bubble position + velocity-based offset for "string" effect)
-          // When bubble moves right, pill drags behind left (opposite velocity)
           pill.offsetX = -bubble.vx * 12
           pill.offsetY = -bubble.vy * 12
           
           // Convert bubble position from % to pixels for spring calculation
-          // CRITICAL: Use viewport ref, not window.innerWidth/Height
-          const viewport = viewportRef.current
           const anchorX = (bubble.x / 100) * viewport.w + pill.offsetX
           const anchorY = (bubble.y / 100) * viewport.h + pill.offsetY
           
@@ -549,40 +561,39 @@ function Home() {
           const dx = anchorX - pill.x
           const dy = anchorY - pill.y
           
-          // Spring constants (tune these)
-          const k = 0.08  // spring strength
-          const damp = 0.82  // damping (lower = more float)
-          
-          // CRITICAL: Spring physics with dt - multiply by dt for frame-rate independence
-          // Accelerate toward anchor (dt-aware)
-          pill.vx = pill.vx * Math.pow(damp, dt) + dx * k * dt
-          pill.vy = pill.vy * Math.pow(damp, dt) + dy * k * dt
+          // CRITICAL: Spring physics with dt - use cached Math.pow result
+          pill.vx = pill.vx * dampValue + dx * k * dt
+          pill.vy = pill.vy * dampValue + dy * k * dt
           
           // Integrate position (dt-aware)
           pill.x += pill.vx * dt
           pill.y += pill.vy * dt
         })
         
-        // Prevent pills from overlapping each other (DOM-only separation)
-        for (let i = 0; i < pills.length; i++) {
-          for (let j = i + 1; j < pills.length; j++) {
-            const p1 = pills[i]
-            const p2 = pills[j]
-            if (!p1 || !p2) continue
-            
-            const dx = p2.x - p1.x
-            const dy = p2.y - p1.y
-            const dist = Math.hypot(dx, dy) || 1
-            const min = 120 // how far apart labels should be
-            
-            if (dist < min) {
-              const push = (min - dist) * 0.02
-              const nx = dx / dist
-              const ny = dy / dist
-              p1.x -= nx * push
-              p1.y -= ny * push
-              p2.x += nx * push
-              p2.y += ny * push
+        // Prevent pills from overlapping each other - THROTTLED for performance (every 5 frames)
+        pillSeparationFrameCount++
+        if (pillSeparationFrameCount >= 5) {
+          pillSeparationFrameCount = 0
+          for (let i = 0; i < pills.length; i++) {
+            for (let j = i + 1; j < pills.length; j++) {
+              const p1 = pills[i]
+              const p2 = pills[j]
+              if (!p1 || !p2) continue
+              
+              const dx = p2.x - p1.x
+              const dy = p2.y - p1.y
+              const dist = Math.hypot(dx, dy) || 1
+              const min = 120 // how far apart labels should be
+              
+              if (dist < min) {
+                const push = (min - dist) * 0.02
+                const nx = dx / dist
+                const ny = dy / dist
+                p1.x -= nx * push
+                p1.y -= ny * push
+                p2.x += nx * push
+                p2.y += ny * push
+              }
             }
           }
         }

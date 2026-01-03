@@ -141,7 +141,8 @@ function Metaballs({ bubbles, showBubbles }) {
     const mesh = new THREE.Mesh(geometry, material)
     scene.add(mesh)
 
-    // Animation loop - Full 60fps for smooth metaballs
+    // Animation loop - THROTTLED to ~30fps for better performance
+    let lastMetaballUpdate = 0
     const animate = () => {
       if (!showBubbles) {
         if (animationFrameRef.current) {
@@ -153,17 +154,25 @@ function Metaballs({ bubbles, showBubbles }) {
       
       animationFrameRef.current = requestAnimationFrame(animate)
       
-      // Update uniforms - update every frame for smooth animation
+      const now = performance.now()
+      // Throttle to ~30fps (update every ~33ms)
+      if (now - lastMetaballUpdate < 33) {
+        renderer.render(scene, camera) // Still render, just don't update uniforms
+        return
+      }
+      lastMetaballUpdate = now
+      
+      // Update uniforms - throttled for performance
       if (materialRef.current && bubbles && Array.isArray(bubbles) && bubbles.length > 0) {
         // Update time for animated colors
-        materialRef.current.uniforms.u_time.value += 0.016 // ~60fps time increment
+        materialRef.current.uniforms.u_time.value += 0.033 // ~30fps time increment
         materialRef.current.uniforms.u_resolution.value.set(
           window.innerWidth,
           window.innerHeight
         )
         materialRef.current.uniforms.u_numBalls.value = Math.min(bubbles.length, 20)
         
-        // Update flattened bubble positions - real-time updates
+        // Update flattened bubble positions
         const flattened = materialRef.current.uniforms.u_ballPositions.value
         const maxBalls = Math.min(bubbles.length, 20)
         for (let i = 0; i < maxBalls; i++) {
@@ -179,9 +188,7 @@ function Metaballs({ bubbles, showBubbles }) {
         materialRef.current.uniforms.u_ballPositions.needsUpdate = true
       }
       
-      // Always render, even if bubbles aren't ready yet
       renderer.render(scene, camera)
-      
     }
     
     animate()
