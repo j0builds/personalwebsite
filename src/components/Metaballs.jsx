@@ -87,14 +87,14 @@ function Metaballs({ bubbles, showBubbles }) {
     // Camera (orthographic for 2D effect)
     const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1)
     
-    // Renderer
+    // Renderer - OPTIMIZED: reduce quality for better performance
     const renderer = new THREE.WebGLRenderer({ 
       alpha: true,
-      antialias: true,
+      antialias: false, // Disable antialiasing for better performance
       powerPreference: 'high-performance'
     })
     renderer.setSize(window.innerWidth, window.innerHeight)
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5)) // Reduced from 2 to 1.5
     renderer.setClearColor(0x000000, 0) // Transparent background
     mountRef.current.appendChild(renderer.domElement)
     rendererRef.current = renderer
@@ -132,9 +132,9 @@ function Metaballs({ bubbles, showBubbles }) {
     const mesh = new THREE.Mesh(geometry, material)
     scene.add(mesh)
 
-    // Animation loop - OPTIMIZED: throttle updates
+    // Animation loop - OPTIMIZED: throttle updates more aggressively
     let lastUpdate = 0
-    const throttleMs = 16 // ~60fps max
+    const throttleMs = 33 // ~30fps max (reduced from 16ms/60fps)
     const animate = () => {
       if (!showBubbles) return
       
@@ -142,28 +142,30 @@ function Metaballs({ bubbles, showBubbles }) {
       
       const now = Date.now()
       if (now - lastUpdate < throttleMs) {
-        renderer.render(scene, camera) // Still render, just don't update uniforms
+        // Skip rendering entirely if throttled
         return
       }
       lastUpdate = now
       
-      // Update uniforms
+      // Update uniforms - only if bubbles array changed
       if (materialRef.current && bubbles && bubbles.length > 0) {
-        materialRef.current.uniforms.u_time.value += 0.01
+        // Skip time update - not needed for static metaballs
+        // materialRef.current.uniforms.u_time.value += 0.01
         materialRef.current.uniforms.u_resolution.value.set(
           window.innerWidth,
           window.innerHeight
         )
         materialRef.current.uniforms.u_numBalls.value = Math.min(bubbles.length, 20)
         
-        // Update flattened bubble positions
+        // Update flattened bubble positions - batch update
         const flattened = materialRef.current.uniforms.u_ballPositions.value
-        bubbles.forEach((bubble, i) => {
-          if (i < 20 && bubble) {
-            flattened[i * 2] = bubble.x || 0
-            flattened[i * 2 + 1] = bubble.y || 0
+        const maxBalls = Math.min(bubbles.length, 20)
+        for (let i = 0; i < maxBalls; i++) {
+          if (bubbles[i]) {
+            flattened[i * 2] = bubbles[i].x || 0
+            flattened[i * 2 + 1] = bubbles[i].y || 0
           }
-        })
+        }
         materialRef.current.uniforms.u_ballPositions.needsUpdate = true
       }
       
@@ -207,4 +209,4 @@ function Metaballs({ bubbles, showBubbles }) {
   return <div ref={mountRef} className="metaballs-container" />
 }
 
-export default Metaballs
+export default memo(Metaballs)

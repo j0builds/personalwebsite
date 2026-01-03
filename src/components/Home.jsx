@@ -177,12 +177,12 @@ function Home() {
   const bubbleElementsRef = useRef({})
   const bubblePositionsRef = useRef(null)
   
-  // Timer to hide bubbles and show quotes after 15 seconds
+  // Timer to hide bubbles and show quotes after 8 seconds
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowBubbles(false)
       setShowQuotes(true)
-    }, 15000)
+    }, 8000)
 
     return () => clearTimeout(timer)
   }, [])
@@ -321,8 +321,14 @@ function Home() {
           // Gentle drift back toward base position (lava lamp effect)
           const driftX = (baseX - x) * 0.01
           const driftY = (baseY - y) * 0.01
-          vx += driftX + (Math.random() - 0.5) * 0.02 // Random float
-          vy += driftY + (Math.random() - 0.5) * 0.02
+          // Reduce random calculations - only add random drift every 3rd frame
+          if (frameCount % 3 === 0) {
+            vx += driftX + (Math.random() - 0.5) * 0.02
+            vy += driftY + (Math.random() - 0.5) * 0.02
+          } else {
+            vx += driftX
+            vy += driftY
+          }
           
           // Damping for smooth movement
           vx *= 0.98
@@ -352,9 +358,8 @@ function Home() {
         }
       })
       
-      // Collision detection between bubbles (only after they've arrived) - OPTIMIZED: only check every 3rd frame
-      frameCount++
-      if (frameCount % 3 === 0) { // Only check collisions every 3rd frame
+      // Collision detection between bubbles (only after they've arrived) - OPTIMIZED: only check every 5th frame
+      if (frameCount % 5 === 0) { // Only check collisions every 5th frame
         for (let i = 0; i < positions.length; i++) {
           for (let j = i + 1; j < positions.length; j++) {
             const b1 = positions[i]
@@ -461,9 +466,9 @@ function Home() {
       }
     })
     
-    // Update mouse position for cursor tracking
+    // Update mouse position for cursor tracking - throttle more aggressively
     const now = Date.now()
-    if (now - lastCursorUpdate.current >= 16) { // ~60fps
+    if (now - lastCursorUpdate.current >= 33) { // ~30fps (reduced from 16ms/60fps)
       lastCursorUpdate.current = now
       setMousePosition({ x, y })
     }
