@@ -1,0 +1,273 @@
+/* Neue Machina Font Face */
+@font-face {
+  font-family: 'Neue Machina';
+  src: url('/fonts/NeueMachina-Regular.woff2') format('woff2'),
+       url('/fonts/NeueMachina-Regular.woff') format('woff'),
+       url('/fonts/NeueMachina-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Neue Machina';
+  src: url('/fonts/NeueMachina-Bold.woff2') format('woff2'),
+       url('/fonts/NeueMachina-Bold.woff') format('woff'),
+       url('/fonts/NeueMachina-Bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Neue Machina';
+  src: url('/fonts/NeueMachina-Light.woff2') format('woff2'),
+       url('/fonts/NeueMachina-Light.woff') format('woff'),
+       url('/fonts/NeueMachina-Light.otf') format('opentype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+.blog-container {
+  min-height: 100vh;
+  background: #0f0f0f;
+  padding: 80px 40px 120px 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+  color: rgba(220, 220, 220, 0.9);
+}
+
+.blog-header {
+  text-align: center;
+  margin-bottom: 4rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid rgba(180, 140, 255, 0.1);
+}
+
+.blog-title {
+  font-family: 'Neue Machina', 'Space Mono', monospace;
+  font-size: clamp(2.5rem, 8vw, 4rem);
+  font-weight: 400;
+  color: rgba(240, 240, 240, 0.95);
+  margin-bottom: 1rem;
+  letter-spacing: -0.01em;
+  transform: rotate(-0.3deg);
+  text-rendering: optimizeLegibility;
+}
+
+.blog-subtitle {
+  font-family: 'Inter', sans-serif;
+  font-size: 1.1rem;
+  color: rgba(200, 200, 200, 0.7);
+  letter-spacing: 0.05em;
+  text-transform: lowercase;
+}
+
+.blog-filters {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 3rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.filter-button {
+  padding: 10px 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.7);
+  font-family: 'Neue Machina', 'Inter', sans-serif;
+  font-size: 0.9rem;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: lowercase;
+  backdrop-filter: blur(5px);
+  font-weight: 300;
+}
+
+.filter-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(180, 140, 255, 0.3);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.filter-button.active {
+  background: rgba(180, 140, 255, 0.15);
+  border-color: rgba(180, 140, 255, 0.4);
+  color: rgba(240, 240, 240, 0.95);
+}
+
+.blog-posts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.blog-post-card {
+  background: rgba(20, 20, 20, 0.6);
+  border: 1px solid rgba(180, 140, 255, 0.15);
+  padding: 2rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(8px);
+  transform: rotate(-0.2deg);
+}
+
+.blog-post-card:hover {
+  background: rgba(30, 30, 30, 0.8);
+  border-color: rgba(180, 140, 255, 0.3);
+  transform: rotate(0deg) translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.post-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  font-size: 0.85rem;
+}
+
+.post-category {
+  font-family: 'Neue Machina', 'Space Mono', monospace;
+  color: rgba(180, 140, 255, 0.8);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  font-weight: 300;
+}
+
+.post-date {
+  font-family: 'Inter', sans-serif;
+  color: rgba(200, 200, 200, 0.5);
+  font-size: 0.85rem;
+}
+
+.post-title {
+  font-family: 'Neue Machina', 'Space Mono', monospace;
+  font-size: 1.3rem;
+  font-weight: 400;
+  color: rgba(240, 240, 240, 0.95);
+  margin-bottom: 1rem;
+  line-height: 1.4;
+  letter-spacing: -0.005em;
+  text-rendering: optimizeLegibility;
+}
+
+.post-excerpt {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: rgba(220, 220, 220, 0.8);
+  margin-bottom: 1.5rem;
+}
+
+.read-more {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  color: rgba(180, 140, 255, 0.8);
+  letter-spacing: 0.05em;
+  text-transform: lowercase;
+  display: inline-block;
+  transition: all 0.3s ease;
+}
+
+.blog-post-card:hover .read-more {
+  color: rgba(200, 160, 255, 1);
+  transform: translateX(4px);
+}
+
+.blog-post-view {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.back-button {
+  padding: 10px 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.8);
+  font-family: 'Neue Machina', 'Inter', sans-serif;
+  font-size: 0.9rem;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: lowercase;
+  margin-bottom: 2rem;
+  backdrop-filter: blur(5px);
+  font-weight: 300;
+}
+
+.back-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(180, 140, 255, 0.3);
+  color: rgba(255, 255, 255, 1);
+}
+
+.blog-post-full {
+  background: rgba(20, 20, 20, 0.6);
+  border: 1px solid rgba(180, 140, 255, 0.15);
+  padding: 3rem;
+  backdrop-filter: blur(8px);
+}
+
+.post-meta {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  font-size: 0.9rem;
+}
+
+.post-title-full {
+  font-family: 'Neue Machina', 'Space Mono', monospace;
+  font-size: clamp(1.8rem, 5vw, 2.5rem);
+  font-weight: 400;
+  color: rgba(240, 240, 240, 0.95);
+  margin-bottom: 2rem;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  text-rendering: optimizeLegibility;
+}
+
+.post-content {
+  font-family: 'Neue Machina', 'Inter', sans-serif;
+  font-size: 1.05rem;
+  line-height: 1.85;
+  color: rgba(220, 220, 220, 0.9);
+  letter-spacing: 0.01em;
+  text-rendering: optimizeLegibility;
+}
+
+.post-content p {
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .blog-container {
+    padding: 50px 20px 100px 20px;
+  }
+
+  .blog-posts-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .blog-post-card {
+    padding: 1.5rem;
+  }
+
+  .blog-post-full {
+    padding: 2rem;
+  }
+
+  .post-title-full {
+    font-size: 1.5rem;
+  }
+
+  .post-content {
+    font-size: 0.95rem;
+  }
+}
