@@ -271,6 +271,19 @@ function Home() {
       let allArrived = true
       frameCount++
       
+      // DEBUG: Log first bubble's position and velocity every 60 frames (~1 second at 60fps)
+      if (frameCount % 60 === 0 && positions.length > 0) {
+        const firstBubble = positions[0]
+        console.log('DEBUG Bubble 0:', {
+          x: firstBubble.x?.toFixed(2),
+          y: firstBubble.y?.toFixed(2),
+          vx: firstBubble.vx?.toFixed(4),
+          vy: firstBubble.vy?.toFixed(4),
+          hasArrived: firstBubble.hasArrived,
+          isAnimating: firstBubble.isAnimating
+        })
+      }
+      
       // Update physics for each bubble
       positions.forEach(bubble => {
         if (!bubble) return
@@ -307,6 +320,8 @@ function Home() {
         }
         
         // Animate bubble from off-screen to target position with curved path
+        // CRITICAL: This Bezier tweening ONLY happens during entry animation
+        // Once hasArrived=true, physics takes over completely
         if (bubble.isAnimating && !hasArrived && bubble.startTime !== null) {
           const animationElapsed = currentTime - bubble.startTime
           const animationDuration = 2500 // 2.5 seconds for curved path
@@ -322,15 +337,18 @@ function Home() {
             { x: baseX, y: baseY }
           )
           
+          // CRITICAL: Only set position during Bezier animation (before arrival)
+          // After arrival, physics will control position
           bubble.x = point.x
           bubble.y = point.y
           
           // Check if arrived at target
           if (progress >= 1) {
             bubble.hasArrived = true
+            // Set final position to base
             bubble.x = baseX
             bubble.y = baseY
-            // Start physics movement after arrival
+            // CRITICAL: Initialize velocity for physics - this is where physics takes over
             bubble.vx = (Math.random() - 0.5) * 0.3
             bubble.vy = (Math.random() - 0.5) * 0.3
           } else {
@@ -346,10 +364,12 @@ function Home() {
         }
         
         // After arriving, apply lava lamp physics
+        // CRITICAL: Only apply physics if bubble has arrived - don't let Bezier override physics
         if (bubble.hasArrived) {
           let { x, y, vx, vy } = bubble
           
-          // Update position
+          // CRITICAL FIX: Use physics-based position updates, not Bezier tweening
+          // Update position based on velocity (physics-driven)
           x += vx
           y += vy
           
@@ -666,11 +686,39 @@ function Home() {
       {!documentOpen && (
         <>
           {/* Metaballs WebGL renderer - lava lamp effect */}
-          {showBubbles && bubblePositionsRef.current && Array.isArray(bubblePositionsRef.current) && bubblePositionsRef.current.length > 0 && (
+          {/* TEMPORARILY DISABLED FOR DEBUG: Test collisions with plain circles */}
+          {false && showBubbles && bubblePositionsRef.current && Array.isArray(bubblePositionsRef.current) && bubblePositionsRef.current.length > 0 && (
             <Metaballs 
               bubbles={bubblePositionsRef.current} 
               showBubbles={showBubbles}
             />
+          )}
+          
+          {/* DEBUG: Render plain circles to test collisions */}
+          {showBubbles && bubblePositionsRef.current && Array.isArray(bubblePositionsRef.current) && bubblePositionsRef.current.length > 0 && (
+            <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 3 }}>
+              {bubblePositionsRef.current.map((bubble, idx) => {
+                if (!bubble || typeof bubble.x !== 'number' || typeof bubble.y !== 'number') return null
+                return (
+                  <div
+                    key={`debug-circle-${bubble.id || idx}`}
+                    style={{
+                      position: 'absolute',
+                      left: `${bubble.x}%`,
+                      top: `${bubble.y}%`,
+                      width: '40px',
+                      height: '40px',
+                      borderRadius: '50%',
+                      backgroundColor: `hsl(${idx * 36}, 70%, 60%)`,
+                      border: '2px solid white',
+                      transform: 'translate(-50%, -50%)',
+                      opacity: 0.8,
+                      pointerEvents: 'none'
+                    }}
+                  />
+                )
+              })}
+            </div>
           )}
           
 
