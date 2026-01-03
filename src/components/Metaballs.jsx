@@ -79,7 +79,10 @@ function Metaballs({ bubbles, showBubbles }) {
 
   useEffect(() => {
     if (!mountRef.current || !showBubbles) return
-    if (!bubbles || !Array.isArray(bubbles) || bubbles.length === 0) return
+    if (!bubbles || !Array.isArray(bubbles) || bubbles.length === 0) {
+      // Don't render if no bubbles, but don't crash
+      return
+    }
 
     // Scene setup
     const scene = new THREE.Scene()

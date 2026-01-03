@@ -144,26 +144,7 @@ function Home() {
     }
   }
 
-  const initialBubblePositions = useRef(
-    hiddenSecrets.map((secret, index) => {
-      const startPos = getRandomOffScreenPosition()
-      return {
-        id: secret.id,
-        x: startPos.x, // Start off-screen
-        y: startPos.y,
-        vx: 0,
-        vy: 0,
-        baseX: parseFloat(secret.x), // Target position
-        baseY: parseFloat(secret.y),
-        startX: startPos.x,
-        startY: startPos.y,
-        startTime: null, // Will be set when animation starts
-        animationDelay: index * 150 + Math.random() * 200, // Staggered: 150ms between each + random 0-200ms
-        isAnimating: false,
-        hasArrived: false
-      }
-    })
-  )
+  const initialBubblePositions = useRef([])
   const animationFrameRef = useRef(null)
   const startTimeRef = useRef(null)
 
@@ -195,6 +176,12 @@ function Home() {
         bubblePositionsRef.current = null
       }
       setAllBubblesArrived(false)
+      return
+    }
+    
+    // Safety check
+    if (!hiddenSecrets || hiddenSecrets.length === 0) {
+      console.error('hiddenSecrets is empty or undefined')
       return
     }
     
@@ -260,7 +247,10 @@ function Home() {
     let frameCount = 0
     const updateBubbles = () => {
       const positions = bubblePositionsRef.current
-      if (!positions) return
+      if (!positions || !startTimeRef.current) {
+        console.warn('Missing positions or startTimeRef')
+        return
+      }
       const currentTime = Date.now()
       const elapsed = currentTime - startTimeRef.current
       let allArrived = true
@@ -268,7 +258,14 @@ function Home() {
       
       // Update physics for each bubble
       positions.forEach(bubble => {
+        if (!bubble) return
+        
         const { baseX, baseY, startX, startY, waypoint1, waypoint2, animationDelay, isAnimating, hasArrived } = bubble
+        
+        // Safety check - ensure waypoints exist, skip this bubble if not
+        if (!waypoint1 || !waypoint2) {
+          return
+        }
         
         // Check if it's time to start animating this bubble
         if (!isAnimating && elapsed >= animationDelay) {
@@ -375,28 +372,28 @@ function Home() {
             
             if (distanceSquared < minDistanceSquared && distanceSquared > 0) {
               const distance = Math.sqrt(distanceSquared)
-            // Collision detected - bounce off each other
-            const angle = Math.atan2(dy, dx)
-            const sin = Math.sin(angle)
-            const cos = Math.cos(angle)
-            
-            // Rotate velocities
-            const vx1 = b1.vx * cos + b1.vy * sin
-            const vy1 = b1.vy * cos - b1.vx * sin
-            const vx2 = b2.vx * cos + b2.vy * sin
-            const vy2 = b2.vy * cos - b2.vx * sin
-            
-            // Swap velocities (elastic collision)
-            const swap = vx1
-            const newVx1 = vx2 * 0.9
-            const newVx2 = swap * 0.9
-            
-            // Rotate back
-            b1.vx = newVx1 * cos - vy1 * sin
-            b1.vy = vy1 * cos + newVx1 * sin
-            b2.vx = newVx2 * cos - vy2 * sin
-            b2.vy = vy2 * cos + newVx2 * sin
-            
+              // Collision detected - bounce off each other
+              const angle = Math.atan2(dy, dx)
+              const sin = Math.sin(angle)
+              const cos = Math.cos(angle)
+              
+              // Rotate velocities
+              const vx1 = b1.vx * cos + b1.vy * sin
+              const vy1 = b1.vy * cos - b1.vx * sin
+              const vx2 = b2.vx * cos + b2.vy * sin
+              const vy2 = b2.vy * cos - b2.vx * sin
+              
+              // Swap velocities (elastic collision)
+              const swap = vx1
+              const newVx1 = vx2 * 0.9
+              const newVx2 = swap * 0.9
+              
+              // Rotate back
+              b1.vx = newVx1 * cos - vy1 * sin
+              b1.vy = vy1 * cos + newVx1 * sin
+              b2.vx = newVx2 * cos - vy2 * sin
+              b2.vy = vy2 * cos + newVx2 * sin
+              
               // Separate bubbles
               const overlap = 12 - distance
               const separationX = (dx / distance) * overlap * 0.5
@@ -633,7 +630,7 @@ function Home() {
       {!documentOpen && (
         <>
           {/* Metaballs WebGL renderer - lava lamp effect */}
-          {showBubbles && bubblePositionsRef.current && (
+          {showBubbles && bubblePositionsRef.current && Array.isArray(bubblePositionsRef.current) && bubblePositionsRef.current.length > 0 && (
             <Metaballs 
               bubbles={bubblePositionsRef.current} 
               showBubbles={showBubbles}
