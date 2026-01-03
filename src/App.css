@@ -65,7 +65,7 @@ html {
   touch-action: pan-y;
 }
 
-/* Spotlight overlay - black with transparent circle at cursor */
+/* Spotlight overlay - black with transparent circle at cursor - ZERO LAG */
 .spotlight-overlay {
   position: fixed;
   top: 0;
@@ -75,11 +75,18 @@ html {
   pointer-events: none !important;
   z-index: 5 !important; /* BELOW secrets (10010) - must not cover them */
   contain: layout style paint;
+  /* Remove all transitions for zero lag */
+  transition: none !important;
+  /* GPU acceleration */
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 
 /* Desktop optimizations */
 .app.desktop .spotlight-overlay {
   will-change: background;
+  /* Force GPU layer */
+  transform: translateZ(0);
 }
 
 /* Mobile optimizations */
@@ -170,8 +177,11 @@ button.secret-modal-close {
   will-change: transform;
   filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.6));
   user-select: none;
-  /* Smooth transition for cursor movement */
-  transition: transform 0.08s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  /* Minimal transition for near-instant response - almost imperceptible */
+  transition: transform 0.01s linear;
+  /* GPU acceleration */
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 
 @media (max-width: 768px) {
@@ -188,8 +198,12 @@ button.secret-modal-close {
   height: 300px;
   pointer-events: none;
   z-index: 10000; /* Above modal content but below cursor */
-  transition: left 0.15s cubic-bezier(0.4, 0, 0.2, 1), top 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.05s linear;
   contain: layout style paint;
+  /* GPU acceleration */
+  transform: translateZ(0);
+  will-change: transform;
+  backface-visibility: hidden;
 }
 
 /* Mobile optimization - disable heavy animations */
@@ -600,30 +614,49 @@ button.secret-modal-close {
   left: auto;
   transform: rotate(-0.5deg);
   color: #e8e8e8;
-  font-size: 0.9rem;
+  font-size: 0.7rem;
   font-family: 'Inter', sans-serif;
   font-weight: 400;
   background: rgba(15, 15, 15, 0.85);
-  padding: 12px 16px;
-  border-radius: 2px;
+  padding: 6px 10px;
+  /* Lava lamp blob shape - organic curvy border */
+  border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
   border: 1px solid rgba(180, 140, 255, 0.2);
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
   letter-spacing: 0.02em;
   backdrop-filter: blur(8px);
   margin: 0;
   display: inline-block;
-  max-width: 300px;
-  min-width: 180px;
+  max-width: 160px;
+  min-width: 80px;
   word-wrap: break-word;
   white-space: normal;
   text-align: left;
-  line-height: 1.5;
+  line-height: 1.4;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
   /* Let parent handle clicks - but ensure it's visible */
   pointer-events: none !important; /* Force no pointer events */
   z-index: 1;
   /* Make sure text doesn't block parent clicks */
   user-select: none;
+  /* Subtle lava lamp animation */
+  animation: blobMorph 8s ease-in-out infinite;
+}
+
+/* Lava lamp blob morphing animation */
+@keyframes blobMorph {
+  0%, 100% {
+    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+  }
+  25% {
+    border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%;
+  }
+  50% {
+    border-radius: 50% 50% 50% 50% / 50% 50% 50% 50%;
+  }
+  75% {
+    border-radius: 40% 60% 30% 60% / 60% 40% 60% 30%;
+  }
 }
 
 @media (max-width: 768px) {
@@ -631,8 +664,10 @@ button.secret-modal-close {
     /* Reduce backdrop-filter on mobile */
     backdrop-filter: blur(4px);
     /* Larger touch target */
-    padding: 14px 18px;
-    min-width: 200px;
+    padding: 6px 10px;
+    min-width: 90px;
+    font-size: 0.65rem;
+    max-width: 150px;
   }
 }
 
@@ -872,10 +907,10 @@ button.secret-modal-close {
   }
 
   .secret-text {
-    font-size: 0.85rem;
-    padding: 10px 14px;
-    max-width: 280px;
-    min-width: 200px;
+    font-size: 0.7rem;
+    padding: 6px 10px;
+    max-width: 180px;
+    min-width: 100px;
     line-height: 1.4;
   }
   
@@ -1715,3 +1750,142 @@ button.secret-modal-close {
   }
 }
 
+/* Life Quotes */
+.life-quotes-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 3rem 2rem;
+  z-index: 100;
+  pointer-events: none;
+}
+
+.quotes-title-section {
+  text-align: center;
+  max-width: 800px;
+  width: 100%;
+  animation: quoteFadeIn 1s ease-out forwards;
+}
+
+.life-quotes-content {
+  text-align: center;
+  max-width: 800px;
+  width: 100%;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+  margin-top: auto;
+}
+
+.quotes-title {
+  font-family: 'Space Mono', 'Courier New', monospace;
+  font-size: clamp(2.5rem, 8vw, 5rem);
+  font-weight: 400;
+  margin-bottom: 1.8rem;
+  margin-top: 0;
+  padding: 0 1.2rem;
+  text-shadow: 
+    0 0 20px rgba(180, 140, 255, 0.3),
+    0 2px 4px rgba(0, 0, 0, 0.5);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  color: #f0f0f0;
+  transform: rotate(-0.3deg);
+}
+
+.quotes-subtitle {
+  font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+  font-family: 'Inter', sans-serif;
+  margin-bottom: 1.6rem;
+  margin-top: 0;
+  padding: 0 1.2rem;
+  opacity: 0.75;
+  letter-spacing: 0.15em;
+  font-weight: 300;
+  line-height: 1.6;
+  color: #d0d0d0;
+  transform: rotate(0.2deg);
+  text-transform: lowercase;
+}
+
+.quotes-description {
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  font-family: 'Inter', sans-serif;
+  margin-bottom: 1.8rem;
+  margin-top: 0;
+  padding: 0 1.2rem;
+  opacity: 0.7;
+  letter-spacing: 0.01em;
+  font-weight: 400;
+  line-height: 1.7;
+  color: #c8c8c8;
+  transform: rotate(-0.1deg);
+}
+
+.quotes-location {
+  font-size: clamp(0.95rem, 1.8vw, 1.15rem);
+  font-family: 'Inter', sans-serif;
+  margin-bottom: 1.6rem;
+  margin-top: 0;
+  padding: 0 1.2rem;
+  opacity: 0.65;
+  letter-spacing: 0.05em;
+  font-weight: 300;
+  line-height: 1.6;
+  color: #b8b8b8;
+  transform: rotate(0.15deg);
+  text-transform: lowercase;
+}
+
+.quotes-citizenship {
+  font-size: clamp(0.9rem, 1.6vw, 1.05rem);
+  font-family: 'Inter', sans-serif;
+  margin-bottom: 2rem;
+  margin-top: 0;
+  padding: 0 1.2rem;
+  opacity: 0.6;
+  letter-spacing: 0.03em;
+  font-weight: 300;
+  line-height: 1.6;
+  color: #a8a8a8;
+  transform: rotate(-0.2deg);
+}
+
+.life-quote {
+  font-family: 'Crimson Text', serif;
+  font-size: clamp(1.2rem, 3vw, 1.8rem);
+  line-height: 1.6;
+  color: rgba(240, 240, 240, 0.9);
+  font-style: italic;
+  letter-spacing: 0.02em;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: quoteFadeIn 1s ease-out forwards;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+@keyframes quoteFadeIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .life-quotes-content {
+    padding: 1.5rem;
+    gap: 2rem;
+  }
+
+  .life-quote {
+    font-size: 1.1rem;
+    line-height: 1.5;
+  }
+}
