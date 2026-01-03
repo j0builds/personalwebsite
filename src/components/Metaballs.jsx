@@ -132,14 +132,23 @@ function Metaballs({ bubbles, showBubbles }) {
     const mesh = new THREE.Mesh(geometry, material)
     scene.add(mesh)
 
-    // Animation loop
+    // Animation loop - OPTIMIZED: throttle updates
+    let lastUpdate = 0
+    const throttleMs = 16 // ~60fps max
     const animate = () => {
       if (!showBubbles) return
       
       animationFrameRef.current = requestAnimationFrame(animate)
       
+      const now = Date.now()
+      if (now - lastUpdate < throttleMs) {
+        renderer.render(scene, camera) // Still render, just don't update uniforms
+        return
+      }
+      lastUpdate = now
+      
       // Update uniforms
-      if (materialRef.current && bubbles.length > 0) {
+      if (materialRef.current && bubbles && bubbles.length > 0) {
         materialRef.current.uniforms.u_time.value += 0.01
         materialRef.current.uniforms.u_resolution.value.set(
           window.innerWidth,
@@ -150,7 +159,7 @@ function Metaballs({ bubbles, showBubbles }) {
         // Update flattened bubble positions
         const flattened = materialRef.current.uniforms.u_ballPositions.value
         bubbles.forEach((bubble, i) => {
-          if (i < 20) {
+          if (i < 20 && bubble) {
             flattened[i * 2] = bubble.x || 0
             flattened[i * 2 + 1] = bubble.y || 0
           }

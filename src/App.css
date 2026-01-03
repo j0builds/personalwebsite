@@ -1889,3 +1889,44 @@ button.secret-modal-close {
     line-height: 1.5;
   }
 }
+
+/* Main page quotes - centered with bubbles */
+.main-page-quotes {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10005;
+  pointer-events: none;
+  text-align: center;
+  max-width: 600px;
+  width: 90%;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.main-quote {
+  font-family: 'Crimson Text', serif;
+  font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+  line-height: 1.6;
+  color: rgba(240, 240, 240, 0.85);
+  font-style: italic;
+  letter-spacing: 0.02em;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: quoteFadeIn 1s ease-out forwards;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+  font-weight: 400;
+}
+
+@media (max-width: 768px) {
+  .main-page-quotes {
+    gap: 1.5rem;
+  }
+
+  .main-quote {
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+}

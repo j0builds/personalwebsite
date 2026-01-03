@@ -257,11 +257,14 @@ function Home() {
       }
     }
     
+    let frameCount = 0
     const updateBubbles = () => {
       const positions = bubblePositionsRef.current
+      if (!positions) return
       const currentTime = Date.now()
       const elapsed = currentTime - startTimeRef.current
       let allArrived = true
+      frameCount++
       
       // Update physics for each bubble
       positions.forEach(bubble => {
@@ -349,21 +352,24 @@ function Home() {
         }
       })
       
-      // Collision detection between bubbles (only after they've arrived)
-      for (let i = 0; i < positions.length; i++) {
-        for (let j = i + 1; j < positions.length; j++) {
-          const b1 = positions[i]
-          const b2 = positions[j]
-          
-          // Only check collisions if both bubbles have arrived
-          if (!b1.hasArrived || !b2.hasArrived) continue
-          
-          const dx = b2.x - b1.x
-          const dy = b2.y - b1.y
-          const distance = Math.sqrt(dx * dx + dy * dy)
-          const minDistance = 12 // Minimum distance between bubbles
-          
-          if (distance < minDistance && distance > 0) {
+      // Collision detection between bubbles (only after they've arrived) - OPTIMIZED: only check every 3rd frame
+      frameCount++
+      if (frameCount % 3 === 0) { // Only check collisions every 3rd frame
+        for (let i = 0; i < positions.length; i++) {
+          for (let j = i + 1; j < positions.length; j++) {
+            const b1 = positions[i]
+            const b2 = positions[j]
+            
+            // Only check collisions if both bubbles have arrived
+            if (!b1.hasArrived || !b2.hasArrived) continue
+            
+            const dx = b2.x - b1.x
+            const dy = b2.y - b1.y
+            const distanceSquared = dx * dx + dy * dy // Use squared distance to avoid sqrt
+            const minDistanceSquared = 144 // 12^2
+            
+            if (distanceSquared < minDistanceSquared && distanceSquared > 0) {
+              const distance = Math.sqrt(distanceSquared)
             // Collision detected - bounce off each other
             const angle = Math.atan2(dy, dx)
             const sin = Math.sin(angle)
@@ -386,25 +392,26 @@ function Home() {
             b2.vx = newVx2 * cos - vy2 * sin
             b2.vy = vy2 * cos + newVx2 * sin
             
-            // Separate bubbles
-            const overlap = minDistance - distance
-            const separationX = (dx / distance) * overlap * 0.5
-            const separationY = (dy / distance) * overlap * 0.5
-            
-            b1.x -= separationX
-            b1.y -= separationY
-            b2.x += separationX
-            b2.y += separationY
+              // Separate bubbles
+              const overlap = 12 - distance
+              const separationX = (dx / distance) * overlap * 0.5
+              const separationY = (dy / distance) * overlap * 0.5
+              
+              b1.x -= separationX
+              b1.y -= separationY
+              b2.x += separationX
+              b2.y += separationY
+            }
           }
         }
       }
       
-      // Update DOM directly for smooth performance
+      // Update DOM directly for smooth performance - use transform instead of left/top for better performance
       positions.forEach(bubble => {
         const element = bubbleElementsRef.current[bubble.id]
         if (element) {
-          element.style.left = `${bubble.x}%`
-          element.style.top = `${bubble.y}%`
+          // Use transform instead of left/top for GPU acceleration
+          element.style.transform = `translate(${bubble.x}%, ${bubble.y}%) translate(-50%, -50%)`
         }
       })
       
@@ -626,6 +633,17 @@ function Home() {
           )}
           
 
+          {/* Quotes on main page - centered with bubbles */}
+          {showBubbles && (
+            <div className="main-page-quotes">
+              {lifeQuotes.map((quote, index) => (
+                <p key={index} className="main-quote" style={{ animationDelay: `${index * 0.3}s` }}>
+                  {quote}
+                </p>
+              ))}
+            </div>
+          )}
+
           {/* All secrets layer - ALL 10 BUBBLES - OUTSIDE permanent-reveal-layer */}
           {showBubbles && (
             <div className={`secrets-layer permanent-secrets ${!showBubbles ? 'fade-out' : ''}`}>
@@ -651,8 +669,8 @@ function Home() {
                       pointerEvents: showBubbles ? 'auto' : 'none',
                       minWidth: '90px',
                       minHeight: '25px',
-                      transition: 'opacity 0.5s ease-out, visibility 0.5s ease-out',
-                      willChange: 'left, top'
+                      willChange: 'transform',
+                      transformOrigin: 'center center'
                     }}
                     onClick={(e) => {
                       e.preventDefault()
