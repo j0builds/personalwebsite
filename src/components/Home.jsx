@@ -768,15 +768,13 @@ function Home() {
 
   // Touch handlers - mobile only, properly isolated
   const handleTouchStart = useCallback((e) => {
-    // Only skip if document is open - work on bubbles page AND quotes page
-    if (documentOpen) return
-    
     // Only process if bubbles, quotes, or document is showing
     if (!showBubbles && !showQuotes && !documentOpen) return
     
     const target = e.target
-    // Only skip if it's a button/link that should handle its own click
-    if (isInteractiveElement(target) && !target.closest('.secret-item')) {
+    // Only skip if it's a button/link/input that should handle its own click
+    // But allow cursor to show on form elements for better UX
+    if (isInteractiveElement(target) && !target.closest('.secret-item') && !target.closest('form') && !target.closest('input') && !target.closest('textarea')) {
       return
     }
     
@@ -788,15 +786,13 @@ function Home() {
   }, [documentOpen, showBubbles, showQuotes, isInteractiveElement, updateMousePosition])
 
   const handleTouchMove = useCallback((e) => {
-    // Only skip if document is open - work on bubbles page AND quotes page
-    if (documentOpen) return
-    
     // Only process if bubbles, quotes, or document is showing
     if (!showBubbles && !showQuotes && !documentOpen) return
     
     const target = e.target
     // Only skip if it's a button/link that should handle its own click
-    if (isInteractiveElement(target) && !target.closest('.secret-item')) {
+    // But allow cursor to show on form elements for better UX
+    if (isInteractiveElement(target) && !target.closest('.secret-item') && !target.closest('form') && !target.closest('input') && !target.closest('textarea')) {
       return
     }
     
@@ -811,8 +807,8 @@ function Home() {
   }, [documentOpen, showBubbles, showQuotes, isInteractiveElement, updateMousePosition])
   
   const handleTouchEnd = useCallback((e) => {
-    // Keep cursor visible briefly after touch ends - work on bubbles page AND quotes page
-    if (e.changedTouches.length > 0 && !documentOpen && (showBubbles || showQuotes)) {
+    // Keep cursor visible briefly after touch ends - work on ALL pages (bubbles, quotes, AND essay/document)
+    if (e.changedTouches.length > 0 && (showBubbles || showQuotes || documentOpen)) {
       const touch = e.changedTouches[0]
       updateMousePosition(touch.clientX, touch.clientY)
     }
