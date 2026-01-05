@@ -1,6 +1,6 @@
-/* Fonts loaded via preload in index.html for better performance */
-/* Inter is preloaded, other fonts load asynchronously */
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Space+Mono:wght@400;700&display=swap');
+/* Fonts loaded asynchronously via JavaScript in index.html to prevent render blocking */
+/* Inter is preloaded, other fonts (Playfair, Crimson, Space Mono) load on-demand */
+/* CSS @import is blocking, so fonts are loaded via <link> tags in index.html instead */
 
 * {
   margin: 0;
@@ -24,7 +24,8 @@ html {
   background: transparent; /* Background handled by body with prismatic gradient */
   cursor: none;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  transition: background 1s ease-in-out;
+  /* Removed background transition (non-composited) - use opacity/transform only */
+  /* transition: background 1s ease-in-out; */
 }
 
 /* Kaleidoscope glass veil - Nigeria×USA prismatic effect */
@@ -83,14 +84,16 @@ html {
       rgba(255, 255, 255, 1) 12deg
     );
 
-  /* subtle motion */
+  /* subtle motion - composited animation only (transform/opacity) */
   animation: kdrift 26s ease-in-out infinite;
+  will-change: transform; /* Hint to browser for GPU acceleration */
 }
 
 @keyframes kdrift {
-  0%   { transform: translate3d(0, 0, 0) rotate(0deg) scale(1.02); filter: hue-rotate(0deg); }
-  50%  { transform: translate3d(-1.5%, 1%, 0) rotate(0.6deg) scale(1.04); filter: hue-rotate(6deg); }
-  100% { transform: translate3d(0, 0, 0) rotate(0deg) scale(1.02); filter: hue-rotate(0deg); }
+  /* Removed filter (non-composited) - use transform only for composited animation */
+  0%   { transform: translate3d(0, 0, 0) rotate(0deg) scale(1.02); }
+  50%  { transform: translate3d(-1.5%, 1%, 0) rotate(0.6deg) scale(1.04); }
+  100% { transform: translate3d(0, 0, 0) rotate(0deg) scale(1.02); }
 }
 
 /* Desktop-specific touch action */
@@ -288,7 +291,8 @@ button.secret-modal-close {
   .cursor-glow {
     width: 150px;
     height: 150px;
-    transition: left 0.1s linear, top 0.1s linear; /* Faster, simpler transition */
+    /* Use transform instead of left/top for composited animation */
+    transition: transform 0.1s linear;
   }
   
   /* Disable particle animations on mobile */
@@ -634,13 +638,15 @@ button.secret-modal-close {
   font-size: 1.2rem;
   color: rgba(255, 255, 255, 0.6);
   font-weight: bold;
-  transition: all 0.3s ease;
+  transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
 .secret-item.hidden-secret:hover::before {
-  background: rgba(180, 140, 255, 0.3);
-  border-color: rgba(180, 140, 255, 0.6);
+  /* Use opacity instead of background for composited animation */
+  opacity: 0.9;
   transform: translate(-50%, -50%) scale(1.1);
+  /* Use transform for border effect via box-shadow (composited) */
+  box-shadow: 0 0 0 2px rgba(180, 140, 255, 0.6);
 }
 
 /* Make clickable secret items have larger hit area */
@@ -1034,7 +1040,7 @@ button.secret-modal-close {
   font-size: 0.85rem;
   letter-spacing: 0.12em;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: transform 0.2s ease, opacity 0.2s ease;
   text-transform: lowercase;
   transform: rotate(-0.5deg);
   font-weight: 400;
@@ -1292,7 +1298,7 @@ button.secret-modal-close {
   text-decoration: underline;
   text-decoration-color: rgba(180, 140, 255, 0.3);
   text-underline-offset: 3px;
-  transition: all 0.2s ease;
+  transition: transform 0.2s ease, opacity 0.2s ease;
   font-weight: 500;
 }
 
@@ -1312,7 +1318,7 @@ button.secret-modal-close {
   border: none;
   cursor: pointer;
   z-index: 100;
-  transition: all 0.3s ease;
+  transition: transform 0.3s ease, opacity 0.3s ease;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1324,7 +1330,7 @@ button.secret-modal-close {
   width: 100%;
   height: 100%;
   filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.5));
-  transition: all 0.3s ease;
+  transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
 .page-nav:hover svg {
@@ -1465,7 +1471,7 @@ button.secret-modal-close {
   font-size: 1rem;
   letter-spacing: 0.1em;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: transform 0.3s ease, opacity 0.3s ease;
   text-transform: lowercase;
   /* Ensure button is always visible and clickable */
   position: relative;
@@ -1543,7 +1549,7 @@ button.secret-modal-close {
   font-family: 'Crimson Text', serif;
   font-size: 1rem;
   letter-spacing: 0.02em;
-  transition: all 0.3s ease;
+  transition: transform 0.3s ease, opacity 0.3s ease;
   backdrop-filter: blur(5px);
 }
 
@@ -1574,7 +1580,7 @@ button.secret-modal-close {
   font-size: 1rem;
   letter-spacing: 0.1em;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: transform 0.3s ease, opacity 0.3s ease;
   text-transform: lowercase;
   backdrop-filter: blur(5px);
   align-self: center;
@@ -1765,7 +1771,7 @@ button.secret-modal-close {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
+  transition: transform 0.2s ease, opacity 0.2s ease;
   z-index: 10002; /* Above cursor (10001) so it's clickable */
   font-family: 'Inter', sans-serif;
   font-weight: 300;

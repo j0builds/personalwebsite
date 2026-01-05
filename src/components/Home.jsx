@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import emailjs from '@emailjs/browser'
-import '../App.css'
+// CSS loaded asynchronously via App.jsx to prevent render blocking
 
 // Constants
 const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID || 'service_ci8h64h'
@@ -605,54 +605,92 @@ function Home() {
     }
   }, [showBubbles, allBubblesArrived])
 
-  // Viewport resize handler - rebuild bounds and update viewport
+  // Viewport resize handler - optimized to prevent forced reflows
   const handleResize = useCallback(() => {
-    viewportRef.current.w = window.innerWidth
-    viewportRef.current.h = window.innerHeight
+    // Batch all reads together to prevent forced reflows
+    const width = window.innerWidth
+    const height = window.innerHeight
     
-    // Rebuild bounds if needed (bubbles use percentages, but pills use pixels)
-    // If bubbles have arrived, we might need to adjust their base positions
-    if (bubblePositionsRef.current && Array.isArray(bubblePositionsRef.current)) {
-      // Bubbles use percentages, so they should be fine
-      // But pills use pixels, so we need to update their positions
-      const pills = pillPositionsRef.current
-      if (pills && Array.isArray(pills)) {
-        bubblePositionsRef.current.forEach((bubble, idx) => {
-          const pill = pills.find(p => p?.id === bubble?.id) || pills[idx]
-          if (pill && bubble) {
-            // Recalculate pill position from bubble percentage
-            pill.x = (bubble.x / 100) * viewportRef.current.w
-            pill.y = (bubble.y / 100) * viewportRef.current.h
-          }
-        })
+    // Update refs (no DOM reads after this point)
+    viewportRef.current.w = width
+    viewportRef.current.h = height
+    
+    // Batch all writes in requestAnimationFrame to prevent forced reflows
+    requestAnimationFrame(() => {
+      // Rebuild bounds if needed (bubbles use percentages, but pills use pixels)
+      if (bubblePositionsRef.current && Array.isArray(bubblePositionsRef.current)) {
+        const pills = pillPositionsRef.current
+        if (pills && Array.isArray(pills)) {
+          bubblePositionsRef.current.forEach((bubble, idx) => {
+            const pill = pills[idx] // Direct access instead of find() to avoid reflow
+            if (pill && bubble) {
+              // Recalculate pill position from bubble percentage
+              pill.x = (bubble.x / 100) * width
+              pill.y = (bubble.y / 100) * height
+            }
+          })
+        }
       }
-    }
+    })
   }, [])
   
-  // Update device type and viewport on resize
+  // Update device type and viewport on resize - optimized to prevent forced reflows
   useEffect(() => {
+    let resizeTimeout
+    let rafId
+    
     const updateDevice = () => {
       const mobile = isMobileDevice()
       setIsMobile(mobile)
     }
     
-    // Initial setup
-    updateDevice()
-    handleResize()
+    // Throttled resize handler to prevent forced reflows
+    const throttledResize = () => {
+      // Cancel pending operations
+      if (resizeTimeout) clearTimeout(resizeTimeout)
+      if (rafId) cancelAnimationFrame(rafId)
+      
+      // Batch reads
+      const width = window.innerWidth
+      const height = window.innerHeight
+      
+      // Update in RAF to prevent forced reflow
+      rafId = requestAnimationFrame(() => {
+        viewportRef.current.w = width
+        viewportRef.current.h = height
+        updateDevice()
+        
+        // Update pills if needed (in same RAF to batch)
+        if (bubblePositionsRef.current && Array.isArray(bubblePositionsRef.current)) {
+          const pills = pillPositionsRef.current
+          if (pills && Array.isArray(pills)) {
+            bubblePositionsRef.current.forEach((bubble, idx) => {
+              const pill = pills[idx]
+              if (pill && bubble) {
+                pill.x = (bubble.x / 100) * width
+                pill.y = (bubble.y / 100) * height
+              }
+            })
+          }
+        }
+      })
+    }
     
-    // Run resize after layout settles (fonts, etc.)
-    requestAnimationFrame(() => handleResize())
-    setTimeout(handleResize, 250)
-    
-    window.addEventListener('resize', () => {
+    // Initial setup - use RAF to avoid blocking
+    rafId = requestAnimationFrame(() => {
       updateDevice()
-      handleResize()
-    }, { passive: true })
+      viewportRef.current.w = window.innerWidth
+      viewportRef.current.h = window.innerHeight
+    })
+    
+    window.addEventListener('resize', throttledResize, { passive: true })
     
     return () => {
-      window.removeEventListener('resize', handleResize)
+      window.removeEventListener('resize', throttledResize)
+      if (resizeTimeout) clearTimeout(resizeTimeout)
+      if (rafId) cancelAnimationFrame(rafId)
     }
-  }, [handleResize])
+  }, [])
 
   // Optimized mouse/touch position update with direct DOM manipulation for cursor
   const updateMousePosition = useCallback((x, y) => {
@@ -931,8 +969,11 @@ function Home() {
                       pointerEvents: 'auto', // Pills DO catch clicks
                       minWidth: '90px',
                       minHeight: '25px',
-                      willChange: 'transform',
-                      transformOrigin: 'center center'
+                      willChange: 'transform', /* Hint for GPU compositing */
+                      transformOrigin: 'center center',
+                      /* Ensure composited layer */
+                      backfaceVisibility: 'hidden',
+                      perspective: 1000
                     }}
                     onClick={(e) => {
                       e.preventDefault()
