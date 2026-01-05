@@ -1,7 +1,9 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App'
-// CSS will be loaded via link tag in index.html to prevent render blocking
+// CSS imported normally - Vite will extract it in production
+// Critical CSS is inlined in index.html to prevent render blocking
+import('./index.css')
 
 try {
   const rootElement = document.getElementById('root')
