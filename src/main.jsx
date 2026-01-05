@@ -1,8 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App'
-// Load CSS asynchronously to prevent render blocking
-import('./index.css')
+// CSS will be loaded via link tag in index.html to prevent render blocking
 
 try {
   const rootElement = document.getElementById('root')

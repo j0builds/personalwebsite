@@ -79,6 +79,29 @@
     <!-- DNS prefetch for external resources -->
     <link rel="dns-prefetch" href="https://fonts.googleapis.com">
     <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+    
+    <!-- Load CSS asynchronously to prevent render blocking -->
+    <link rel="preload" href="/src/index.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="/src/index.css"></noscript>
+    <link rel="preload" href="/src/App.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="/src/App.css"></noscript>
+    
+    <!-- Fallback script for browsers that don't support onload -->
+    <script>
+      (function() {
+        var loadCSS = function(href) {
+          var link = document.createElement('link');
+          link.rel = 'stylesheet';
+          link.href = href;
+          link.media = 'print';
+          link.onload = function() { this.media = 'all'; };
+          document.head.appendChild(link);
+        };
+        // Load CSS files asynchronously
+        loadCSS('/src/index.css');
+        loadCSS('/src/App.css');
+      })();
+    </script>
 </head>
 <body>
     <div id="root"></div>

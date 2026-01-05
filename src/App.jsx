@@ -2,8 +2,7 @@ import React, { Suspense, lazy } from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import Navigation from './components/Navigation'
 import GlobalCursor from './components/GlobalCursor'
-// Load CSS asynchronously to prevent render blocking
-import('./App.css')
+// CSS will be loaded via link tag to prevent render blocking
 
 // Lazy load routes for code splitting - improves initial load time
 const Home = lazy(() => import('./components/Home'))
