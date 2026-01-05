@@ -14,6 +14,7 @@ html {
 
 body {
   margin: 0;
+  /* Use system fonts first for instant rendering (FCP improvement) */
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
@@ -25,13 +26,15 @@ body {
   touch-action: manipulation;
   width: 100%;
   min-height: 100%; /* Allow content to expand beyond viewport */
-  /* Nigeria×USA prismatic field background */
+  /* Nigeria×USA prismatic field background - optimized for faster rendering */
   background:
     radial-gradient(circle at 18% 22%, color-mix(in srgb, var(--ng-green) 70%, white 30%) 0%, transparent 45%),
     radial-gradient(circle at 82% 28%, color-mix(in srgb, var(--us-blue) 70%, white 30%) 0%, transparent 50%),
     radial-gradient(circle at 55% 78%, color-mix(in srgb, var(--us-red) 65%, white 35%) 0%, transparent 52%),
     linear-gradient(180deg, #050507 0%, #070712 40%, #050507 100%);
   background-attachment: fixed;
+  /* Ensure content is visible immediately */
+  color: #f0f0f0;
 }
 
 code {

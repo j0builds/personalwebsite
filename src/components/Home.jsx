@@ -204,14 +204,14 @@ function Home() {
         const targetX = parseFloat(secret.x) || 50
         const targetY = parseFloat(secret.y) || 50
         
-        // Create curved path with random waypoints
+        // Simplified curved path with fewer waypoints for better performance
         const waypoint1 = {
-          x: startPos.x + (targetX - startPos.x) * 0.3 + (Math.random() - 0.5) * 30,
-          y: startPos.y + (targetY - startPos.y) * 0.3 + (Math.random() - 0.5) * 30
+          x: startPos.x + (targetX - startPos.x) * 0.4 + (Math.random() - 0.5) * 20, // Reduced randomness
+          y: startPos.y + (targetY - startPos.y) * 0.4 + (Math.random() - 0.5) * 20
         }
         const waypoint2 = {
-          x: startPos.x + (targetX - startPos.x) * 0.7 + (Math.random() - 0.5) * 30,
-          y: startPos.y + (targetY - startPos.y) * 0.7 + (Math.random() - 0.5) * 30
+          x: startPos.x + (targetX - startPos.x) * 0.6 + (Math.random() - 0.5) * 20,
+          y: startPos.y + (targetY - startPos.y) * 0.6 + (Math.random() - 0.5) * 20
         }
         
         return {
@@ -291,14 +291,26 @@ function Home() {
     }
     
       let frameCount = 0
-      let collisionFrameCount = 0
-      let pillSeparationFrameCount = 0
+      let lastUpdateTime = 0
+      const TARGET_FPS = 30 // Reduced from 60fps to 30fps for better performance
+      const FRAME_INTERVAL = 1000 / TARGET_FPS // ~33ms per frame
       
       // Cache expensive calculations
       const viewport = viewportRef.current
       const dampPowCache = {} // Cache Math.pow results
       
       const updateBubbles = (now) => {
+        // Pause if tab is hidden
+        if (document.hidden) {
+          animationFrameRef.current = requestAnimationFrame(updateBubbles)
+          return
+        }
+        // Throttle to 30fps for better performance
+        if (now - lastUpdateTime < FRAME_INTERVAL) {
+          animationFrameRef.current = requestAnimationFrame(updateBubbles)
+          return
+        }
+        lastUpdateTime = now
       const positions = bubblePositionsRef.current
       if (!positions || !Array.isArray(positions) || positions.length === 0) {
         // Keep animation loop running even if positions aren't ready yet
@@ -382,7 +394,7 @@ function Home() {
           
           if (bubble.isAnimating && bubble.startTime !== null) {
             const animationElapsed = currentTime - bubble.startTime
-            const animationDuration = 2500 // 2.5 seconds for curved path
+            const animationDuration = 2000 // Reduced from 2.5s to 2s for faster entry
             const progress = Math.min(animationElapsed / animationDuration, 1)
             const easedProgress = easeOutCubic(progress)
             
@@ -426,40 +438,40 @@ function Home() {
           x += vx * dt
           y += vy * dt
           
-          // Gentle drift back toward base position (lava lamp effect) - ENHANCED
-          const driftX = (baseX - x) * 0.015
-          const driftY = (baseY - y) * 0.015
-          // Add more random drift for lava lamp effect - THROTTLED (every 4 frames)
-          if (frameCount % 4 === 0) {
-            vx += (driftX + (Math.random() - 0.5) * 0.04) * dt
-            vy += (driftY + (Math.random() - 0.5) * 0.04) * dt
+          // Simplified gentle drift back toward base position (lava lamp effect)
+          const driftX = (baseX - x) * 0.01 // Reduced from 0.015 for less aggressive movement
+          const driftY = (baseY - y) * 0.01
+          // Simplified random drift - only every 8 frames for better performance
+          if (frameCount % 8 === 0) {
+            vx += (driftX + (Math.random() - 0.5) * 0.02) * dt
+            vy += (driftY + (Math.random() - 0.5) * 0.02) * dt
           } else {
             vx += driftX * dt
             vy += driftY * dt
           }
           
-          // Less damping for more movement - use dt-aware damping (cached for performance)
-          const damp = 0.985
+          // Increased damping for smoother, less CPU-intensive movement
+          const damp = 0.99 // Increased from 0.985 for less movement
           const dampKey = `${damp}_${dt.toFixed(3)}`
           const dampValue = dampPowCache[dampKey] || (dampPowCache[dampKey] = Math.pow(damp, dt))
           vx *= dampValue
           vy *= dampValue
           
-          // Boundary constraints (keep bubbles on screen)
+          // Simplified boundary constraints (keep bubbles on screen)
           if (x < 5) {
             x = 5
-            vx *= -0.8 // Bounce off edge
+            vx *= -0.5 // Reduced bounce for smoother movement
           } else if (x > 95) {
             x = 95
-            vx *= -0.8
+            vx *= -0.5
           }
           
           if (y < 5) {
             y = 5
-            vy *= -0.8
+            vy *= -0.5
           } else if (y > 95) {
             y = 95
-            vy *= -0.8
+            vy *= -0.5
           }
           
           bubble.x = x
@@ -469,69 +481,17 @@ function Home() {
         }
       })
       
-      // Collision detection between bubbles - THROTTLED for performance (every 3 frames)
-      collisionFrameCount++
-      if (collisionFrameCount >= 3) {
-        collisionFrameCount = 0
-        for (let i = 0; i < positions.length; i++) {
-          for (let j = i + 1; j < positions.length; j++) {
-            const b1 = positions[i]
-            const b2 = positions[j]
-            
-            if (!b1 || !b2) continue
-            // Only check collisions if both bubbles are in FLOATING phase
-            if (b1.phase !== PHASE.FLOATING || b2.phase !== PHASE.FLOATING) continue
-            
-            const dx = b2.x - b1.x
-            const dy = b2.y - b1.y
-            const distanceSquared = dx * dx + dy * dy
-            const minDistanceSquared = 256 // 16^2
-            
-            if (distanceSquared < minDistanceSquared && distanceSquared > 0) {
-              const distance = Math.sqrt(distanceSquared)
-              // Collision detected - bounce off each other with more force
-              const angle = Math.atan2(dy, dx)
-              const sin = Math.sin(angle)
-              const cos = Math.cos(angle)
-              
-              // Rotate velocities
-              const vx1 = b1.vx * cos + b1.vy * sin
-              const vy1 = b1.vy * cos - b1.vx * sin
-              const vx2 = b2.vx * cos + b2.vy * sin
-              const vy2 = b2.vy * cos - b2.vx * sin
-              
-              // Swap velocities (elastic collision) - more bounce
-              const swap = vx1
-              const newVx1 = vx2 * 1.1
-              const newVx2 = swap * 1.1
-              
-              // Rotate back
-              b1.vx = newVx1 * cos - vy1 * sin
-              b1.vy = vy1 * cos + newVx1 * sin
-              b2.vx = newVx2 * cos - vy2 * sin
-              b2.vy = vy2 * cos + newVx2 * sin
-              
-              // Separate bubbles more aggressively
-              const overlap = 16 - distance
-              const separationX = (dx / distance) * overlap * 0.6
-              const separationY = (dy / distance) * overlap * 0.6
-              
-              b1.x -= separationX
-              b1.y -= separationY
-              b2.x += separationX
-              b2.y += separationY
-            }
-          }
-        }
-      }
+      // REMOVED: Collision detection - major performance improvement
+      // This was causing O(n²) complexity and significant CPU usage
+      // Bubbles will now just drift naturally without collision checks
       
-      // Update pill positions using spring-follow physics (pills tethered to bubbles)
+      // Update pill positions using simplified spring-follow physics (pills tethered to bubbles)
       const pills = pillPositionsRef.current
       if (pills && Array.isArray(pills)) {
         // OPTIMIZED: Use direct array indexing instead of find() - O(1) instead of O(n)
         const viewport = viewportRef.current
-        const k = 0.08  // spring strength
-        const damp = 0.82  // damping
+        const k = 0.06  // Reduced spring strength for smoother, less CPU-intensive movement
+        const damp = 0.85  // Increased damping for smoother movement
         const dampKey = `${damp}_${dt.toFixed(3)}`
         const dampValue = dampPowCache[dampKey] || (dampPowCache[dampKey] = Math.pow(damp, dt))
         
@@ -548,19 +508,19 @@ function Home() {
             pill.vy = 0
           }
           
-          // Calculate anchor point (bubble position + velocity-based offset for "string" effect)
-          pill.offsetX = -bubble.vx * 12
-          pill.offsetY = -bubble.vy * 12
+          // Simplified anchor point calculation (reduced offset for less movement)
+          pill.offsetX = -bubble.vx * 8 // Reduced from 12
+          pill.offsetY = -bubble.vy * 8
           
           // Convert bubble position from % to pixels for spring calculation
           const anchorX = (bubble.x / 100) * viewport.w + pill.offsetX
           const anchorY = (bubble.y / 100) * viewport.h + pill.offsetY
           
-          // Spring physics: accelerate toward anchor
+          // Simplified spring physics: accelerate toward anchor
           const dx = anchorX - pill.x
           const dy = anchorY - pill.y
           
-          // CRITICAL: Spring physics with dt - use cached Math.pow result
+          // Simplified spring physics with dt - use cached Math.pow result
           pill.vx = pill.vx * dampValue + dx * k * dt
           pill.vy = pill.vy * dampValue + dy * k * dt
           
@@ -569,33 +529,8 @@ function Home() {
           pill.y += pill.vy * dt
         })
         
-        // Prevent pills from overlapping each other - THROTTLED for performance (every 5 frames)
-        pillSeparationFrameCount++
-        if (pillSeparationFrameCount >= 5) {
-          pillSeparationFrameCount = 0
-          for (let i = 0; i < pills.length; i++) {
-            for (let j = i + 1; j < pills.length; j++) {
-              const p1 = pills[i]
-              const p2 = pills[j]
-              if (!p1 || !p2) continue
-              
-              const dx = p2.x - p1.x
-              const dy = p2.y - p1.y
-              const dist = Math.hypot(dx, dy) || 1
-              const min = 120 // how far apart labels should be
-              
-              if (dist < min) {
-                const push = (min - dist) * 0.02
-                const nx = dx / dist
-                const ny = dy / dist
-                p1.x -= nx * push
-                p1.y -= ny * push
-                p2.x += nx * push
-                p2.y += ny * push
-              }
-            }
-          }
-        }
+        // REMOVED: Pill separation - major performance improvement
+        // This was causing O(n²) complexity. Pills will naturally avoid overlap through spring physics
       }
       
       // Update DOM directly for smooth performance - update every frame for smooth animation
@@ -739,7 +674,7 @@ function Home() {
     
     // Update mouse position for cursor tracking - throttle more aggressively
     const now = performance.now()
-    if (now - lastCursorUpdate.current >= 33) { // ~30fps (reduced from 16ms/60fps)
+    if (now - lastCursorUpdate.current >= 50) { // ~20fps for cursor updates (reduced from 33ms/30fps)
       lastCursorUpdate.current = now
       setMousePosition({ x, y })
     }
@@ -885,7 +820,43 @@ function Home() {
   // Cursor style - now handled via direct DOM manipulation, but keep for initial render
   const cursorStyle = useMemo(() => ({
     transform: `translate(${mousePosition.x}px, ${mousePosition.y}px) translate(-50%, -50%) rotate(2deg)`
-  }), [])
+  }), [mousePosition.x, mousePosition.y])
+  
+  // Memoize secret items and quotes to prevent unnecessary re-renders
+  const memoizedSecrets = useMemo(() => hiddenSecrets, [])
+  const memoizedMainQuotes = useMemo(() => 
+    lifeQuotes.map((quote, index) => (
+      <p key={index} className="main-quote" style={{ animationDelay: `${index * 0.3}s` }}>
+        {quote}
+      </p>
+    )), [])
+  const memoizedLifeQuotes = useMemo(() => 
+    lifeQuotes.map((quote, index) => (
+      <p key={index} className="life-quote" style={{ animationDelay: `${index * 0.2}s` }}>
+        {quote}
+      </p>
+    )), [])
+  const memoizedEssayContent = useMemo(() => 
+    essayContent.map((line, index) => {
+      if (line.includes('LinkedIn')) {
+        return (
+          <p key={index}>
+            <a href="https://www.linkedin.com/in/joseph-ayinde" target="_blank" rel="noopener noreferrer" className="page-link">{line}</a>
+          </p>
+        )
+      }
+      if (line.includes('@') && line.includes('.com')) {
+        return (
+          <p key={index}>
+            <a href={`mailto:${line}`} className="page-link">{line}</a>
+          </p>
+        )
+      }
+      if (line && line === line.toUpperCase() && line.length > 3 && !line.startsWith('•')) {
+        return <h3 key={index} className="essay-heading">{line}</h3>
+      }
+      return <p key={index}>{line}</p>
+    }), [])
 
   // Secret click handler - unified for mobile/desktop
   const handleSecretInteraction = useCallback((secret, e) => {
@@ -924,11 +895,7 @@ function Home() {
           {/* Quotes on main page - centered with bubbles */}
           {showBubbles && (
             <div className="main-page-quotes">
-              {lifeQuotes.map((quote, index) => (
-                <p key={index} className="main-quote" style={{ animationDelay: `${index * 0.3}s` }}>
-                  {quote}
-                </p>
-              ))}
+              {memoizedMainQuotes}
             </div>
           )}
 
@@ -944,7 +911,7 @@ function Home() {
                 overflow: 'visible' // Allow pills to render off-screen
               }}
             >
-              {hiddenSecrets.map(secret => {
+              {memoizedSecrets.map(secret => {
                 // Pills are positioned by spring-follow physics in the animation loop
                 // CRITICAL: Don't set initial transform here - spring physics owns transform
                 return (
@@ -1024,11 +991,7 @@ function Home() {
               
               {/* Quotes at bottom */}
               <div className="life-quotes-content">
-                {lifeQuotes.map((quote, index) => (
-                  <p key={index} className="life-quote" style={{ animationDelay: `${index * 0.2}s` }}>
-                    {quote}
-                  </p>
-                ))}
+                {memoizedLifeQuotes}
               </div>
             </div>
           )}
@@ -1057,26 +1020,7 @@ function Home() {
           <div className="essay-container">
             <div className="essay-content">
               <div className="essay-text">
-                {essayContent.map((line, index) => {
-                  if (line.includes('LinkedIn')) {
-                    return (
-                      <p key={index}>
-                        <a href="https://www.linkedin.com/in/joseph-ayinde" target="_blank" rel="noopener noreferrer" className="page-link">{line}</a>
-                      </p>
-                    )
-                  }
-                  if (line.includes('@') && line.includes('.com')) {
-                    return (
-                      <p key={index}>
-                        <a href={`mailto:${line}`} className="page-link">{line}</a>
-                      </p>
-                    )
-                  }
-                  if (line && line === line.toUpperCase() && line.length > 3 && !line.startsWith('•')) {
-                    return <h3 key={index} className="essay-heading">{line}</h3>
-                  }
-                  return <p key={index}>{line}</p>
-                })}
+                {memoizedEssayContent}
                 
                 <div className="connect-section">
                   {!exploreClicked ? (
@@ -1118,7 +1062,14 @@ function Home() {
             <div className="secret-modal-content">
               {selectedSecret.image && (
                 <div className="secret-modal-image-container">
-                  <img src={selectedSecret.image} alt={selectedSecret.text} className="secret-modal-image" onError={(e) => e.target.style.display = 'none'} />
+                  <img 
+                    src={selectedSecret.image} 
+                    alt={selectedSecret.text} 
+                    className="secret-modal-image" 
+                    loading="lazy"
+                    decoding="async"
+                    onError={(e) => e.target.style.display = 'none'} 
+                  />
                 </div>
               )}
               <div className="secret-modal-text">
