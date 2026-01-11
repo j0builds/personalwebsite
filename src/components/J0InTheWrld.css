@@ -7,27 +7,16 @@
     #f093fb 50%, 
     #4facfe 75%, 
     #00f2fe 100%);
-  background-size: 400% 400%;
-  animation: gradientShift 15s ease infinite;
+  /* Removed animated gradient for performance - static gradient */
   color: #fff;
   padding: 0;
   position: relative;
   overflow: hidden;
 }
 
-@keyframes gradientShift {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
+/* Removed gradientShift animation for performance */
 
-/* Matrix background container - optimized for performance */
+/* Matrix background container - heavily optimized */
 .matrix-background {
   position: fixed;
   top: 0;
@@ -35,15 +24,15 @@
   width: 100%;
   height: 100%;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  grid-template-rows: repeat(4, 1fr);
-  gap: 30px;
-  padding: 50px;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 40px;
+  padding: 60px;
   pointer-events: none;
   z-index: 1;
 }
 
-/* Matrix image cell - optimized */
+/* Matrix image cell - NO ANIMATION for maximum performance */
 .matrix-image-cell {
   position: relative;
   width: 100%;
@@ -51,8 +40,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  animation: matrixTwirl var(--duration, 20s) var(--delay, 0s) infinite ease-in-out;
-  /* Removed will-change for performance */
+  /* Removed all animations for performance */
 }
 
 /* Matrix image - optimized */
@@ -71,15 +59,7 @@
 
 /* Removed hover effect for performance */
 
-/* Simplified animation - only gentle rotation for performance */
-@keyframes matrixTwirl {
-  0%, 100% {
-    transform: translate(0, 0) rotate(0deg);
-  }
-  50% {
-    transform: translate(0, 0) rotate(var(--rotation, 180deg));
-  }
-}
+/* Removed matrixTwirl animation completely for performance */
 
 /* Content overlay - removed backdrop-filter for performance */
 .j0-wrld-content {
@@ -168,6 +148,20 @@
   .matrix-background {
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: repeat(3, 1fr);
+    gap: 30px;
+    padding: 50px;
+  }
+
+  .matrix-image {
+    max-width: 200px;
+    max-height: 200px;
+  }
+}
+
+@media (max-width: 768px) {
+  .matrix-background {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
     gap: 20px;
     padding: 40px;
   }
@@ -175,20 +169,6 @@
   .matrix-image {
     max-width: 180px;
     max-height: 180px;
-  }
-}
-
-@media (max-width: 768px) {
-  .matrix-background {
-    grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(3, 1fr);
-    gap: 15px;
-    padding: 30px;
-  }
-
-  .matrix-image {
-    max-width: 150px;
-    max-height: 150px;
   }
 
   .j0-wrld-content {
@@ -209,13 +189,13 @@
   .matrix-background {
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: repeat(2, 1fr);
-    gap: 10px;
-    padding: 20px;
+    gap: 15px;
+    padding: 30px;
   }
 
   .matrix-image {
-    max-width: 120px;
-    max-height: 120px;
+    max-width: 150px;
+    max-height: 150px;
   }
 
   .j0-wrld-content {

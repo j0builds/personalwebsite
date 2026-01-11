@@ -1,77 +1,10 @@
 import React from 'react'
 import './J0InTheWrld.css'
 
-const bannerImages = [
-  { src: '/assets/images/cognition.jpg', alt: 'Cognition' },
-  { src: '/assets/images/open-ai.jpg', alt: 'OpenAI' },
-  { src: '/assets/images/neurosurgery.jpg', alt: 'Neurosurgery' },
-  { src: '/assets/images/cmu.jpg', alt: 'Carnegie Mellon' },
-  { src: '/assets/images/unc.JPG', alt: 'UNC Chapel Hill' },
-  { src: '/assets/images/chancellor.jpg', alt: 'Chancellor Scholar' },
-  { src: '/assets/images/residency.jpg', alt: 'The Residency' },
-  { src: '/assets/images/launch.jpg', alt: 'LAUNCH Chapel Hill' },
-  { src: '/assets/images/soccer.jpg', alt: 'Soccer' },
-  { src: '/assets/images/saywordfc.jpg', alt: 'Say Word FC' }
-]
-
-// Create a matrix of images - REDUCED for performance
-function createMatrixImages() {
-  const matrixImages = []
-  const columns = 4 // Reduced from 6
-  const rows = 4 // Reduced from 8 (16 images instead of 48 - 67% reduction)
-  
-  for (let row = 0; row < rows; row++) {
-    for (let col = 0; col < columns; col++) {
-      const imageIndex = (row * columns + col) % bannerImages.length
-      const image = bannerImages[imageIndex]
-      const uniqueId = `matrix-${row}-${col}`
-      
-      matrixImages.push({
-        ...image,
-        id: uniqueId,
-        row,
-        col,
-        // Simpler animations for performance
-        animationDelay: Math.random() * 3,
-        animationDuration: 20 + Math.random() * 10, // Slower animations (20-30s)
-        rotationSpeed: 180 + Math.random() * 180, // Less rotation (180-360 degrees)
-        moveDistance: 50 + Math.random() * 50 // Less movement (50-100px)
-      })
-    }
-  }
-  
-  return matrixImages
-}
-
 function J0InTheWrld() {
-  const matrixImages = React.useMemo(() => createMatrixImages(), [])
-  
   return (
     <div className="j0-wrld-container">
-      {/* Matrix background with twirling images */}
-      <div className="matrix-background">
-        {matrixImages.map((imageData) => (
-          <div
-            key={imageData.id}
-            className="matrix-image-cell"
-            style={{
-              '--delay': `${imageData.animationDelay}s`,
-              '--duration': `${imageData.animationDuration}s`,
-              '--rotation': `${imageData.rotationSpeed}deg`
-            }}
-          >
-            <img
-              src={imageData.src}
-              alt={imageData.alt}
-              className="matrix-image"
-              loading="lazy"
-              decoding="async"
-            />
-          </div>
-        ))}
-      </div>
-
-      {/* Content overlay */}
+      {/* Content */}
       <div className="j0-wrld-content">
         <div className="j0-wrld-header">
           <h1 className="j0-wrld-title">j0 in the wrld</h1>
