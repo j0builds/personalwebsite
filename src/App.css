@@ -1764,8 +1764,8 @@ button.secret-modal-close {
 }
 
 .page-link:hover {
-  color: rgba(200, 160, 255, 1);
-  text-decoration-color: rgba(200, 160, 255, 0.6);
+  color: rgba(0, 135, 83, 1);
+  text-decoration-color: rgba(0, 135, 83, 0.6);
 }
 
 /* Page navigation buttons - Soccer Goals */
