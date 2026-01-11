@@ -7,24 +7,43 @@ const bannerImages = [
   { src: '/assets/images/neurosurgery.jpg', alt: 'Neurosurgery' },
   { src: '/assets/images/cmu.jpg', alt: 'Carnegie Mellon' },
   { src: '/assets/images/unc.JPG', alt: 'UNC Chapel Hill' },
-  { src: '/assets/images/chancellor.jpg', alt: 'Chancellor Scholar' }
+  { src: '/assets/images/chancellor.jpg', alt: 'Chancellor Scholar' },
+  { src: '/assets/images/residency.jpg', alt: 'The Residency' },
+  { src: '/assets/images/launch.jpg', alt: 'LAUNCH Chapel Hill' },
+  { src: '/assets/images/soccer.jpg', alt: 'Soccer' },
+  { src: '/assets/images/saywordfc.jpg', alt: 'Say Word FC' }
 ]
 
-function J0InTheWrld() {
-  // Create a small matrix - just 6 images for performance
-  const matrixImages = React.useMemo(() => {
-    const images = []
-    // Just use first 6 images from bannerImages
-    for (let i = 0; i < 6; i++) {
-      images.push({
-        ...bannerImages[i],
-        id: `matrix-${i}`,
-        delay: i * 0.5, // Stagger animation delays
-        duration: 15 + (i % 3) * 5 // Vary durations (15s, 20s, 25s)
+// Create a matrix of images with twirling animation
+function createMatrixImages() {
+  const matrixImages = []
+  const columns = 6
+  const rows = 8
+  
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < columns; col++) {
+      const imageIndex = (row * columns + col) % bannerImages.length
+      const image = bannerImages[imageIndex]
+      const uniqueId = `matrix-${row}-${col}`
+      
+      matrixImages.push({
+        ...image,
+        id: uniqueId,
+        row,
+        col,
+        animationDelay: Math.random() * 5,
+        animationDuration: 15 + Math.random() * 15,
+        rotationSpeed: 360 + Math.random() * 360,
+        moveDistance: 100 + Math.random() * 100
       })
     }
-    return images
-  }, [])
+  }
+  
+  return matrixImages
+}
+
+function J0InTheWrld() {
+  const matrixImages = React.useMemo(() => createMatrixImages(), [])
 
   return (
     <div className="j0-wrld-container">
@@ -35,8 +54,10 @@ function J0InTheWrld() {
             key={imageData.id}
             className="matrix-image-cell"
             style={{
-              '--delay': `${imageData.delay}s`,
-              '--duration': `${imageData.duration}s`
+              '--delay': `${imageData.animationDelay}s`,
+              '--duration': `${imageData.animationDuration}s`,
+              '--rotation': `${imageData.rotationSpeed}deg`,
+              '--move': `${imageData.moveDistance}px`
             }}
           >
             <img

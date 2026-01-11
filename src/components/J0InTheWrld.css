@@ -7,7 +7,8 @@
     #f093fb 50%, 
     #4facfe 75%, 
     #00f2fe 100%);
-  /* Removed animated gradient for performance - static gradient */
+  background-size: 400% 400%;
+  animation: gradientShift 15s ease infinite;
   color: #fff;
   padding: 0;
   position: relative;
@@ -26,7 +27,7 @@
   }
 }
 
-/* Matrix background container - lightweight version */
+/* Matrix background container */
 .matrix-background {
   position: fixed;
   top: 0;
@@ -34,15 +35,15 @@
   width: 100%;
   height: 100%;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(2, 1fr);
-  gap: 50px;
-  padding: 80px;
+  grid-template-columns: repeat(6, 1fr);
+  grid-template-rows: repeat(8, 1fr);
+  gap: 30px;
+  padding: 50px;
   pointer-events: none;
   z-index: 1;
 }
 
-/* Matrix image cell - gentle rotation animation */
+/* Matrix image cell - twirling animation */
 .matrix-image-cell {
   position: relative;
   width: 100%;
@@ -51,9 +52,10 @@
   align-items: center;
   justify-content: center;
   animation: matrixTwirl var(--duration, 20s) var(--delay, 0s) infinite ease-in-out;
+  will-change: transform;
 }
 
-/* Matrix image - optimized */
+/* Matrix image */
 .matrix-image {
   width: 100%;
   height: 100%;
@@ -61,23 +63,33 @@
   max-height: 200px;
   object-fit: cover;
   border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-  opacity: 0.6;
-  /* Removed transition for performance */
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  opacity: 0.7;
   transform-origin: center center;
+  transition: opacity 0.3s ease;
 }
 
-/* Simple gentle rotation animation */
+.matrix-image:hover {
+  opacity: 1;
+}
+
+/* Twirling animation - translate, rotate, and scale */
 @keyframes matrixTwirl {
   0%, 100% {
-    transform: rotate(0deg);
+    transform: translate(0, 0) rotate(0deg) scale(1);
+  }
+  25% {
+    transform: translate(calc(var(--move, 50px) * 0.5), calc(var(--move, 50px) * -0.3)) rotate(calc(var(--rotation, 180deg) * 0.25)) scale(1.1);
   }
   50% {
-    transform: rotate(180deg);
+    transform: translate(calc(var(--move, 50px) * 0.7), calc(var(--move, 50px) * 0.5)) rotate(calc(var(--rotation, 180deg) * 0.5)) scale(0.9);
+  }
+  75% {
+    transform: translate(calc(var(--move, 50px) * -0.4), calc(var(--move, 50px) * 0.6)) rotate(calc(var(--rotation, 180deg) * 0.75)) scale(1.05);
   }
 }
 
-/* Content overlay - removed backdrop-filter for performance */
+/* Content overlay */
 .j0-wrld-content {
   position: relative;
   z-index: 10;
@@ -87,8 +99,8 @@
   justify-content: center;
   align-items: center;
   padding: 4rem 2rem;
-  background: rgba(0, 0, 0, 0.3);
-  /* Removed backdrop-filter for performance */
+  background: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(2px);
 }
 
 /* Header Section */
@@ -122,21 +134,36 @@
   font-weight: 300;
 }
 
-/* Coming Soon Section - optimized for performance */
+/* Coming Soon Section */
 .coming-soon-section {
   text-align: center;
   padding: 3rem 2rem;
   max-width: 600px;
   margin: 0 auto;
   background: rgba(255, 255, 255, 0.15);
-  /* Removed backdrop-filter for performance */
+  backdrop-filter: blur(10px);
   /* Unique organic blob shape - irregular border-radius */
   border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
   border: 1px solid rgba(255, 255, 255, 0.2);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
   position: relative;
   transform: rotate(-2deg);
-  /* Removed animation for performance */
+  animation: blobMorph 8s ease-in-out infinite;
+}
+
+@keyframes blobMorph {
+  0%, 100% {
+    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+  }
+  25% {
+    border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%;
+  }
+  50% {
+    border-radius: 50% 50% 50% 50% / 50% 50% 50% 50%;
+  }
+  75% {
+    border-radius: 40% 60% 50% 40% / 60% 40% 60% 40%;
+  }
 }
 
 .coming-soon-title {
@@ -162,29 +189,29 @@
 /* Mobile Responsive */
 @media (max-width: 1024px) {
   .matrix-background {
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(2, 1fr);
-    gap: 40px;
-    padding: 60px;
-  }
-
-  .matrix-image {
-    max-width: 200px;
-    max-height: 200px;
-  }
-}
-
-@media (max-width: 768px) {
-  .matrix-background {
-    grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(3, 1fr);
-    gap: 30px;
-    padding: 50px;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(6, 1fr);
+    gap: 25px;
+    padding: 40px;
   }
 
   .matrix-image {
     max-width: 180px;
     max-height: 180px;
+  }
+}
+
+@media (max-width: 768px) {
+  .matrix-background {
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+    gap: 20px;
+    padding: 30px;
+  }
+
+  .matrix-image {
+    max-width: 150px;
+    max-height: 150px;
   }
 
   .j0-wrld-content {
@@ -204,14 +231,14 @@
 @media (max-width: 480px) {
   .matrix-background {
     grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(2, 1fr);
+    grid-template-rows: repeat(3, 1fr);
     gap: 15px;
-    padding: 30px;
+    padding: 20px;
   }
 
   .matrix-image {
-    max-width: 150px;
-    max-height: 150px;
+    max-width: 120px;
+    max-height: 120px;
   }
 
   .j0-wrld-content {
