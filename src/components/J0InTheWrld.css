@@ -27,7 +27,7 @@
   }
 }
 
-/* Matrix background container */
+/* Matrix background container - optimized for performance */
 .matrix-background {
   position: fixed;
   top: 0;
@@ -35,15 +35,15 @@
   width: 100%;
   height: 100%;
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  grid-template-rows: repeat(8, 1fr);
-  gap: 20px;
-  padding: 40px;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(4, 1fr);
+  gap: 30px;
+  padding: 50px;
   pointer-events: none;
   z-index: 1;
 }
 
-/* Matrix image cell */
+/* Matrix image cell - optimized */
 .matrix-image-cell {
   position: relative;
   width: 100%;
@@ -51,54 +51,37 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  animation: matrixTwirl var(--duration, 12s) var(--delay, 0s) infinite ease-in-out;
-  will-change: transform;
+  animation: matrixTwirl var(--duration, 20s) var(--delay, 0s) infinite ease-in-out;
+  /* Removed will-change for performance */
 }
 
-/* Matrix image */
+/* Matrix image - optimized */
 .matrix-image {
   width: 100%;
   height: 100%;
-  max-width: 180px;
-  max-height: 180px;
+  max-width: 200px;
+  max-height: 200px;
   object-fit: cover;
   border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3),
-              0 0 20px rgba(255, 255, 255, 0.1);
-  opacity: 0.7;
-  transition: opacity 0.3s ease;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  opacity: 0.6;
+  /* Removed transition for performance */
   transform-origin: center center;
 }
 
-.matrix-image-cell:hover .matrix-image {
-  opacity: 1;
-  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.4),
-              0 0 30px rgba(255, 255, 255, 0.2);
-}
+/* Removed hover effect for performance */
 
-/* Twirling animation - rotate and move in circular/elliptical paths */
+/* Simplified animation - only gentle rotation for performance */
 @keyframes matrixTwirl {
-  0% {
-    transform: translate(0, 0) rotate(0deg) scale(1);
-  }
-  25% {
-    transform: translate(calc(var(--move, 100px) * 0.7), calc(var(--move, 100px) * -0.5)) 
-               rotate(calc(var(--rotation, 360deg) * 0.25)) scale(1.1);
+  0%, 100% {
+    transform: translate(0, 0) rotate(0deg);
   }
   50% {
-    transform: translate(var(--move, 100px), 0) 
-               rotate(calc(var(--rotation, 360deg) * 0.5)) scale(0.9);
-  }
-  75% {
-    transform: translate(calc(var(--move, 100px) * 0.7), calc(var(--move, 100px) * 0.5)) 
-               rotate(calc(var(--rotation, 360deg) * 0.75)) scale(1.05);
-  }
-  100% {
-    transform: translate(0, 0) rotate(var(--rotation, 360deg)) scale(1);
+    transform: translate(0, 0) rotate(var(--rotation, 180deg));
   }
 }
 
-/* Content overlay */
+/* Content overlay - removed backdrop-filter for performance */
 .j0-wrld-content {
   position: relative;
   z-index: 10;
@@ -108,8 +91,8 @@
   justify-content: center;
   align-items: center;
   padding: 4rem 2rem;
-  background: rgba(0, 0, 0, 0.2);
-  backdrop-filter: blur(2px);
+  background: rgba(0, 0, 0, 0.3);
+  /* Removed backdrop-filter for performance */
 }
 
 /* Header Section */
@@ -143,41 +126,21 @@
   font-weight: 300;
 }
 
-/* Coming Soon Section */
+/* Coming Soon Section - optimized for performance */
 .coming-soon-section {
   text-align: center;
   padding: 3rem 2rem;
   max-width: 600px;
   margin: 0 auto;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.15);
+  /* Removed backdrop-filter for performance */
   /* Unique organic blob shape - irregular border-radius */
   border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
   border: 1px solid rgba(255, 255, 255, 0.2);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
   position: relative;
   transform: rotate(-2deg);
-  animation: blobMorph 8s ease-in-out infinite;
-}
-
-/* Subtle organic animation - shape morphs slightly */
-@keyframes blobMorph {
-  0%, 100% {
-    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
-    transform: rotate(-2deg);
-  }
-  25% {
-    border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%;
-    transform: rotate(1deg);
-  }
-  50% {
-    border-radius: 50% 50% 30% 80% / 40% 40% 60% 50%;
-    transform: rotate(-1deg);
-  }
-  75% {
-    border-radius: 40% 60% 50% 50% / 60% 30% 70% 40%;
-    transform: rotate(0.5deg);
-  }
+  /* Removed animation for performance */
 }
 
 .coming-soon-title {
@@ -203,8 +166,22 @@
 /* Mobile Responsive */
 @media (max-width: 1024px) {
   .matrix-background {
-    grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: repeat(6, 1fr);
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 20px;
+    padding: 40px;
+  }
+
+  .matrix-image {
+    max-width: 180px;
+    max-height: 180px;
+  }
+}
+
+@media (max-width: 768px) {
+  .matrix-background {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(3, 1fr);
     gap: 15px;
     padding: 30px;
   }
@@ -212,20 +189,6 @@
   .matrix-image {
     max-width: 150px;
     max-height: 150px;
-  }
-}
-
-@media (max-width: 768px) {
-  .matrix-background {
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(5, 1fr);
-    gap: 10px;
-    padding: 20px;
-  }
-
-  .matrix-image {
-    max-width: 120px;
-    max-height: 120px;
   }
 
   .j0-wrld-content {
@@ -245,14 +208,14 @@
 @media (max-width: 480px) {
   .matrix-background {
     grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(4, 1fr);
-    gap: 8px;
-    padding: 15px;
+    grid-template-rows: repeat(2, 1fr);
+    gap: 10px;
+    padding: 20px;
   }
 
   .matrix-image {
-    max-width: 100px;
-    max-height: 100px;
+    max-width: 120px;
+    max-height: 120px;
   }
 
   .j0-wrld-content {

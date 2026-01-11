@@ -14,11 +14,11 @@ const bannerImages = [
   { src: '/assets/images/saywordfc.jpg', alt: 'Say Word FC' }
 ]
 
-// Create a matrix of images (multiple instances spread across the page)
+// Create a matrix of images - REDUCED for performance
 function createMatrixImages() {
   const matrixImages = []
-  const columns = 6
-  const rows = 8
+  const columns = 4 // Reduced from 6
+  const rows = 4 // Reduced from 8 (16 images instead of 48 - 67% reduction)
   
   for (let row = 0; row < rows; row++) {
     for (let col = 0; col < columns; col++) {
@@ -31,11 +31,11 @@ function createMatrixImages() {
         id: uniqueId,
         row,
         col,
-        // Random animation delays and durations for organic feel
-        animationDelay: Math.random() * 5,
-        animationDuration: 8 + Math.random() * 8, // 8-16 seconds
-        rotationSpeed: 360 + Math.random() * 360, // 360-720 degrees
-        moveDistance: 100 + Math.random() * 150 // 100-250px movement
+        // Simpler animations for performance
+        animationDelay: Math.random() * 3,
+        animationDuration: 20 + Math.random() * 10, // Slower animations (20-30s)
+        rotationSpeed: 180 + Math.random() * 180, // Less rotation (180-360 degrees)
+        moveDistance: 50 + Math.random() * 50 // Less movement (50-100px)
       })
     }
   }
@@ -57,8 +57,7 @@ function J0InTheWrld() {
             style={{
               '--delay': `${imageData.animationDelay}s`,
               '--duration': `${imageData.animationDuration}s`,
-              '--rotation': `${imageData.rotationSpeed}deg`,
-              '--move': `${imageData.moveDistance}px`
+              '--rotation': `${imageData.rotationSpeed}deg`
             }}
           >
             <img
@@ -66,6 +65,7 @@ function J0InTheWrld() {
               alt={imageData.alt}
               className="matrix-image"
               loading="lazy"
+              decoding="async"
             />
           </div>
         ))}
