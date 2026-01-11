@@ -8,7 +8,6 @@ import { EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, EMAILJS_PUBLIC_KEY } from '../
 
 // Import components
 import LavaLamp from './LavaLamp'
-import ImageFrames from './ImageFrames'
 import MainPageQuotes from './MainPageQuotes'
 import LifeQuotes from './LifeQuotes'
 import ExperiencePills from './ExperiencePills'
@@ -791,9 +790,6 @@ function Home() {
 
           {/* Quotes on main page - centered with bubbles */}
           {showBubbles && <MainPageQuotes />}
-
-          {/* Image placeholder frames - fill the void space */}
-          {showBubbles && <ImageFrames />}
 
           {/* Experience pills layer - pills tethered to bubbles via spring physics */}
           {showBubbles && (

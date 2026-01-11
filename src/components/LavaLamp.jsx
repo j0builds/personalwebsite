@@ -1,6 +1,6 @@
 import React from 'react'
 
-// Lava lamp background blobs component
+// Aurora background blobs component - optimized for performance
 export default function LavaLamp() {
   return (
     <div className="lava-lamp-container">
@@ -9,9 +9,6 @@ export default function LavaLamp() {
       <div className="lava-blob blob-3"></div>
       <div className="lava-blob blob-4"></div>
       <div className="lava-blob blob-5"></div>
-      <div className="lava-blob blob-6"></div>
-      <div className="lava-blob blob-7"></div>
-      <div className="lava-blob blob-8"></div>
     </div>
   )
 }
