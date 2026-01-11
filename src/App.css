@@ -28,107 +28,107 @@ html {
   /* transition: background 1s ease-in-out; */
 }
 
-/* Lava lamp container - fluid organic blobs */
+/* Lava lamp container - fluid organic blobs (aurora lights) */
 .lava-lamp-container {
   position: fixed;
   inset: 0;
   pointer-events: none;
   z-index: 0;
   overflow: hidden;
-  /* Natural blend mode - softer, more organic */
-  mix-blend-mode: soft-light;
+  /* Screen blend mode for aurora glow effect */
+  mix-blend-mode: screen;
 }
 
-/* Individual lava lamp blobs - natural supernatural glow */
+/* Individual lava lamp blobs - aurora lights glow */
 .lava-blob {
   position: absolute;
   border-radius: 50%;
-  /* Softer, more natural blur - like ethereal light */
-  filter: blur(80px);
-  opacity: 0.4;
+  /* Softer, more natural blur - like ethereal aurora light */
+  filter: blur(100px);
+  opacity: 0.6;
   will-change: transform, opacity;
   /* GPU acceleration */
   transform: translateZ(0);
   backface-visibility: hidden;
-  /* Natural glow effect */
-  box-shadow: 0 0 100px rgba(0, 0, 0, 0.1);
+  /* Aurora glow effect */
+  box-shadow: 0 0 150px rgba(0, 255, 255, 0.2);
 }
 
-/* Blob 1 - Natural green glow - like forest light */
+/* Blob 1 - Aurora green glow */
 .blob-1 {
-  width: 400px;
-  height: 400px;
-  background: radial-gradient(circle, rgba(0, 135, 83, 0.5) 0%, rgba(0, 100, 60, 0.25) 50%, transparent 100%);
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(0, 255, 150, 0.7) 0%, rgba(0, 200, 120, 0.4) 40%, transparent 70%);
   top: 10%;
   left: 15%;
   animation: lavaFloat1 20s ease-in-out infinite;
 }
 
-/* Blob 2 - Warm earth brown - like rich soil */
+/* Blob 2 - Aurora purple/violet */
 .blob-2 {
-  width: 350px;
-  height: 350px;
-  background: radial-gradient(circle, rgba(139, 69, 19, 0.4) 0%, rgba(101, 50, 14, 0.2) 50%, transparent 100%);
+  width: 450px;
+  height: 450px;
+  background: radial-gradient(circle, rgba(138, 43, 226, 0.7) 0%, rgba(75, 0, 130, 0.4) 40%, transparent 70%);
   top: 60%;
   right: 20%;
   animation: lavaFloat2 25s ease-in-out infinite;
 }
 
-/* Blob 3 - Warm earth red - like sunset */
+/* Blob 3 - Aurora blue/cyan */
 .blob-3 {
-  width: 300px;
-  height: 300px;
-  background: radial-gradient(circle, rgba(178, 34, 52, 0.4) 0%, rgba(120, 20, 30, 0.2) 50%, transparent 100%);
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(0, 191, 255, 0.7) 0%, rgba(0, 150, 200, 0.4) 40%, transparent 70%);
   bottom: 15%;
   left: 25%;
   animation: lavaFloat3 22s ease-in-out infinite;
 }
 
-/* Blob 4 - Soft teal - like ocean mist */
+/* Blob 4 - Aurora teal/cyan */
 .blob-4 {
-  width: 280px;
-  height: 280px;
-  background: radial-gradient(circle, rgba(0, 135, 83, 0.4) 0%, rgba(0, 80, 50, 0.15) 50%, transparent 100%);
+  width: 380px;
+  height: 380px;
+  background: radial-gradient(circle, rgba(64, 224, 208, 0.6) 0%, rgba(0, 206, 209, 0.4) 40%, transparent 70%);
   top: 40%;
   right: 35%;
   animation: lavaFloat4 18s ease-in-out infinite;
 }
 
-/* Blob 5 - Warm earth blend - like sunset earth */
+/* Blob 5 - Aurora magenta/pink */
 .blob-5 {
-  width: 320px;
-  height: 320px;
-  background: radial-gradient(circle, rgba(178, 34, 52, 0.35) 0%, rgba(139, 69, 19, 0.2) 50%, transparent 100%);
+  width: 420px;
+  height: 420px;
+  background: radial-gradient(circle, rgba(255, 20, 147, 0.6) 0%, rgba(199, 21, 133, 0.4) 40%, transparent 70%);
   bottom: 25%;
   right: 15%;
   animation: lavaFloat5 24s ease-in-out infinite;
 }
 
-/* Blob 6 - Small natural green accent */
+/* Blob 6 - Aurora green accent */
 .blob-6 {
-  width: 200px;
-  height: 200px;
-  background: radial-gradient(circle, rgba(0, 135, 83, 0.4) 0%, rgba(0, 100, 60, 0.15) 50%, transparent 100%);
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(50, 205, 50, 0.6) 0%, rgba(0, 255, 127, 0.4) 40%, transparent 70%);
   top: 70%;
   left: 50%;
   animation: lavaFloat6 16s ease-in-out infinite;
 }
 
-/* Blob 7 - Medium warm orange */
+/* Blob 7 - Aurora blue/purple blend */
 .blob-7 {
-  width: 250px;
-  height: 250px;
-  background: radial-gradient(circle, rgba(210, 105, 30, 0.4) 0%, rgba(160, 82, 45, 0.2) 50%, transparent 100%);
+  width: 350px;
+  height: 350px;
+  background: radial-gradient(circle, rgba(138, 43, 226, 0.6) 0%, rgba(0, 191, 255, 0.4) 40%, transparent 70%);
   top: 20%;
   left: 60%;
   animation: lavaFloat7 21s ease-in-out infinite;
 }
 
-/* Blob 8 - Small warm accent */
+/* Blob 8 - Aurora cyan accent */
 .blob-8 {
-  width: 180px;
-  height: 180px;
-  background: radial-gradient(circle, rgba(178, 34, 52, 0.35) 0%, rgba(120, 20, 30, 0.15) 50%, transparent 100%);
+  width: 280px;
+  height: 280px;
+  background: radial-gradient(circle, rgba(0, 255, 255, 0.6) 0%, rgba(64, 224, 208, 0.4) 40%, transparent 70%);
   bottom: 40%;
   left: 10%;
   animation: lavaFloat8 19s ease-in-out infinite;
