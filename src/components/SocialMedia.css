@@ -51,14 +51,63 @@
 }
 
 .social-icon {
-  font-size: 28px;
-  line-height: 1;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
-  transition: transform 0.2s ease;
+  width: 28px;
+  height: 28px;
+  color: #ffffff;
+  filter: 
+    drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5))
+    drop-shadow(0 0 8px rgba(255, 255, 255, 0.2))
+    contrast(1.2)
+    brightness(1.1);
+  transition: transform 0.2s ease, filter 0.2s ease;
+  stroke: rgba(255, 255, 255, 0.8);
+  stroke-width: 0.5px;
+  paint-order: stroke fill;
 }
 
 .social-bubble:hover .social-icon {
-  transform: scale(1.1);
+  transform: scale(1.15) rotate(5deg);
+  filter: 
+    drop-shadow(0 3px 6px rgba(255, 255, 255, 0.4))
+    drop-shadow(0 0 12px rgba(255, 255, 255, 0.3))
+    contrast(1.3)
+    brightness(1.2);
+}
+
+.instagram-icon {
+  color: #ffffff;
+  /* Instagram gradient effect */
+  filter: 
+    drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5))
+    drop-shadow(0 0 8px rgba(255, 105, 180, 0.3))
+    contrast(1.2)
+    brightness(1.1);
+}
+
+.instagram-bubble:hover .instagram-icon {
+  filter: 
+    drop-shadow(0 3px 6px rgba(255, 105, 180, 0.5))
+    drop-shadow(0 0 12px rgba(138, 43, 226, 0.4))
+    contrast(1.3)
+    brightness(1.2);
+}
+
+.linkedin-icon {
+  color: #ffffff;
+  /* LinkedIn blue glow effect */
+  filter: 
+    drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5))
+    drop-shadow(0 0 8px rgba(0, 119, 181, 0.3))
+    contrast(1.2)
+    brightness(1.1);
+}
+
+.linkedin-bubble:hover .linkedin-icon {
+  filter: 
+    drop-shadow(0 3px 6px rgba(0, 119, 181, 0.5))
+    drop-shadow(0 0 12px rgba(0, 119, 181, 0.4))
+    contrast(1.3)
+    brightness(1.2);
 }
 
 /* Instagram specific styling */
@@ -144,6 +193,7 @@
   }
   
   .social-icon {
-    font-size: 20px;
+    width: 20px;
+    height: 20px;
   }
 }
