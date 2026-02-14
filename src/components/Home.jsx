@@ -1,121 +1,24 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import emailjs from '@emailjs/browser'
-import Metaballs from './Metaballs'
-import '../App.css'
+// CSS loaded asynchronously via App.jsx to prevent render blocking
 
-// Constants
-const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID || 'service_ci8h64h'
-const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID || 'template_sipb9ui'
-const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY || 'i0dQLe27a4mA6Or6D'
+// Import data and utilities
+import { hiddenSecrets, isMobileDevice } from '../data/homeData'
+import { EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, EMAILJS_PUBLIC_KEY } from '../utils/emailConfig'
 
-
-const essayContent = [
-  "hey i'm Joseph Ayinde", "aka j0", "", "and i am a polymath (builder, thinker, dreamer)", "",
-  "from greensboro north carolina", "", "i am a dual citizen of both the united states and nigeria", "", "",
-  "I've always been fascinated by the spaces between things.", "",
-  "The gap between biology and technology. The intersection of",
-  "neuroscience and artificial intelligence. The bridge between",
-  "what we know and what we're discovering.", "",
-  "This curiosity led me down a path that most would call",
-  "unconventional. I don't fit neatly into boxes-and that's",
-  "exactly where I thrive.", "", "",
-  "THE BEGINNING", "",
-  "At 18, I arrived at UNC Chapel Hill as one of 25 students",
-  "worldwide selected for the Chancellor's Science Scholars",
-  "program-the university's highest STEM merit scholarship.",
-  "But here's the thing: I wasn't just there to study.", "",
-  "I was there to build.", "",
-  "While my peers were memorizing textbooks, I was already",
-  "prototyping a non-invasive brain-computer interface. By",
-  "November 2022, I'd co-founded Cognition (then HEALLY),",
-  "assembling a team of researchers, engineers, and clinicians",
-  "to explore what happens when you merge EEG technology",
-  "with artificial intelligence.", "",
-  "We secured $150,000+ in funding. We partnered with Google",
-  "DeepMind, NVIDIA, Carnegie Mellon, and others. But more",
-  "importantly, we asked questions that hadn't been asked before.", "", "",
-  "THE BREAKTHROUGH", "",
-  "In 2023, something extraordinary happened.", "",
-  "I became the world's first undergraduate intern in the",
-  "world's first Computational Neurosurgery lab-in Sydney,",
-  "Australia, under Professor Antonio Di Ieva.", "",
-  "Imagine being 20 years old, shadowing over 80 neurosurgical",
-  "operations, witnessing neuromodulation procedures that",
-  "most medical students never see, and leading research on",
-  "the legal and ethical implications of AI in neurosurgery.", "",
-  "That was my summer.", "",
-  "I didn't just observe. I participated in weekly case meetings",
-  "at Macquarie University Hospital. I presented at the",
-  "Australian Institute of Health Innovation. I saw the future",
-  "of medicine being written, and I was helping write it.", "", "",
-  "THE PIVOT", "",
-  "Then came OpenAI.", "",
-  "At 21, I joined as a Member of Technical Staff, serving as",
-  "a biology expert for next-generation large language models.",
-  "I wasn't just coding-I was helping shape how AI understands",
-  "biology, neuroscience, and scientific reasoning.", "",
-  "I worked on fine-tuning models that could interpret research",
-  "data, generate context-aware responses, and apply",
-  "cutting-edge biological principles. I saw firsthand how",
-  "AI could transform scientific discovery.", "",
-  "But I also saw its limitations. And that's when I knew",
-  "I needed to build something of my own.", "", "",
-  "THE ACCELERATION", "",
-  "In 2024, I was selected as 1 of 10 ventures across North",
-  "Carolina for LAUNCH Chapel Hill's competitive Summer",
-  "Accelerator. I refined our business model with mentorship",
-  "from Harvard Business School faculty. I delivered pitches",
-  "that demonstrated not just traction, but vision.", "",
-  "That same year, I received the International Young",
-  "Outstanding Leadership Award in Healthcare in Las Vegas.",
-  "I was named a Dreamers Who Do INNOVATE Carolina Scholar.", "",
-  "But awards are just markers. What matters is what you do next.", "", "",
-  "THE PHILOSOPHY", "",
-  "I believe the best work happens at the edges.", "",
-  "Not in the center of established fields, but in the spaces",
-  "between them. Not by following paths, but by creating new ones.", "",
-  "I'm building at the intersection of neuroscience, AI, and",
-  "human experience. I'm thinking about problems that don't",
-  "have answers yet. I'm dreaming of possibilities that",
-  "haven't been imagined.", "", "",
-  "THE INVITATION", "",
-  "I'm always interested in connecting with fellow builders,",
-  "thinkers, and dreamers.", "",
-  "Whether it's collaboration, conversation, or simply sharing",
-  "ideas-I believe the best work happens when diverse",
-  "perspectives come together.", "",
-  "Let's build something meaningful together."
-]
-
-const hiddenSecrets = [
-  { id: 1, x: '12%', y: '22%', text: 'Ex-OpenAI Member of Technical Staff', image: '/assets/images/openai.jpg', description: 'At 21, I joined OpenAI as a Member of Technical Staff, serving as a biology expert for next-generation large language models. I wasn\'t just coding-I was helping shape how AI understands biology, neuroscience, and scientific reasoning. I worked on fine-tuning models that could interpret research data, generate context-aware responses, and apply cutting-edge biological principles. I saw firsthand how AI could transform scientific discovery, but I also saw its limitations. And that\'s when I knew I needed to build something of my own.' },
-  { id: 2, x: '78%', y: '18%', text: "World's first intern in the world's first computational neurosurgery lab", image: '/assets/images/neurosurgery.jpg', description: 'In 2023, at 20 years old, I became the world\'s first undergraduate intern in the world\'s first Computational Neurosurgery lab in Sydney, Australia, under Professor Antonio Di Ieva. Imagine shadowing over 80 neurosurgical operations, witnessing neuromodulation procedures that most medical students never see, and leading research on the legal and ethical implications of AI in neurosurgery. I didn\'t just observe-I participated in weekly case meetings at Macquarie University Hospital, presented at the Australian Institute of Health Innovation, and saw the future of medicine being written. That was my summer.' },
-  { id: 3, x: '88%', y: '52%', text: 'Computational Neuroscience Scholar at Carnegie Mellon University', image: '/assets/images/cmu.jpg', description: 'As a Computational Neuroscience Scholar at Carnegie Mellon University, I worked at the intersection of neuroscience and artificial intelligence. This partnership was instrumental in advancing Cognition\'s research, exploring what happens when you merge EEG technology with artificial intelligence. Carnegie Mellon provided critical research support and collaboration opportunities that helped shape our understanding of brain-computer interfaces and neural computation.' },
-  { id: 4, x: '22%', y: '78%', text: 'UNC Chapel Hill - Honors Biology, Neuroscience, Chemistry Graduate', image: '/assets/images/unc.JPG', description: 'I arrived at UNC Chapel Hill at 18 as one of 25 students worldwide selected for the Chancellor\'s Science Scholars program-the university\'s highest STEM merit scholarship. But here\'s the thing: I wasn\'t just there to study. I was there to build. While my peers were memorizing textbooks, I was already prototyping a non-invasive brain-computer interface. I graduated with honors in Biology, Neuroscience, and Chemistry, but more importantly, I left with the foundation to build at the intersection of biology and technology.' },
-  { id: 5, x: '5%', y: '88%', text: "Chancellor's Science Scholar - 1 of 25 selected worldwide", image: '/assets/images/chancellor.jpg', description: 'Selected as one of 25 students worldwide for the Chancellor\'s Science Scholars program-UNC Chapel Hill\'s highest STEM merit scholarship. This recognition wasn\'t just about academic achievement; it was about potential. The program provided the resources and community that enabled me to pursue unconventional paths, to build while studying, and to ask questions that hadn\'t been asked before. It was the foundation that made everything else possible.' },
-  { id: 6, x: '95%', y: '28%', text: 'The Residency Delta Finalist', image: '/assets/images/residency.jpg', description: 'Selected as 1 of 20 finalists for The Residency Delta-Sam Altman\'s accelerator program-from over 1,500 applicants. This prestigious program recognizes innovative entrepreneurs and technologists making significant impact in their fields. This recognition came as I was building Cognition and exploring the spaces between biology and technology. Being a finalist validated that the work at the edges-the unconventional paths-is where meaningful innovation happens.' },
-  { id: 7, x: '18%', y: '10%', text: 'CEO and Founder of Cognition', image: '/assets/images/cognition.jpg', description: 'In May 2025, I founded Cognition-The Cognitive OS for Learning and the world\'s first Social Intelligence Network. We\'re solving the fundamental forgetting crisis: people forget up to 70% of what they learn online within 24 hours. Cognition is the drop-in intelligence layer that transforms any software into a living system that converses, remembers, and reinforces growth across apps, devices, and time. We\'ve secured $150,000+ in funding and partnered with Google DeepMind, NVIDIA, and Carnegie Mellon. Looking ahead, we\'re pioneering non-invasive AI EEG brain-computer interfaces that will close the loop between biological learning processes and digital knowledge systems-making forgetting optional and learning effortless. Cognition is more than software; it\'s the cognitive infrastructure for humanity\'s next chapter.' },
-  { id: 8, x: '82%', y: '72%', text: 'LAUNCH Chapel Hill Startup Accelerator Cohort 25 Recipient', image: '/assets/images/launch.jpg', description: 'In 2024, I was selected as 1 of 10 ventures across North Carolina for LAUNCH Chapel Hill\'s competitive Summer Accelerator. I refined our business model with mentorship from Harvard Business School faculty and delivered pitches that demonstrated not just traction, but vision. That same year, I also received the International Young Outstanding Leadership Award in Healthcare in Las Vegas and was named a Dreamers Who Do INNOVATE Carolina Scholar. But awards are just markers. What matters is what you do next.' },
-  { id: 9, x: '8%', y: '38%', text: 'Played at the highest level of youth soccer in US', image: '/assets/images/soccer.jpg', description: 'I started playing soccer at the age of 3 recreationally, then began playing competitive soccer at the lowest level at age 10. I got moved up every year after that, steadily climbing through the ranks. In my final two years playing (sophomore and junior years of college), I played at the highest youth level in the United States-the Elite Clubs National League. This journey from recreational play to the pinnacle of youth soccer taught me about discipline, perseverance, continuous improvement, and what it takes to compete at the highest levels-lessons that have shaped my approach to building companies and leading teams.' },
-  { id: 10, x: '92%', y: '82%', text: 'Founding team for Say Word FC', image: '/assets/images/saywordfc.jpg', description: 'I was part of the founding team for Say Word FC, which went from a local 7v7 team to internationally recognized, playing in global tournaments such as TST (The Soccer Tournament) against the likes of Sergio Aguero, Luis Nani, and Heather O\'Reilly on ESPN. This journey taught me about building teams, creating culture, establishing vision, and turning an idea into a reality. The lessons learned from founding and building Say Word FC-from recruiting players to establishing team identity to competing on the world stage-directly informed my approach to building companies and leading teams.' },
-]
-
-// Device detection utility
-const isMobileDevice = () => {
-  return window.innerWidth <= 768 || ('ontouchstart' in window && window.matchMedia('(pointer: coarse)').matches)
-}
-
-const lifeQuotes = [
-  "The best work happens at the edges-not in the center of established fields, but in the spaces between them.",
-  "I believe the best work happens when diverse perspectives come together.",
-  "Not by following paths, but by creating new ones."
-]
+// Import components
+import LavaLamp from './LavaLamp'
+import MainPageQuotes from './MainPageQuotes'
+import LifeQuotes from './LifeQuotes'
+import ExperiencePills from './ExperiencePills'
+import DocumentView from './DocumentView'
+import SecretModal from './SecretModal'
 
 function Home() {
   // State
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
   // Initialize with all secrets revealed for visibility
-  const [revealedSecrets, setRevealedSecrets] = useState(new Set(hiddenSecrets.map(s => s.id)))
+  const [revealedSecrets] = useState(new Set(hiddenSecrets.map(s => s.id)))
   const [documentOpen, setDocumentOpen] = useState(false)
   const [exploreClicked, setExploreClicked] = useState(false)
   const [formData, setFormData] = useState({ name: '', email: '', message: '' })
@@ -144,28 +47,11 @@ function Home() {
     }
   }
 
-  const initialBubblePositions = useRef(
-    hiddenSecrets.map((secret, index) => {
-      const startPos = getRandomOffScreenPosition()
-      return {
-        id: secret.id,
-        x: startPos.x, // Start off-screen
-        y: startPos.y,
-        vx: 0,
-        vy: 0,
-        baseX: parseFloat(secret.x), // Target position
-        baseY: parseFloat(secret.y),
-        startX: startPos.x,
-        startY: startPos.y,
-        startTime: null, // Will be set when animation starts
-        animationDelay: index * 150 + Math.random() * 200, // Staggered: 150ms between each + random 0-200ms
-        isAnimating: false,
-        hasArrived: false
-      }
-    })
-  )
+  const initialBubblePositions = useRef([])
   const animationFrameRef = useRef(null)
   const startTimeRef = useRef(null)
+  const lastTimeRef = useRef(performance.now()) // Single clock - MANDATORY
+  const allArrivedRef = useRef(false) // Ref instead of state for RAF
 
   // Refs for performance
   const mousePosRef = useRef({ x: 0, y: 0 })
@@ -176,18 +62,26 @@ function Home() {
   const lastCursorUpdate = useRef(0)
   const bubbleElementsRef = useRef({})
   const bubblePositionsRef = useRef(null)
+  const pillPositionsRef = useRef([]) // Spring-follow state for pills
   
-  // Timer to hide bubbles and show quotes after 15 seconds
+  // Viewport object - single source of truth for window dimensions
+  const viewportRef = useRef({ w: window.innerWidth, h: window.innerHeight })
+  
+  // Delta time tracking for stable physics
+  const lastFrameTimeRef = useRef(performance.now())
+  
+  // Timer to hide bubbles and show quotes after 8 seconds
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowBubbles(false)
       setShowQuotes(true)
-    }, 15000)
+    }, 8000)
 
     return () => clearTimeout(timer)
   }, [])
 
   // Lava lamp physics animation - optimized with direct DOM manipulation
+  // TEMPORARILY DISABLED TO FIX CRASH
   useEffect(() => {
     if (!showBubbles) {
       // Reset bubble positions when hiding
@@ -198,48 +92,87 @@ function Home() {
       return
     }
     
+    // Safety check
+    if (!hiddenSecrets || hiddenSecrets.length === 0) {
+      console.error('hiddenSecrets is empty or undefined')
+      return
+    }
+    
     // Reset state when showing bubbles
     setAllBubblesArrived(false)
-
+    
     // Reset and reinitialize positions when showing bubbles
-    initialBubblePositions.current = hiddenSecrets.map((secret, index) => {
-      const startPos = getRandomOffScreenPosition()
-      const targetX = parseFloat(secret.x)
-      const targetY = parseFloat(secret.y)
+    try {
+      initialBubblePositions.current = hiddenSecrets.map((secret, index) => {
+        const startPos = getRandomOffScreenPosition()
+        const targetX = parseFloat(secret.x) || 50
+        const targetY = parseFloat(secret.y) || 50
+        
+        // Simplified curved path with fewer waypoints for better performance
+        const waypoint1 = {
+          x: startPos.x + (targetX - startPos.x) * 0.4 + (Math.random() - 0.5) * 20, // Reduced randomness
+          y: startPos.y + (targetY - startPos.y) * 0.4 + (Math.random() - 0.5) * 20
+        }
+        const waypoint2 = {
+          x: startPos.x + (targetX - startPos.x) * 0.6 + (Math.random() - 0.5) * 20,
+          y: startPos.y + (targetY - startPos.y) * 0.6 + (Math.random() - 0.5) * 20
+        }
+        
+        return {
+          id: secret.id,
+          x: startPos.x,
+          y: startPos.y,
+          vx: 0,
+          vy: 0,
+          baseX: targetX,
+          baseY: targetY,
+          startX: startPos.x,
+          startY: startPos.y,
+          waypoint1,
+          waypoint2,
+          startTime: null,
+          animationDelay: index * 150 + Math.random() * 200,
+          isAnimating: false,
+          hasArrived: false
+        }
+      })
       
-      // Create curved path with random waypoints
-      const waypoint1 = {
-        x: startPos.x + (targetX - startPos.x) * 0.3 + (Math.random() - 0.5) * 30,
-        y: startPos.y + (targetY - startPos.y) * 0.3 + (Math.random() - 0.5) * 30
-      }
-      const waypoint2 = {
-        x: startPos.x + (targetX - startPos.x) * 0.7 + (Math.random() - 0.5) * 30,
-        y: startPos.y + (targetY - startPos.y) * 0.7 + (Math.random() - 0.5) * 30
-      }
+      // Initialize positions ref with initial positions
+      bubblePositionsRef.current = initialBubblePositions.current.map(b => ({ ...b }))
       
-      return {
-        id: secret.id,
-        x: startPos.x,
-        y: startPos.y,
-        vx: 0,
-        vy: 0,
-        baseX: targetX,
-        baseY: targetY,
-        startX: startPos.x,
-        startY: startPos.y,
-        waypoint1,
-        waypoint2,
-        startTime: null,
-        animationDelay: index * 150 + Math.random() * 200,
-        isAnimating: false,
-        hasArrived: false
-      }
+      // Initialize pill positions (pills directly follow bubbles - no physics needed)
+      pillPositionsRef.current = hiddenSecrets.map((secret, index) => {
+        const bubble = bubblePositionsRef.current[index]
+        return {
+          id: secret.id,
+          x: bubble?.x ?? 50, // Start at bubble position
+          y: bubble?.y ?? 50
+        }
+      })
+      
+      startTimeRef.current = performance.now()
+      lastTimeRef.current = performance.now() // Initialize clock
+      allArrivedRef.current = false // Reset arrival state
+    } catch (error) {
+      console.error('Error initializing bubbles:', error)
+      bubblePositionsRef.current = []
+      startTimeRef.current = performance.now()
+      lastTimeRef.current = performance.now()
+      allArrivedRef.current = false
+      return
+    }
+    
+    // Animation phases - hard separation
+    const PHASE = {
+      ENTERING: 0,
+      FLOATING: 1
+    }
+    
+    // Initialize bubble phases
+    bubblePositionsRef.current.forEach(bubble => {
+      bubble.phase = PHASE.ENTERING
     })
-    
-    // Initialize positions ref with initial positions
-    bubblePositionsRef.current = initialBubblePositions.current.map(b => ({ ...b }))
-    startTimeRef.current = Date.now()
-    
+
     // Easing function for smooth animation
     const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3)
     
@@ -257,89 +190,184 @@ function Home() {
       }
     }
     
-    const updateBubbles = () => {
+      let frameCount = 0
+      let lastUpdateTime = 0
+      const TARGET_FPS = 15 // Very aggressively reduced to 15fps for maximum performance
+      const FRAME_INTERVAL = 1000 / TARGET_FPS // ~66ms per frame
+      
+      // Cache expensive calculations
+      const viewport = viewportRef.current
+      
+      const updateBubbles = (now) => {
+        // Pause if tab is hidden
+        if (document.hidden) {
+          animationFrameRef.current = requestAnimationFrame(updateBubbles)
+          return
+        }
+        // Throttle to 30fps for better performance
+        if (now - lastUpdateTime < FRAME_INTERVAL) {
+          animationFrameRef.current = requestAnimationFrame(updateBubbles)
+          return
+        }
+        lastUpdateTime = now
       const positions = bubblePositionsRef.current
-      const currentTime = Date.now()
+      if (!positions || !Array.isArray(positions) || positions.length === 0) {
+        // Keep animation loop running even if positions aren't ready yet
+        lastTimeRef.current = now
+        if (animationFrameRef.current) {
+          cancelAnimationFrame(animationFrameRef.current)
+        }
+        animationFrameRef.current = requestAnimationFrame(updateBubbles)
+        return
+      }
+      if (!startTimeRef.current) {
+        startTimeRef.current = now
+        lastTimeRef.current = now
+        // Continue animation loop
+        if (animationFrameRef.current) {
+          cancelAnimationFrame(animationFrameRef.current)
+        }
+        animationFrameRef.current = requestAnimationFrame(updateBubbles)
+        return
+      }
+      
+      // Calculate delta time (normalized to 60fps units) and clamp it
+      const dtMs = now - lastTimeRef.current
+      lastTimeRef.current = now
+      
+      // CRITICAL: Clamp dt to prevent explosions when DevTools opens/closes
+      const dt = Math.min(1.5, Math.max(0.5, dtMs / 16.666))
+      
+      // Use performance.now() for elapsed time (not Date.now())
+      const currentTime = now
       const elapsed = currentTime - startTimeRef.current
       let allArrived = true
+      frameCount++
       
       // Update physics for each bubble
       positions.forEach(bubble => {
-        const { baseX, baseY, startX, startY, waypoint1, waypoint2, animationDelay, startTime, isAnimating, hasArrived } = bubble
+        if (!bubble) return
         
-        // Check if it's time to start animating this bubble
-        if (!isAnimating && elapsed >= animationDelay) {
-          bubble.isAnimating = true
-          bubble.startTime = currentTime
+        let { baseX, baseY, startX, startY, waypoint1, waypoint2, animationDelay } = bubble
+        
+        // CRITICAL: Clamp NaN BEFORE any physics calculations
+        if (!Number.isFinite(bubble.x) || !Number.isFinite(bubble.y)) {
+          bubble.x = bubble.baseX
+          bubble.y = bubble.baseY
+          bubble.vx = 0
+          bubble.vy = 0
+          bubble.phase = PHASE.FLOATING
+          return
         }
         
-        // Animate bubble from off-screen to target position with curved path
-        if (bubble.isAnimating && !hasArrived) {
-          const animationElapsed = currentTime - bubble.startTime
-          const animationDuration = 2500 // 2.5 seconds for curved path
-          const progress = Math.min(animationElapsed / animationDuration, 1)
-          const easedProgress = easeOutCubic(progress)
+        // Ensure waypoints exist - create defaults if missing
+        if (!waypoint1 || !waypoint2) {
+          // Create default waypoints if missing
+          waypoint1 = {
+            x: startX + (baseX - startX) * 0.3 + (Math.random() - 0.5) * 30,
+            y: startY + (baseY - startY) * 0.3 + (Math.random() - 0.5) * 30
+          }
+          waypoint2 = {
+            x: startX + (baseX - startX) * 0.7 + (Math.random() - 0.5) * 30,
+            y: startY + (baseY - startY) * 0.7 + (Math.random() - 0.5) * 30
+          }
+          bubble.waypoint1 = waypoint1
+          bubble.waypoint2 = waypoint2
+        }
+        
+        // Ensure start position is set (off-screen)
+        if (bubble.x === undefined || bubble.x === null) {
+          bubble.x = startX
+        }
+        if (bubble.y === undefined || bubble.y === null) {
+          bubble.y = startY
+        }
+        
+        // Hard-separate animation phases - never allow both systems to run
+        if (bubble.phase === PHASE.ENTERING) {
+          // ENTERING phase: Bezier tweening only
+          if (!bubble.isAnimating && elapsed >= animationDelay) {
+            bubble.isAnimating = true
+            bubble.startTime = currentTime
+          }
           
-          // Use cubic bezier for curved path: start -> waypoint1 -> waypoint2 -> target
-          const point = cubicBezier(
-            easedProgress,
-            { x: startX, y: startY },
-            waypoint1,
-            waypoint2,
-            { x: baseX, y: baseY }
-          )
-          
-          bubble.x = point.x
-          bubble.y = point.y
-          
-          // Check if arrived at target
-          if (progress >= 1) {
-            bubble.hasArrived = true
-            bubble.x = baseX
-            bubble.y = baseY
-            // Start physics movement after arrival
-            bubble.vx = (Math.random() - 0.5) * 0.3
-            bubble.vy = (Math.random() - 0.5) * 0.3
+          if (bubble.isAnimating && bubble.startTime !== null) {
+            const animationElapsed = currentTime - bubble.startTime
+            const animationDuration = 2000 // Reduced from 2.5s to 2s for faster entry
+            const progress = Math.min(animationElapsed / animationDuration, 1)
+            const easedProgress = easeOutCubic(progress)
+            
+            // Use cubic bezier for curved path: start -> waypoint1 -> waypoint2 -> target
+            const point = cubicBezier(
+              easedProgress,
+              { x: startX, y: startY },
+              waypoint1,
+              waypoint2,
+              { x: baseX, y: baseY }
+            )
+            
+            bubble.x = point.x
+            bubble.y = point.y
+            
+            // Check if arrived at target - transition to FLOATING phase
+            if (progress >= 1) {
+              bubble.phase = PHASE.FLOATING
+              bubble.x = baseX
+              bubble.y = baseY
+              // Initialize velocity for physics
+              bubble.vx = (Math.random() - 0.5) * 0.3
+              bubble.vy = (Math.random() - 0.5) * 0.3
+            } else {
+              allArrived = false
+            }
           } else {
+            // Keep bubble at starting position until animation starts
+            if (bubble.x !== startX || bubble.y !== startY) {
+              bubble.x = startX
+              bubble.y = startY
+            }
             allArrived = false
           }
-        } else if (!hasArrived) {
-          allArrived = false
-        }
-        
-        // After arriving, apply lava lamp physics
-        if (bubble.hasArrived) {
+        } else if (bubble.phase === PHASE.FLOATING) {
+          // FLOATING phase: Physics only
           let { x, y, vx, vy } = bubble
           
-          // Update position
-          x += vx
-          y += vy
+          // CRITICAL FIX: Use physics-based position updates with dt
+          // Update position based on velocity (physics-driven) - multiply by dt
+          x += vx * dt
+          y += vy * dt
           
-          // Gentle drift back toward base position (lava lamp effect)
-          const driftX = (baseX - x) * 0.01
-          const driftY = (baseY - y) * 0.01
-          vx += driftX + (Math.random() - 0.5) * 0.02 // Random float
-          vy += driftY + (Math.random() - 0.5) * 0.02
+          // Minimal drift - simplified for performance
+          const driftX = (baseX - x) * 0.005 // Very minimal drift
+          const driftY = (baseY - y) * 0.005
+          // Random drift only every 16 frames (much less frequent)
+          if (frameCount % 16 === 0) {
+            vx += (driftX + (Math.random() - 0.5) * 0.01) * dt
+            vy += (driftY + (Math.random() - 0.5) * 0.01) * dt
+          } else {
+            vx += driftX * dt
+            vy += driftY * dt
+          }
           
-          // Damping for smooth movement
-          vx *= 0.98
-          vy *= 0.98
+          // High damping for minimal movement (better performance)
+          vx *= 0.995
+          vy *= 0.995
           
-          // Boundary constraints (keep bubbles on screen)
+          // Simplified boundary constraints (keep bubbles on screen)
           if (x < 5) {
             x = 5
-            vx *= -0.8 // Bounce off edge
+            vx *= -0.5 // Reduced bounce for smoother movement
           } else if (x > 95) {
             x = 95
-            vx *= -0.8
+            vx *= -0.5
           }
           
           if (y < 5) {
             y = 5
-            vy *= -0.8
+            vy *= -0.5
           } else if (y > 95) {
             y = 95
-            vy *= -0.8
+            vy *= -0.5
           }
           
           bubble.x = x
@@ -349,91 +377,285 @@ function Home() {
         }
       })
       
-      // Collision detection between bubbles (only after they've arrived)
-      for (let i = 0; i < positions.length; i++) {
-        for (let j = i + 1; j < positions.length; j++) {
-          const b1 = positions[i]
-          const b2 = positions[j]
+      // Collision detection - bubbles bounce off each other like a snow globe
+      // Optimized: Only check collisions every few frames and use spatial optimization
+      const BUBBLE_RADIUS = 3.5 // Approximate radius in percentage (7% diameter for pills)
+      const COLLISION_DAMPING = 0.8 // Damping factor for collision response (0-1)
+      
+      // Only run collision detection every 2 frames for performance (30fps -> 15fps collision checks)
+      if (frameCount % 2 === 0) {
+        // Pre-filter floating bubbles for better performance
+        const floatingBubbles = positions.filter(b => b && b.phase === PHASE.FLOATING && 
+          Number.isFinite(b.x) && Number.isFinite(b.y) && 
+          Number.isFinite(b.vx) && Number.isFinite(b.vy))
+        
+        // Optimized collision detection with early exit
+        for (let i = 0; i < floatingBubbles.length; i++) {
+          const bubble1 = floatingBubbles[i]
+          if (!bubble1) continue
           
-          // Only check collisions if both bubbles have arrived
-          if (!b1.hasArrived || !b2.hasArrived) continue
-          
-          const dx = b2.x - b1.x
-          const dy = b2.y - b1.y
-          const distance = Math.sqrt(dx * dx + dy * dy)
-          const minDistance = 12 // Minimum distance between bubbles
-          
-          if (distance < minDistance && distance > 0) {
-            // Collision detected - bounce off each other
-            const angle = Math.atan2(dy, dx)
-            const sin = Math.sin(angle)
-            const cos = Math.cos(angle)
+          for (let j = i + 1; j < floatingBubbles.length; j++) {
+            const bubble2 = floatingBubbles[j]
+            if (!bubble2) continue
             
-            // Rotate velocities
-            const vx1 = b1.vx * cos + b1.vy * sin
-            const vy1 = b1.vy * cos - b1.vx * sin
-            const vx2 = b2.vx * cos + b2.vy * sin
-            const vy2 = b2.vy * cos - b2.vx * sin
+            // Quick distance check (squared distance to avoid sqrt)
+            const dx = bubble2.x - bubble1.x
+            const dy = bubble2.y - bubble1.y
+            const distSq = dx * dx + dy * dy
+            const minDistSq = (BUBBLE_RADIUS * 2) * (BUBBLE_RADIUS * 2)
             
-            // Swap velocities (elastic collision)
-            const swap = vx1
-            const newVx1 = vx2 * 0.9
-            const newVx2 = swap * 0.9
+            // Early exit if bubbles are too far apart
+            if (distSq > minDistSq || distSq < 0.000001) continue
             
-            // Rotate back
-            b1.vx = newVx1 * cos - vy1 * sin
-            b1.vy = vy1 * cos + newVx1 * sin
-            b2.vx = newVx2 * cos - vy2 * sin
-            b2.vy = vy2 * cos + newVx2 * sin
+            // Only calculate sqrt when collision is detected
+            const distance = Math.sqrt(distSq)
+            const minDistance = BUBBLE_RADIUS * 2
             
-            // Separate bubbles
-            const overlap = minDistance - distance
-            const separationX = (dx / distance) * overlap * 0.5
-            const separationY = (dy / distance) * overlap * 0.5
-            
-            b1.x -= separationX
-            b1.y -= separationY
-            b2.x += separationX
-            b2.y += separationY
+            // Check if bubbles are colliding
+            if (distance < minDistance && distance > 0.001) {
+              // Normalize collision vector
+              const nx = dx / distance
+              const ny = dy / distance
+              
+              // Separate bubbles to prevent overlap
+              const overlap = minDistance - distance
+              const separationX = nx * overlap * 0.5
+              const separationY = ny * overlap * 0.5
+              
+              bubble1.x -= separationX
+              bubble1.y -= separationY
+              bubble2.x += separationX
+              bubble2.y += separationY
+              
+              // Clamp positions to prevent NaN
+              bubble1.x = Math.max(5, Math.min(95, bubble1.x))
+              bubble1.y = Math.max(5, Math.min(95, bubble1.y))
+              bubble2.x = Math.max(5, Math.min(95, bubble2.x))
+              bubble2.y = Math.max(5, Math.min(95, bubble2.y))
+              
+              // Calculate relative velocity
+              const relativeVx = bubble2.vx - bubble1.vx
+              const relativeVy = bubble2.vy - bubble1.vy
+              const relativeSpeed = relativeVx * nx + relativeVy * ny
+              
+              // Only resolve collision if bubbles are moving towards each other
+              if (relativeSpeed < 0) {
+                // Calculate impulse (elastic collision)
+                const impulse = relativeSpeed * COLLISION_DAMPING
+                
+                // Apply impulse to velocities with clamping
+                bubble1.vx = Math.max(-2, Math.min(2, bubble1.vx + impulse * nx))
+                bubble1.vy = Math.max(-2, Math.min(2, bubble1.vy + impulse * ny))
+                bubble2.vx = Math.max(-2, Math.min(2, bubble2.vx - impulse * nx))
+                bubble2.vy = Math.max(-2, Math.min(2, bubble2.vy - impulse * ny))
+              }
+            }
           }
         }
       }
       
-      // Update DOM directly for smooth performance
-      positions.forEach(bubble => {
-        const element = bubbleElementsRef.current[bubble.id]
-        if (element) {
-          element.style.left = `${bubble.x}%`
-          element.style.top = `${bubble.y}%`
-        }
-      })
-      
-      // Check if all bubbles have arrived
-      if (allArrived && !allBubblesArrived) {
-        setAllBubblesArrived(true)
+      // Update pill positions using DIRECT positioning (no spring physics for performance)
+      const pills = pillPositionsRef.current
+      if (pills && Array.isArray(pills)) {
+        const viewport = viewportRef.current
+        
+        positions.forEach((bubble, idx) => {
+          const pill = pills[idx]
+          if (!pill || !bubble) return
+          
+          // CRITICAL: Check for NaN values
+          if (!Number.isFinite(bubble.x) || !Number.isFinite(bubble.y)) {
+            return
+          }
+          
+          // DIRECT positioning - no spring physics, just follow bubble directly (much faster)
+          // Add safety checks and clamping
+          const safeBubbleX = Math.max(0, Math.min(100, bubble.x))
+          const safeBubbleY = Math.max(0, Math.min(100, bubble.y))
+          pill.x = (safeBubbleX / 100) * viewport.w
+          pill.y = (safeBubbleY / 100) * viewport.h
+          
+          // Ensure pill values are finite
+          if (!Number.isFinite(pill.x)) pill.x = (safeBubbleX / 100) * viewport.w
+          if (!Number.isFinite(pill.y)) pill.y = (safeBubbleY / 100) * viewport.h
+        })
       }
       
+      // Update DOM directly for smooth performance - update every frame for smooth animation
+      // Bubbles: only update metaball positions (not DOM - bubbles are invisible)
+      // Pills: update DOM with spring-follow positions
+      positions.forEach(bubble => {
+        // Bubbles are rendered by WebGL metaballs, not DOM
+        // No DOM update needed for bubbles
+      })
+      
+      // Update pill DOM elements with spring-follow positions
+      // CRITICAL: This is the ONLY place that should update pill transforms
+      if (pills && Array.isArray(pills) && viewport.w > 0 && viewport.h > 0) {
+        pills.forEach((pill, idx) => {
+          if (!pill || !pill.id) return
+          
+          const element = bubbleElementsRef.current[pill.id]
+          if (!element) return
+          
+          // Get corresponding bubble for fallback
+          const bubble = positions && positions[idx]
+          
+          // Final NaN check before rendering with fallback
+          if (!Number.isFinite(pill.x) || !Number.isFinite(pill.y)) {
+            // Reset to safe position instead of skipping
+            const fallbackX = bubble && Number.isFinite(bubble.x) ? (bubble.x / 100) * viewport.w : viewport.w / 2
+            const fallbackY = bubble && Number.isFinite(bubble.y) ? (bubble.y / 100) * viewport.h : viewport.h / 2
+            pill.x = fallbackX
+            pill.y = fallbackY
+          }
+          
+          // Clamp values to prevent off-screen rendering (allow slight overflow for smooth animation)
+          const safeX = Math.max(-100, Math.min(viewport.w + 100, pill.x))
+          const safeY = Math.max(-100, Math.min(viewport.h + 100, pill.y))
+          
+          // NO rotation calculation - just direct positioning for performance
+          // Use translate3d for GPU acceleration
+          try {
+            if (element && element.style) {
+              element.style.transform = `translate3d(${safeX}px, ${safeY}px, 0)`
+            }
+          } catch (err) {
+            // Silently fail if element is no longer in DOM - prevents crashes
+            if (process.env.NODE_ENV === 'development') {
+              console.warn('Failed to update pill transform:', err)
+            }
+          }
+        })
+      }
+      
+      // Check if all bubbles have arrived - use ref, not state (no React re-renders in RAF)
+      if (allArrived && !allArrivedRef.current) {
+        allArrivedRef.current = true
+      }
+      
+      // CRITICAL: RAF lifecycle fix - cancel before requesting new frame
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current)
+      }
       animationFrameRef.current = requestAnimationFrame(updateBubbles)
     }
     
+    // CRITICAL: Start animation immediately - don't wait for mouse events
+    // Use performance.now() for accurate timing
+    // Cancel any existing RAF first
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current)
+    }
     animationFrameRef.current = requestAnimationFrame(updateBubbles)
+    
+    // Sync allArrivedRef to React state outside RAF (separate effect)
+    // This prevents React re-renders during animation
+    const syncArrivedState = () => {
+      if (allArrivedRef.current && !allBubblesArrived) {
+        setAllBubblesArrived(true)
+      }
+    }
+    
+    // Sync less frequently for performance
+    const syncInterval = setInterval(syncArrivedState, 500)
     
     return () => {
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current)
+        animationFrameRef.current = null
+      }
+      if (syncInterval) {
+        clearInterval(syncInterval)
       }
     }
-  }, [showBubbles])
+  }, [showBubbles, allBubblesArrived])
 
-  // Update device type on resize
+  // Viewport resize handler - optimized to prevent forced reflows
+  const handleResize = useCallback(() => {
+    // Batch all reads together to prevent forced reflows
+    const width = window.innerWidth
+    const height = window.innerHeight
+    
+    // Update refs (no DOM reads after this point)
+    viewportRef.current.w = width
+    viewportRef.current.h = height
+    
+    // Batch all writes in requestAnimationFrame to prevent forced reflows
+    requestAnimationFrame(() => {
+      // Rebuild bounds if needed (bubbles use percentages, but pills use pixels)
+      if (bubblePositionsRef.current && Array.isArray(bubblePositionsRef.current)) {
+        const pills = pillPositionsRef.current
+        if (pills && Array.isArray(pills)) {
+          bubblePositionsRef.current.forEach((bubble, idx) => {
+            const pill = pills[idx] // Direct access instead of find() to avoid reflow
+            if (pill && bubble) {
+              // Recalculate pill position from bubble percentage
+              pill.x = (bubble.x / 100) * width
+              pill.y = (bubble.y / 100) * height
+            }
+          })
+        }
+      }
+    })
+  }, [])
+  
+  // Update device type and viewport on resize - optimized to prevent forced reflows
   useEffect(() => {
+    let resizeTimeout
+    let rafId
+    
     const updateDevice = () => {
       const mobile = isMobileDevice()
       setIsMobile(mobile)
     }
-    updateDevice()
-    window.addEventListener('resize', updateDevice, { passive: true })
-    return () => window.removeEventListener('resize', updateDevice)
+    
+    // Throttled resize handler to prevent forced reflows
+    const throttledResize = () => {
+      // Cancel pending operations
+      if (resizeTimeout) clearTimeout(resizeTimeout)
+      if (rafId) cancelAnimationFrame(rafId)
+      
+      // Batch reads
+      const width = window.innerWidth
+      const height = window.innerHeight
+      
+      // Update in RAF to prevent forced reflow
+      rafId = requestAnimationFrame(() => {
+        viewportRef.current.w = width
+        viewportRef.current.h = height
+        updateDevice()
+        
+        // Update pills if needed (in same RAF to batch)
+        if (bubblePositionsRef.current && Array.isArray(bubblePositionsRef.current)) {
+          const pills = pillPositionsRef.current
+          if (pills && Array.isArray(pills)) {
+            bubblePositionsRef.current.forEach((bubble, idx) => {
+              const pill = pills[idx]
+              if (pill && bubble) {
+                pill.x = (bubble.x / 100) * width
+                pill.y = (bubble.y / 100) * height
+              }
+            })
+          }
+        }
+      })
+    }
+    
+    // Initial setup - use RAF to avoid blocking
+    rafId = requestAnimationFrame(() => {
+      updateDevice()
+      viewportRef.current.w = window.innerWidth
+      viewportRef.current.h = window.innerHeight
+    })
+    
+    window.addEventListener('resize', throttledResize, { passive: true })
+    
+    return () => {
+      window.removeEventListener('resize', throttledResize)
+      if (resizeTimeout) clearTimeout(resizeTimeout)
+      if (rafId) cancelAnimationFrame(rafId)
+    }
   }, [])
 
   // Optimized mouse/touch position update with direct DOM manipulation for cursor
@@ -454,9 +676,9 @@ function Home() {
       }
     })
     
-    // Update mouse position for cursor tracking
-    const now = Date.now()
-    if (now - lastCursorUpdate.current >= 16) { // ~60fps
+    // Update mouse position for cursor tracking - throttle more aggressively
+    const now = performance.now()
+    if (now - lastCursorUpdate.current >= 50) { // ~20fps for cursor updates (reduced from 33ms/30fps)
       lastCursorUpdate.current = now
       setMousePosition({ x, y })
     }
@@ -484,39 +706,51 @@ function Home() {
 
   // Touch handlers - mobile only, properly isolated
   const handleTouchStart = useCallback((e) => {
-    if (documentOpen) return
+    // Only process if bubbles, quotes, or document is showing
+    if (!showBubbles && !showQuotes && !documentOpen) return
     
-        const target = e.target
-    // Allow interactive elements to handle their own events
-    if (isInteractiveElement(target) || target.closest('.secret-item')) {
-          return
-        }
+    const target = e.target
+    // Only skip if it's a button/link/input that should handle its own click
+    // But allow cursor to show on form elements for better UX
+    if (isInteractiveElement(target) && !target.closest('.secret-item') && !target.closest('form') && !target.closest('input') && !target.closest('textarea')) {
+      return
+    }
     
     if (e.touches.length > 0) {
-        const touch = e.touches[0]
+      const touch = e.touches[0]
       updateMousePosition(touch.clientX, touch.clientY)
-        e.preventDefault()
+      // Don't prevent default on touchstart - let it bubble for proper touch handling
     }
-  }, [documentOpen, isInteractiveElement, updateMousePosition])
+  }, [documentOpen, showBubbles, showQuotes, isInteractiveElement, updateMousePosition])
 
   const handleTouchMove = useCallback((e) => {
-    if (documentOpen) return
+    // Only process if bubbles, quotes, or document is showing
+    if (!showBubbles && !showQuotes && !documentOpen) return
     
-        const target = e.target
-    // Allow interactive elements to handle their own events
-    if (isInteractiveElement(target) || target.closest('.secret-item')) {
-          return
-        }
+    const target = e.target
+    // Only skip if it's a button/link that should handle its own click
+    // But allow cursor to show on form elements for better UX
+    if (isInteractiveElement(target) && !target.closest('.secret-item') && !target.closest('form') && !target.closest('input') && !target.closest('textarea')) {
+      return
+    }
     
     if (e.touches.length > 0) {
-      e.preventDefault()
+      // Don't prevent default - let scrolling work naturally
       if (touchMoveRafRef.current) cancelAnimationFrame(touchMoveRafRef.current)
       touchMoveRafRef.current = requestAnimationFrame(() => {
         const touch = e.touches[0]
         updateMousePosition(touch.clientX, touch.clientY)
       })
     }
-  }, [documentOpen, isInteractiveElement, updateMousePosition])
+  }, [documentOpen, showBubbles, showQuotes, isInteractiveElement, updateMousePosition])
+  
+  const handleTouchEnd = useCallback((e) => {
+    // Keep cursor visible briefly after touch ends - work on ALL pages (bubbles, quotes, AND essay/document)
+    if (e.changedTouches.length > 0 && (showBubbles || showQuotes || documentOpen)) {
+      const touch = e.changedTouches[0]
+      updateMousePosition(touch.clientX, touch.clientY)
+    }
+  }, [documentOpen, showBubbles, showQuotes, updateMousePosition])
 
   // Event listeners - separate mobile/desktop handlers
   useEffect(() => {
@@ -525,19 +759,22 @@ function Home() {
     
     // Only attach touch handlers on mobile devices
     if (isMobile) {
-      document.addEventListener('touchstart', handleTouchStart, { passive: false })
-      document.addEventListener('touchmove', handleTouchMove, { passive: false })
+      // Use passive: true for better performance - we're not preventing default
+      document.addEventListener('touchstart', handleTouchStart, { passive: true })
+      document.addEventListener('touchmove', handleTouchMove, { passive: true })
+      document.addEventListener('touchend', handleTouchEnd, { passive: true })
     }
     
     return () => {
       window.removeEventListener('mousemove', handleMouseMove)
       if (isMobile) {
-      document.removeEventListener('touchstart', handleTouchStart)
-      document.removeEventListener('touchmove', handleTouchMove)
+        document.removeEventListener('touchstart', handleTouchStart)
+        document.removeEventListener('touchmove', handleTouchMove)
+        document.removeEventListener('touchend', handleTouchEnd)
       }
       if (touchMoveRafRef.current) cancelAnimationFrame(touchMoveRafRef.current)
     }
-  }, [handleMouseMove, handleTouchStart, handleTouchMove, isMobile])
+  }, [handleMouseMove, handleTouchStart, handleTouchMove, handleTouchEnd, isMobile])
 
 
 
@@ -554,22 +791,63 @@ function Home() {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }))
   }, [])
 
+  // Input validation and sanitization
+  const sanitizeInput = (input) => {
+    if (typeof input !== 'string') return ''
+    return input.trim().slice(0, 1000) // Limit length
+  }
+
+  const validateEmail = (email) => {
+    if (!email || typeof email !== 'string') return false
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    return emailRegex.test(email.trim())
+  }
+
   const handleFormSubmit = useCallback(async (e) => {
     e.preventDefault()
+    
+    // Validate inputs
+    const sanitizedName = sanitizeInput(formData.name)
+    const sanitizedEmail = sanitizeInput(formData.email)
+    const sanitizedMessage = sanitizeInput(formData.message)
+    
+    if (!sanitizedName || sanitizedName.length < 2) {
+      setFormStatus({ loading: false, success: false, error: 'Please enter a valid name (at least 2 characters).' })
+      return
+    }
+    
+    if (!validateEmail(sanitizedEmail)) {
+      setFormStatus({ loading: false, success: false, error: 'Please enter a valid email address.' })
+      return
+    }
+    
+    if (!sanitizedMessage || sanitizedMessage.length < 10) {
+      setFormStatus({ loading: false, success: false, error: 'Please enter a message (at least 10 characters).' })
+      return
+    }
+    
     setFormStatus({ loading: true, success: false, error: '' })
 
-    if (EMAILJS_SERVICE_ID === 'YOUR_SERVICE_ID' || EMAILJS_TEMPLATE_ID === 'YOUR_TEMPLATE_ID' || EMAILJS_PUBLIC_KEY === 'YOUR_PUBLIC_KEY') {
-      setFormStatus({ loading: false, success: false, error: 'Email service not configured.' })
+    if (!EMAILJS_SERVICE_ID || !EMAILJS_TEMPLATE_ID || !EMAILJS_PUBLIC_KEY ||
+        EMAILJS_SERVICE_ID === 'YOUR_SERVICE_ID' || 
+        EMAILJS_TEMPLATE_ID === 'YOUR_TEMPLATE_ID' || 
+        EMAILJS_PUBLIC_KEY === 'YOUR_PUBLIC_KEY') {
+      setFormStatus({ loading: false, success: false, error: 'Email service not configured. Please contact the site administrator.' })
       return
     }
 
     try {
-      await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-        from_name: formData.name,
-        from_email: formData.email,
-        message: formData.message,
-        to_email: 'josephayinde64@gmail.com'
-      }, EMAILJS_PUBLIC_KEY)
+      await emailjs.send(
+        EMAILJS_SERVICE_ID, 
+        EMAILJS_TEMPLATE_ID, 
+        {
+          from_name: sanitizedName,
+          from_email: sanitizedEmail,
+          message: sanitizedMessage,
+          to_email: 'joseph@cognitionus.com'
+        }, 
+        EMAILJS_PUBLIC_KEY
+      )
 
       setFormStatus({ loading: false, success: true, error: '' })
       setFormData({ name: '', email: '', message: '' })
@@ -579,7 +857,12 @@ function Home() {
       }, 3000)
     } catch (error) {
       console.error('EmailJS error:', error)
-      setFormStatus({ loading: false, success: false, error: 'Failed to send message. Please try again later.' })
+      const errorMessage = error?.text || error?.message || 'Unknown error'
+      setFormStatus({ 
+        loading: false, 
+        success: false, 
+        error: `Failed to send message: ${errorMessage}. Please try again later.` 
+      })
     }
   }, [formData])
 
@@ -587,138 +870,44 @@ function Home() {
   // Cursor style - now handled via direct DOM manipulation, but keep for initial render
   const cursorStyle = useMemo(() => ({
     transform: `translate(${mousePosition.x}px, ${mousePosition.y}px) translate(-50%, -50%) rotate(2deg)`
-  }), [])
-
-  // Secret click handler - unified for mobile/desktop
-  const handleSecretInteraction = useCallback((secret, e) => {
-    e.preventDefault()
-    e.stopPropagation()
-    handleSecretClick(secret)
-  }, [handleSecretClick])
-
-  // Touch handler for secrets - mobile only
-  const handleSecretTouch = useCallback((secret, e) => {
-    e.stopPropagation()
-    handleSecretClick(secret)
-  }, [handleSecretClick])
+  }), [mousePosition.x, mousePosition.y])
 
   return (
-    <div className={`app ${documentOpen ? 'document-open' : ''} ${isMobile ? 'mobile' : 'desktop'}`}>
-      {/* Cursor - optimized with direct DOM ref - show when bubbles, quotes, OR document is visible */}
-      {(showBubbles || showQuotes || documentOpen) && (
-        <div 
-          ref={cursorElementRef}
-          className="soccer-ball-cursor" 
-          style={cursorStyle}
-        >
-          ⚽
-        </div>
-      )}
+    <>
+      <div className={`app ${documentOpen ? 'document-open' : ''} ${isMobile ? 'mobile' : 'desktop'}`}>
+        {/* Lava lamp blobs - fluid organic shapes */}
+        <LavaLamp />
+        
+        {/* Cursor - optimized with direct DOM ref - show when bubbles, quotes, OR document is visible */}
+        {(showBubbles || showQuotes || documentOpen) && (
+          <div 
+            ref={cursorElementRef}
+            className="soccer-ball-cursor" 
+            style={cursorStyle}
+          >
+            ⚽
+          </div>
+        )}
 
-      {!documentOpen && (
-        <>
-          {/* Metaballs WebGL renderer - lava lamp effect */}
-          {showBubbles && bubblePositionsRef.current && (
-            <Metaballs 
-              bubbles={bubblePositionsRef.current} 
-              showBubbles={showBubbles}
-            />
-          )}
+        {!documentOpen && (
+          <>
           
 
-          {/* All secrets layer - ALL 10 BUBBLES - OUTSIDE permanent-reveal-layer */}
+          {/* Quotes on main page - centered with bubbles */}
+          {showBubbles && <MainPageQuotes />}
+
+          {/* Experience pills layer - pills tethered to bubbles via spring physics */}
           {showBubbles && (
-            <div className={`secrets-layer permanent-secrets ${!showBubbles ? 'fade-out' : ''}`}>
-              {hiddenSecrets.map(secret => {
-                // Use initial position, will be updated by physics animation
-                const currentX = secret.x
-                const currentY = secret.y
-                
-                return (
-                  <div
-                    key={`secret-${secret.id}`}
-                    ref={el => bubbleElementsRef.current[secret.id] = el}
-                    className="secret-item revealed permanent clickable"
-                    style={{ 
-                      position: 'absolute',
-                      left: currentX, 
-                      top: currentY, 
-                      transform: 'translate(-50%, -50%)',
-                      zIndex: 10010,
-                      opacity: showBubbles ? 1 : 0,
-                      visibility: showBubbles ? 'visible' : 'hidden',
-                      display: showBubbles ? 'block' : 'none',
-                      pointerEvents: showBubbles ? 'auto' : 'none',
-                      minWidth: '90px',
-                      minHeight: '25px',
-                      transition: 'opacity 0.5s ease-out, visibility 0.5s ease-out',
-                      willChange: 'left, top'
-                    }}
-                    onClick={(e) => {
-                      e.preventDefault()
-                      e.stopPropagation()
-                      handleSecretClick(secret)
-                    }}
-                    onTouchEnd={isMobile ? (e) => {
-                      e.preventDefault()
-                      e.stopPropagation()
-                      handleSecretClick(secret)
-                    } : undefined}
-                    role="button"
-                    tabIndex={0}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault()
-                        handleSecretClick(secret)
-                      }
-                    }}
-                  >
-                    <div 
-                      className="secret-text" 
-                      style={{ 
-                        opacity: showBubbles ? 1 : 0, 
-                        visibility: showBubbles ? 'visible' : 'hidden', 
-                        display: showBubbles ? 'inline-block' : 'none',
-                        pointerEvents: 'none',
-                        // Unique blob shape for each bubble
-                        borderRadius: secret.id % 3 === 0 
-                          ? '60% 40% 30% 70% / 60% 30% 70% 40%'
-                          : secret.id % 3 === 1
-                          ? '30% 60% 70% 40% / 50% 60% 30% 60%'
-                          : '50% 50% 50% 50% / 50% 50% 50% 50%',
-                        animationDelay: `${secret.id * 0.5}s`
-                      }}
-                    >
-                      {secret.text}
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
+            <ExperiencePills
+              showBubbles={showBubbles}
+              isMobile={isMobile}
+              bubbleElementsRef={bubbleElementsRef}
+              onSecretClick={handleSecretClick}
+            />
           )}
 
           {/* Life Quotes - appear after bubbles disappear */}
-          {showQuotes && (
-            <div className="life-quotes-container">
-              {/* Title section at top */}
-              <div className="quotes-title-section">
-                <h1 className="quotes-title">hey i'm Joseph Ayinde</h1>
-                <p className="quotes-subtitle">aka j0</p>
-                <p className="quotes-description">and i am a polymath (builder, thinker, dreamer)</p>
-                <p className="quotes-location">from greensboro north carolina</p>
-                <p className="quotes-citizenship">i am a dual citizen of both the united states and nigeria</p>
-              </div>
-              
-              {/* Quotes at bottom */}
-              <div className="life-quotes-content">
-                {lifeQuotes.map((quote, index) => (
-                  <p key={index} className="life-quote" style={{ animationDelay: `${index * 0.2}s` }}>
-                    {quote}
-                  </p>
-                ))}
-              </div>
-            </div>
-          )}
+          {showQuotes && <LifeQuotes />}
 
           {/* Cursor glow - desktop only - optimized with direct DOM ref */}
           {!isMobile && showBubbles && (
@@ -740,83 +929,23 @@ function Home() {
 
       {/* Document view */}
       {documentOpen && (
-        <div className="document-container">
-          <div className="essay-container">
-            <div className="essay-content">
-              <div className="essay-text">
-                {essayContent.map((line, index) => {
-                  if (line.includes('LinkedIn')) {
-                    return (
-                      <p key={index}>
-                        <a href="https://www.linkedin.com/in/joseph-ayinde" target="_blank" rel="noopener noreferrer" className="page-link">{line}</a>
-                      </p>
-                    )
-                  }
-                  if (line.includes('@') && line.includes('.com')) {
-                    return (
-                      <p key={index}>
-                        <a href={`mailto:${line}`} className="page-link">{line}</a>
-                      </p>
-                    )
-                  }
-                  if (line && line === line.toUpperCase() && line.length > 3 && !line.startsWith('•')) {
-                    return <h3 key={index} className="essay-heading">{line}</h3>
-                  }
-                  return <p key={index}>{line}</p>
-                })}
-                
-                <div className="connect-section">
-                  {!exploreClicked ? (
-                    <button className="explore-button" onClick={handleExploreClick}>explore more</button>
-                  ) : (
-                    <div className="access-locked">
-                      <p className="locked-message">access locked, fill out contact form to gain full access</p>
-                      {formStatus.success ? (
-                        <div className="form-success">
-                          <p>Thank you! Your message has been sent. I'll get back to you soon.</p>
-                        </div>
-                      ) : (
-                        <form className="contact-form" onSubmit={handleFormSubmit}>
-                          {formStatus.error && (
-                            <div className="form-error"><p>{formStatus.error}</p></div>
-                          )}
-                          <input type="text" name="name" placeholder="Name" value={formData.name} onChange={handleFormChange} required className="form-input" disabled={formStatus.loading} />
-                          <input type="email" name="email" placeholder="Email" value={formData.email} onChange={handleFormChange} required className="form-input" disabled={formStatus.loading} />
-                          <textarea name="message" placeholder="Message" value={formData.message} onChange={handleFormChange} required className="form-textarea" rows="5" disabled={formStatus.loading} />
-                          <button type="submit" className="form-submit-button" disabled={formStatus.loading}>
-                            {formStatus.loading ? 'Sending...' : 'Submit'}
-                          </button>
-                        </form>
-                      )}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <DocumentView
+          exploreClicked={exploreClicked}
+          formData={formData}
+          formStatus={formStatus}
+          onExploreClick={handleExploreClick}
+          onFormChange={handleFormChange}
+          onFormSubmit={handleFormSubmit}
+        />
       )}
 
       {/* Secret modal */}
-      {selectedSecret && (
-        <div className="secret-modal-overlay" onClick={handleCloseSecretModal}>
-          <div className="secret-modal" onClick={(e) => e.stopPropagation()}>
-            <button className="secret-modal-close" onClick={handleCloseSecretModal}>×</button>
-            <div className="secret-modal-content">
-              {selectedSecret.image && (
-                <div className="secret-modal-image-container">
-                  <img src={selectedSecret.image} alt={selectedSecret.text} className="secret-modal-image" onError={(e) => e.target.style.display = 'none'} />
-                </div>
-              )}
-              <div className="secret-modal-text">
-                <h2 className="secret-modal-title">{selectedSecret.text}</h2>
-                <p className="secret-modal-description">{selectedSecret.description}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
+      <SecretModal 
+        secret={selectedSecret} 
+        onClose={handleCloseSecretModal} 
+      />
+      </div>
+    </>
   )
 }
 

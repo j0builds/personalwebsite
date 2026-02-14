@@ -1,22 +1,38 @@
+:root {
+  --ng-green: #008753;
+  --us-red: #B22234;
+  --earth-brown: #8B4513; /* Replaced blue with earth brown */
+  --warm-orange: #D2691E; /* Warm earth tone */
+  --glass-white: rgba(255, 255, 255, 0.08);
+}
+
 html {
   width: 100%;
-  height: 100%;
+  min-height: 100%; /* Allow content to expand beyond viewport */
   /* Enable touch tracking */
   touch-action: manipulation;
 }
 
 body {
   margin: 0;
+  /* Use system fonts first for instant rendering (FCP improvement) */
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overflow: hidden;
+  overflow-x: hidden; /* Prevent horizontal scrolling */
+  overflow-y: auto; /* Allow vertical scrolling */
   /* Enable touch tracking */
   touch-action: manipulation;
   width: 100%;
-  height: 100%;
+  min-height: 100%; /* Allow content to expand beyond viewport */
+  /* Black background with aurora lights */
+  background: #000000;
+  background-attachment: fixed;
+  /* Ensure content is visible immediately */
+  color: #f0f0f0;
+  position: relative;
 }
 
 code {

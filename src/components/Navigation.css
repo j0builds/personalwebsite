@@ -3,9 +3,9 @@
   top: 0;
   left: 0;
   width: 100%;
-  background: rgba(15, 15, 15, 0.95);
+  background: rgba(26, 26, 10, 0.95);
   backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(180, 140, 255, 0.1);
+  border-bottom: 1px solid rgba(0, 135, 83, 0.1);
   z-index: 10000;
   padding: 1rem 2rem;
   transform: translateY(-100%);
@@ -45,7 +45,7 @@
   transform: translateX(-50%);
   width: 0;
   height: 1px;
-  background: rgba(180, 140, 255, 0.6);
+  background: rgba(0, 135, 83, 0.6);
   transition: width 0.3s ease;
 }
 
@@ -58,12 +58,12 @@
 }
 
 .nav-link.active {
-  color: rgba(180, 140, 255, 0.9);
+  color: rgba(0, 135, 83, 0.9);
 }
 
 .nav-link.active::after {
   width: 80%;
-  background: rgba(180, 140, 255, 0.8);
+  background: rgba(0, 135, 83, 0.8);
 }
 
 .nav-toggle {
@@ -73,7 +73,7 @@
   width: 50px;
   height: 50px;
   background: rgba(20, 20, 20, 0.8);
-  border: 1px solid rgba(180, 140, 255, 0.2);
+  border: 1px solid rgba(0, 135, 83, 0.2);
   border-radius: 4px;
   cursor: pointer;
   z-index: 10001;
@@ -89,7 +89,7 @@
 
 .nav-toggle:hover {
   background: rgba(30, 30, 30, 0.9);
-  border-color: rgba(180, 140, 255, 0.4);
+  border-color: rgba(0, 135, 83, 0.4);
 }
 
 .nav-toggle span {
