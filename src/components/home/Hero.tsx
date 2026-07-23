@@ -54,9 +54,9 @@ function RotatingRole() {
 
   return (
     <span className="inline-flex items-center gap-2 mt-1">
-      <span className="relative flex h-2 w-2 shrink-0">
-        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
-        <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500" />
+      <span className="relative flex h-1.5 w-1.5 shrink-0">
+        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#3d5c4a]/50 opacity-60" />
+        <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#3d5c4a]/80" />
       </span>
       <AnimatePresence mode="wait">
         <motion.span
@@ -95,23 +95,23 @@ export function Hero() {
     >
       <motion.p
         variants={line}
-        className="text-neutral-400 text-sm font-mono tracking-widest mb-4"
+        className="text-neutral-400/90 text-sm font-mono tracking-[0.22em] mb-5"
       >
         hey, i&apos;m
       </motion.p>
 
-      <motion.h1 variants={line} className="mb-6">
+      <motion.h1 variants={line} className="mb-7">
         <TextScramble
           text="Joseph Ayinde"
           delay={400}
           speed={45}
-          className="text-4xl md:text-6xl lg:text-7xl font-mono font-normal tracking-tight bg-gradient-to-r from-neutral-900 via-neutral-800 to-neutral-500 bg-clip-text text-transparent"
+          className="text-4xl md:text-6xl lg:text-7xl font-mono font-normal tracking-tight text-neutral-900"
         />
       </motion.h1>
 
       <motion.p
         variants={line}
-        className="text-lg md:text-xl text-neutral-500 leading-relaxed max-w-xl mb-10"
+        className="text-lg md:text-xl text-neutral-500/95 leading-[1.7] max-w-xl mb-10"
       >
         co-founder &amp; ceo @{' '}
         <a
@@ -132,7 +132,7 @@ export function Hero() {
         <MagneticButton className="inline-block">
           <Link
             href="/projects"
-            className="block px-6 py-3 text-sm font-mono tracking-wide border border-neutral-300 text-neutral-600 hover:border-neutral-500 hover:text-neutral-900 transition-all duration-300 rounded-lg hover:shadow-[0_0_20px_rgba(0,0,0,0.05)]"
+            className="block px-6 py-3 text-sm font-mono tracking-wide border border-neutral-300/80 text-neutral-600 hover:border-neutral-500 hover:text-neutral-900 transition-all duration-300 rounded-md"
           >
             view work
           </Link>

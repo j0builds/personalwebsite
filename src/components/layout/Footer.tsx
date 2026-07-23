@@ -2,7 +2,7 @@ import { SOCIAL_LINKS } from '@/lib/constants'
 
 export function Footer() {
   return (
-    <footer className="border-t border-neutral-200 px-6 md:px-12 py-8">
+    <footer className="border-t border-neutral-200/70 px-6 md:px-12 py-8">
       <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
         <p className="text-xs text-neutral-400 font-mono">
           &copy; {new Date().getFullYear()} Joseph Ayinde

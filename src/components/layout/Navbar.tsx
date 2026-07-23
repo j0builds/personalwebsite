@@ -92,8 +92,8 @@ export function Navbar() {
         <div
           className={`absolute inset-0 transition-all duration-500 ${
             scrolled
-              ? 'bg-[#fafafa]/90 backdrop-blur-lg shadow-[0_1px_0_rgba(0,0,0,0.04)]'
-              : 'bg-[#fafafa]/80 backdrop-blur-md'
+              ? 'bg-[#f7f6f4]/88 backdrop-blur-lg shadow-[0_1px_0_rgba(28,27,25,0.04)]'
+              : 'bg-[#f7f6f4]/70 backdrop-blur-md'
           }`}
         />
         <nav className="relative flex items-center justify-between max-w-6xl mx-auto">

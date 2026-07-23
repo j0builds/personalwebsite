@@ -8,13 +8,12 @@ export function ComfortTint() {
 
   const triggerTint = useCallback(() => {
     setVisible(true)
-    setTimeout(() => setVisible(false), 3000)
+    setTimeout(() => setVisible(false), 4200)
   }, [])
 
   useEffect(() => {
     const scheduleNext = () => {
-      // Random interval between 75-105 seconds (centered around 90s)
-      const delay = (75 + Math.random() * 30) * 1000
+      const delay = (90 + Math.random() * 40) * 1000
       return setTimeout(() => {
         triggerTint()
         timerRef = scheduleNext()
@@ -32,10 +31,11 @@ export function ComfortTint() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 1.5, ease: 'easeInOut' }}
+          transition={{ duration: 2.2, ease: 'easeInOut' }}
           className="fixed inset-0 pointer-events-none z-[9998]"
           style={{
-            background: 'radial-gradient(ellipse at center, rgba(255, 244, 214, 0.12) 0%, rgba(255, 236, 179, 0.06) 60%, transparent 100%)',
+            background:
+              'radial-gradient(ellipse at 40% 30%, rgba(180, 190, 175, 0.08) 0%, rgba(247, 246, 244, 0.02) 55%, transparent 100%)',
           }}
           aria-hidden
         />

@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Inter, Space_Mono } from 'next/font/google'
+import { Newsreader, Space_Mono } from 'next/font/google'
 import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
 import { SmoothScroll } from '@/components/shared/SmoothScroll'
@@ -7,9 +7,9 @@ import { CustomCursor } from '@/components/shared/CustomCursor'
 import { ComfortTint } from '@/components/shared/ComfortTint'
 import './globals.css'
 
-const inter = Inter({
+const newsreader = Newsreader({
   subsets: ['latin'],
-  variable: '--font-inter',
+  variable: '--font-sans-body',
   display: 'swap',
 })
 
@@ -49,8 +49,8 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${spaceMono.variable}`}>
-      <body className="bg-[#fafafa] text-neutral-900 font-sans antialiased">
+    <html lang="en" className={`${newsreader.variable} ${spaceMono.variable}`}>
+      <body className="bg-[#f7f6f4] text-neutral-900 font-sans antialiased">
         <SmoothScroll />
         <CustomCursor />
         <ComfortTint />
