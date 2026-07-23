@@ -25,12 +25,20 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
     >
       <TiltCard className="relative group block p-6 rounded-xl border border-neutral-200 bg-white/60 backdrop-blur-sm hover:border-neutral-300 hover:bg-white/80 transition-colors duration-300 overflow-hidden shadow-sm hover:shadow-md">
         {project.image && (
-          <div className="relative w-full h-48 mb-5 rounded-lg overflow-hidden bg-neutral-100">
+          <div
+            className={`relative w-full h-48 mb-5 rounded-lg overflow-hidden ${
+              project.id === 'lamlab' ? 'bg-black' : 'bg-neutral-100'
+            }`}
+          >
             <Image
               src={project.image}
               alt={project.title}
               fill
-              className="object-cover transition-transform duration-500 group-hover:scale-105"
+              className={
+                project.id === 'lamlab'
+                  ? 'object-contain p-10 transition-transform duration-500 group-hover:scale-105'
+                  : 'object-cover transition-transform duration-500 group-hover:scale-105'
+              }
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             />
           </div>

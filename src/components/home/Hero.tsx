@@ -4,6 +4,7 @@ import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { TextScramble } from '@/components/shared/TextScramble'
 import { MagneticButton } from '@/components/shared/MagneticButton'
+import { LamLogo } from '@/components/shared/LamLogo'
 
 const container = {
   hidden: { opacity: 0 },
@@ -50,21 +51,29 @@ export function Hero() {
         />
       </motion.h1>
 
-      <motion.p
-        variants={line}
-        className="text-lg md:text-xl text-neutral-500/95 leading-[1.7] max-w-xl mb-10"
-      >
-        co-founder &amp; ceo of{' '}
+      <motion.div variants={line} className="mb-8">
         <a
           href="https://lamlab.ai"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-neutral-800 underline underline-offset-4 decoration-neutral-300 hover:decoration-neutral-500 transition-colors duration-300"
+          className="inline-flex items-center gap-3 group"
         >
-          The Learning and Memory Lab
+          <LamLogo
+            variant="lockup"
+            tone="dark"
+            markClassName="h-11 w-11 md:h-12 md:w-12"
+            priority
+          />
+          <span className="sr-only">The Learning and Memory Lab</span>
         </a>
-        . building a world where humans and machines can learn together.
-        polymath. Tar Heel. SF Bay Area.
+      </motion.div>
+
+      <motion.p
+        variants={line}
+        className="text-lg md:text-xl text-neutral-500/95 leading-[1.7] max-w-xl mb-10"
+      >
+        co-founder &amp; ceo — full-time building a world where humans and
+        machines can learn together. polymath. Tar Heel. SF Bay Area.
         <br />
         <span className="inline-flex items-center gap-2 mt-2">
           <span className="relative flex h-1.5 w-1.5 shrink-0">
@@ -79,7 +88,7 @@ export function Hero() {
               rel="noopener noreferrer"
               className="text-neutral-800 underline underline-offset-4 decoration-neutral-300 hover:decoration-neutral-500 transition-colors duration-300"
             >
-              Lam Lab
+              The Learning and Memory Lab
             </a>
           </span>
         </span>

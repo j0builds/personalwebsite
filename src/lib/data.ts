@@ -52,7 +52,7 @@ export const projects: Project[] = [
       'Building Lucy, an AI-native L&D platform for humans and machines — so your company becomes a system that learns and consolidates itself. Backed by angels from Stanford to the US Military. Affiliated with Founders, Inc. and The Residency (Sam Altman).',
     category: 'built',
     tags: ['AI', 'L&D', 'Memory', 'Enterprise', 'Neuroscience'],
-    image: '/assets/images/cognition.jpg',
+    image: '/assets/brand/lam.png',
     link: 'https://lamlab.ai',
     external: true,
     featured: true,

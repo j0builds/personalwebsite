@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion'
 import { ScrollRevealText } from '@/components/shared/ScrollRevealText'
+import { LamLogo } from '@/components/shared/LamLogo'
 
 export function BioSection() {
   return (
@@ -11,9 +12,23 @@ export function BioSection() {
       transition={{ duration: 0.8, ease: [0.25, 0.4, 0.25, 1] }}
       className="mb-20"
     >
-      <h1 className="text-3xl md:text-4xl font-mono tracking-tight text-neutral-900 mb-8">
-        About
-      </h1>
+      <div className="mb-8 flex flex-wrap items-end justify-between gap-6">
+        <h1 className="text-3xl md:text-4xl font-mono tracking-tight text-neutral-900">
+          About
+        </h1>
+        <a
+          href="https://lamlab.ai"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="opacity-80 hover:opacity-100 transition-opacity duration-300"
+        >
+          <LamLogo
+            variant="lockup"
+            tone="dark"
+            markClassName="h-9 w-9"
+          />
+        </a>
+      </div>
       <div className="space-y-5 leading-relaxed">
         <ScrollRevealText className="text-neutral-500">
           Joseph Ayinde is a world-class scientist and builder from Greensboro, North Carolina — a dual citizen of the United States and Nigeria, now based in the San Francisco Bay Area. Polymath. Tar Heel.
