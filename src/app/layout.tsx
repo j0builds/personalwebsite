@@ -26,10 +26,10 @@ export const metadata: Metadata = {
     template: '%s | Joseph Ayinde',
   },
   description:
-    'Polymath builder at the intersection of neuroscience, AI, and human experience. Ex-OpenAI MTS, CMU Scholar, CEO of Cognition.',
+    'Polymath builder at the intersection of neuroscience, AI, and human experience. CMU Scholar, CEO of Cognition.',
   openGraph: {
     title: 'Joseph Ayinde (j0)',
-    description: 'Polymath builder. Ex-OpenAI. Neuroscience x AI.',
+    description: 'Polymath builder. Neuroscience x AI.',
     url: 'https://josephayinde.com',
     siteName: 'Joseph Ayinde',
     type: 'website',
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Joseph Ayinde (j0)',
-    description: 'Polymath builder. Ex-OpenAI. Neuroscience x AI.',
+    description: 'Polymath builder. Neuroscience x AI.',
   },
 }
 
