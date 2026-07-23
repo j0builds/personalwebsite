@@ -7,9 +7,16 @@ import { TextScramble } from '@/components/shared/TextScramble'
 import { MagneticButton } from '@/components/shared/MagneticButton'
 
 const roles = [
-  { prefix: 'currently founder at', label: 'Cognition', href: 'https://cognitionus.com' },
-  { prefix: 'currently content engineer at', label: 'Chatbase', href: undefined },
-  { prefix: 'currently at', label: 'Willow', href: undefined },
+  {
+    prefix: 'currently co-founder & ceo at',
+    label: 'The Learning and Memory Lab',
+    href: 'https://lamlab.ai',
+  },
+  {
+    prefix: 'currently S26 resident at',
+    label: 'The Residency',
+    href: undefined,
+  },
 ] as const
 
 const container = {
@@ -106,18 +113,17 @@ export function Hero() {
         variants={line}
         className="text-lg md:text-xl text-neutral-500 leading-relaxed max-w-xl mb-10"
       >
-        22-year-old world-class scientist and builder. research at the
-        intersection of neuroscience and machine learning, building in the
-        human potential space. ex-Scale AI, US NSF, Australian NIHI. founder of{' '}
+        co-founder &amp; ceo @{' '}
         <a
-          href="https://cognitionus.com"
+          href="https://lamlab.ai"
           target="_blank"
           rel="noopener noreferrer"
           className="text-neutral-700 underline underline-offset-4 decoration-neutral-300 hover:decoration-neutral-500 transition-colors duration-300"
         >
-          Cognition
+          The Learning and Memory Lab
         </a>
-        .
+        . building a world where humans and machines can learn together.
+        polymath. Tar Heel. SF Bay Area.
         <br />
         <RotatingRole />
       </motion.p>

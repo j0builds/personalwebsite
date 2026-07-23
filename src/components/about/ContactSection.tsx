@@ -15,9 +15,9 @@ export function ContactSection() {
         Connect
       </h2>
       <p className="text-sm text-neutral-500 mb-6 leading-relaxed">
-        Always interested in connecting with fellow builders, thinkers, and
-        dreamers. Whether it&apos;s collaboration, conversation, or simply
-        sharing ideas.
+        Building The Learning and Memory Lab in SF. Always open to founders,
+        operators, investors, and HR / L&amp;D leaders who care about how
+        humans and machines learn together.
       </p>
       <div className="flex flex-wrap items-center gap-4 md:gap-6">
         <a

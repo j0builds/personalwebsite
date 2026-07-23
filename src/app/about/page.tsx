@@ -5,7 +5,7 @@ import { PageTransition } from '@/components/shared/PageTransition'
 export const metadata = {
   title: 'About',
   description:
-    'Joseph Ayinde | CMU Scholar, CEO of Cognition, neurosurgery researcher.',
+    'Joseph Ayinde | Co-Founder & CEO of The Learning and Memory Lab. Polymath. Tar Heel. SF Bay Area.',
 }
 
 export default function AboutPage() {

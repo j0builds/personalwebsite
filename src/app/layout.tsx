@@ -22,14 +22,15 @@ const spaceMono = Space_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: 'Joseph Ayinde | Builder, Researcher, Dreamer',
+    default: 'Joseph Ayinde | Co-Founder & CEO, The Learning and Memory Lab',
     template: '%s | Joseph Ayinde',
   },
   description:
-    'Polymath builder at the intersection of neuroscience, AI, and human experience. CMU Scholar, CEO of Cognition.',
+    'Co-founder & CEO of The Learning and Memory Lab. Building a world where humans and machines can learn together. Polymath. Tar Heel. SF Bay Area.',
   openGraph: {
     title: 'Joseph Ayinde (j0)',
-    description: 'Polymath builder. Neuroscience x AI.',
+    description:
+      'Co-founder & CEO @ The Learning and Memory Lab. Humans + machines learning together.',
     url: 'https://josephayinde.com',
     siteName: 'Joseph Ayinde',
     type: 'website',
@@ -37,7 +38,8 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Joseph Ayinde (j0)',
-    description: 'Polymath builder. Neuroscience x AI.',
+    description:
+      'Co-founder & CEO @ The Learning and Memory Lab. Humans + machines learning together.',
   },
 }
 

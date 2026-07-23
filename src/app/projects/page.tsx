@@ -7,7 +7,8 @@ import { PageTransition } from '@/components/shared/PageTransition'
 
 export const metadata = {
   title: 'Projects',
-  description: 'Research, publications, and things built by Joseph Ayinde.',
+  description:
+    'Research and products from Joseph Ayinde — The Learning and Memory Lab, Lucy, Butterfly, and more.',
 }
 
 export default function ProjectsPage() {

@@ -15,41 +15,39 @@ export function BioSection() {
         About
       </h1>
       <div className="space-y-5 leading-relaxed">
-        <ScrollRevealText
-          className="text-neutral-500"
-        >
-          Joseph Ayinde is a polymath builder from Greensboro, North Carolina, a dual citizen of the United States and Nigeria. The work happens at the edges: the gap between biology and technology, the intersection of neuroscience and artificial intelligence, the bridge between what we know and what we are discovering.
+        <ScrollRevealText className="text-neutral-500">
+          Joseph Ayinde is a world-class scientist and builder from Greensboro, North Carolina — a dual citizen of the United States and Nigeria, now based in the San Francisco Bay Area. Polymath. Tar Heel.
         </ScrollRevealText>
         <ScrollRevealText
           className="text-neutral-500"
           highlightWords={{
-            Cognition: 'text-neutral-700',
+            Learning: 'text-neutral-700',
+            Memory: 'text-neutral-700',
+            Lab: 'text-neutral-700',
+            Lucy: 'text-neutral-700',
           }}
         >
-          Previously co-founded Cognition (formerly HEALLY), the Cognitive OS for Learning. Prototyped and tested a non-invasive EEG-AI brain-computer interface, ran human-subject usability trials, and raised $150K+ with partners including Google DeepMind, NVIDIA, and Carnegie Mellon LearnLab.
+          Now co-founder &amp; CEO of The Learning and Memory Lab, building Lucy — an AI-native L&amp;D platform for humans and machines. The company is backed by a vibrant group of angels, from Stanford to the US Military, and affiliated with Founders, Inc. and The Residency.
         </ScrollRevealText>
-        <ScrollRevealText className="text-neutral-500">
-          Became the world&apos;s first undergraduate intern in the world&apos;s first Computational Neurosurgery lab in Sydney, Australia, shadowing 80+ neurosurgical operations and leading a research project on AI ethics in neurosurgery under Prof. Antonio Di Ieva.
+        <ScrollRevealText
+          className="text-neutral-500"
+          highlightWords={{
+            HEALLY: 'text-neutral-700',
+          }}
+        >
+          At 6, built a flashcard game on an Apple iPod and was aired on the local news. At 19, built HEALLY into a globally recognized company with over $150,000 in funding and world-class industry partnerships, and flew alone to Australia for a neurosurgical apprenticeship under Dr. Antonio Di Ieva and Dr. Eric Suero Molina.
         </ScrollRevealText>
         <ScrollRevealText
           className="text-neutral-500"
           highlightWords={{
             Carnegie: 'text-neutral-700',
             Mellon: 'text-neutral-700',
-            LearnLab: 'text-neutral-700',
           }}
         >
-          Research spans operator theory for learning dynamics and evolutionary biology (NSF-funded, Pfennig Lab). Selected as a Computational Models of Learning Scholar at Carnegie Mellon LearnLab, the #1 learning science lab in the world.
+          At 20, won a first international science award and a first national business award, and worked at Scale AI. At 21, researched through the NSF and US DOD. At 22, graduated from UNC Chapel Hill (May 2025) with degrees in Biology, Neuroscience, and Chemistry, then was selected as a Neuroscience and Machine Learning Scholar at Carnegie Mellon University.
         </ScrollRevealText>
-        <ScrollRevealText
-          className="text-neutral-500"
-          highlightWords={{
-            UNC: 'text-neutral-700',
-            Chapel: 'text-neutral-700',
-            Hill: 'text-neutral-700',
-          }}
-        >
-          Arrived at UNC Chapel Hill at 18 as one of 25 students worldwide selected for the Chancellor's Science Scholars program. Graduated with honors in Biology, Neuroscience, and Chemistry.
+        <ScrollRevealText className="text-neutral-500">
+          The throughline is learning itself — how humans remember, how machines adapt, and how both get better together. That is what The Learning and Memory Lab is for.
         </ScrollRevealText>
       </div>
     </motion.section>
