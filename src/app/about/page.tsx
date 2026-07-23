@@ -1,5 +1,4 @@
 import { BioSection } from '@/components/about/BioSection'
-import { ExperienceTimeline } from '@/components/about/ExperienceTimeline'
 import { ContactSection } from '@/components/about/ContactSection'
 import { PageTransition } from '@/components/shared/PageTransition'
 
@@ -14,7 +13,6 @@ export default function AboutPage() {
     <PageTransition>
       <div className="max-w-3xl mx-auto px-6 md:px-12 pt-32 pb-24">
         <BioSection />
-        <ExperienceTimeline />
         <ContactSection />
       </div>
     </PageTransition>
