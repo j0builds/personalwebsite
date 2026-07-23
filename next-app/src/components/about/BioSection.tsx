@@ -28,13 +28,8 @@ export function BioSection() {
         >
           Previously co-founded Cognition (formerly HEALLY), the Cognitive OS for Learning. Prototyped and tested a non-invasive EEG-AI brain-computer interface, ran human-subject usability trials, and raised $150K+ with partners including Google DeepMind, NVIDIA, and Carnegie Mellon LearnLab.
         </ScrollRevealText>
-        <ScrollRevealText
-          className="text-neutral-500"
-          highlightWords={{
-            OpenAI: 'text-neutral-700',
-          }}
-        >
-          At 21, joined OpenAI as a Member of Technical Staff, serving as a biology expert for next-generation large language models. Before that, became the world's first undergraduate intern in the world's first Computational Neurosurgery lab in Sydney, Australia, shadowing 80+ neurosurgical operations and leading a research project on AI ethics in neurosurgery under Prof. Antonio Di Ieva.
+        <ScrollRevealText className="text-neutral-500">
+          Became the world&apos;s first undergraduate intern in the world&apos;s first Computational Neurosurgery lab in Sydney, Australia, shadowing 80+ neurosurgical operations and leading a research project on AI ethics in neurosurgery under Prof. Antonio Di Ieva.
         </ScrollRevealText>
         <ScrollRevealText
           className="text-neutral-500"

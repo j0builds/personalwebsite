@@ -108,7 +108,7 @@ export function Hero() {
       >
         22-year-old world-class scientist and builder. research at the
         intersection of neuroscience and machine learning, building in the
-        human potential space. ex-OpenAI, ex-Scale AI, US NSF, Australian NIHI. founder of{' '}
+        human potential space. ex-Scale AI, US NSF, Australian NIHI. founder of{' '}
         <a
           href="https://cognitionus.com"
           target="_blank"
