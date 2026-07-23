@@ -111,15 +111,6 @@ export const experiences: Experience[] = [
     image: '/assets/images/cmu.jpg',
   },
   {
-    id: 'openai',
-    role: 'Member of Technical Staff',
-    organization: 'OpenAI',
-    period: 'Jan – May 2024',
-    description:
-      'Biology expert for next-generation LLMs. Fine-tuned models for scientific reasoning and data interpretation.',
-    image: '/assets/images/open-ai.jpg',
-  },
-  {
     id: 'scale-ai',
     role: 'AI Specialist',
     organization: 'Scale AI',
