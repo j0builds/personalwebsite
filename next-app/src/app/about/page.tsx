@@ -6,7 +6,7 @@ import { PageTransition } from '@/components/shared/PageTransition'
 export const metadata = {
   title: 'About',
   description:
-    'Joseph Ayinde | ex-OpenAI MTS, CMU Scholar, CEO of Cognition, neurosurgery researcher.',
+    'Joseph Ayinde | CMU Scholar, CEO of Cognition, neurosurgery researcher.',
 }
 
 export default function AboutPage() {
