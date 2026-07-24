@@ -81,7 +81,7 @@ export function Hero() {
                 href="https://lamlab.ai"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="block rounded-full bg-white px-7 py-3 font-mono text-sm tracking-wide text-[#07080c] transition-opacity duration-300 hover:opacity-90"
+                className="block rounded-full bg-white px-7 py-3 font-mono text-sm tracking-wide text-[#0a0a0b] transition-opacity duration-300 hover:opacity-90"
               >
                 enter Lam Lab
               </a>
@@ -96,19 +96,18 @@ export function Hero() {
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, scale: 0.94 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1.1, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
-          className="relative mx-auto flex h-[280px] w-[280px] items-center justify-center md:h-[380px] md:w-[380px] lg:h-[440px] lg:w-[440px]"
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.9, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+          className="relative mx-auto flex h-[260px] w-[260px] items-center justify-center md:h-[360px] md:w-[360px] lg:h-[420px] lg:w-[420px]"
         >
-          <div className="absolute inset-[12%] rounded-full bg-white/[0.04] blur-3xl" />
           <Image
             src="/assets/brand/lam.png"
             alt="The Learning and Memory Lab"
-            width={440}
-            height={440}
+            width={420}
+            height={420}
             priority
-            className="relative h-full w-full object-contain drop-shadow-[0_0_60px_rgba(255,255,255,0.08)]"
+            className="h-full w-full object-contain"
           />
         </motion.div>
       </div>
