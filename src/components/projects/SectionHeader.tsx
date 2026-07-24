@@ -16,10 +16,10 @@ export function SectionHeader({ title, description }: SectionHeaderProps) {
       transition={{ duration: 0.6, ease: [0.25, 0.4, 0.25, 1] }}
       className="mb-10"
     >
-      <h2 className="mb-2 font-mono text-2xl tracking-tight text-[#141311]">
+      <h2 className="mb-2 font-sans text-2xl font-medium tracking-tight text-white">
         {title}
       </h2>
-      <p className="text-sm text-[#141311]/4">{description}</p>
+      <p className="text-sm text-white/40">{description}</p>
     </motion.div>
   )
 }

@@ -23,11 +23,11 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
       }}
       className={project.featured ? 'md:col-span-2' : ''}
     >
-      <TiltCard className="group relative block overflow-hidden rounded-2xl border border-[#141311]/08 bg-[#FCFBF9]/55 p-6 transition-colors duration-300 hover:border-[#141311]/16 hover:bg-[#FCFBF9]/85">
+      <TiltCard className="group relative block overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] p-6 transition-colors duration-300 hover:border-white/20 hover:bg-white/[0.07]">
         {project.image && (
           <div
             className={`relative mb-5 h-48 w-full overflow-hidden rounded-xl ${
-              project.id === 'lamlab' ? 'bg-[#141311]' : 'bg-[#141311]/04'
+              project.id === 'lamlab' ? 'bg-black/60' : 'bg-white/5'
             }`}
           >
             <Image
@@ -44,7 +44,7 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
           </div>
         )}
 
-        <h3 className="mb-2 text-lg font-medium text-[#141311]/85 transition-colors duration-300 group-hover:text-[#141311]">
+        <h3 className="mb-2 text-lg font-medium text-white/90 transition-colors duration-300 group-hover:text-white">
           {project.link ? (
             <a
               href={project.link}
@@ -59,7 +59,7 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
           )}
         </h3>
 
-        <p className="mb-4 text-sm leading-relaxed text-[#141311]/5 group-hover:text-[#141311]/65">
+        <p className="mb-4 text-sm leading-relaxed text-white/50 group-hover:text-white/65">
           {project.description}
         </p>
 
@@ -67,7 +67,7 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
           {project.tags.map((tag) => (
             <span
               key={tag}
-              className="rounded-md border border-[#141311]/08 bg-[#141311]/[0.03] px-2.5 py-1 font-mono text-xs text-[#141311]/45"
+              className="rounded-md border border-white/10 bg-white/[0.04] px-2.5 py-1 font-mono text-xs text-white/45"
             >
               {tag}
             </span>

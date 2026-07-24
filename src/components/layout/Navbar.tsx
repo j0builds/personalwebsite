@@ -31,9 +31,7 @@ function MagneticNavLink({
     setPosition({ x: x * 0.15, y: y * 0.15 })
   }
 
-  const handleMouseLeave = () => {
-    setPosition({ x: 0, y: 0 })
-  }
+  const handleMouseLeave = () => setPosition({ x: 0, y: 0 })
 
   return (
     <li
@@ -48,16 +46,14 @@ function MagneticNavLink({
       <Link
         href={href}
         className={`relative text-sm tracking-wide transition-colors duration-300 ${
-          isActive
-            ? 'text-[#141311]'
-            : 'text-[#141311]/40 hover:text-[#141311]/75'
+          isActive ? 'text-white' : 'text-white/40 hover:text-white/75'
         }`}
       >
         {label}
         {isActive && (
           <motion.div
             layoutId="nav-indicator"
-            className="absolute -bottom-1 left-0 right-0 h-px bg-[#141311]/35"
+            className="absolute -bottom-1 left-0 right-0 h-px bg-white/45"
             transition={{ type: 'spring', stiffness: 380, damping: 30 }}
           />
         )}
@@ -83,27 +79,25 @@ export function Navbar() {
   return (
     <header className="fixed top-0 left-0 right-0 z-50">
       <motion.div
-        className="absolute top-0 left-0 right-0 z-10 h-[1px] origin-left bg-[#141311]/10"
+        className="absolute top-0 left-0 right-0 z-10 h-px origin-left bg-white/15"
         style={{ scaleX }}
       />
-
-      <div className="px-6 py-4 md:px-12 md:py-6">
+      <div className="px-6 py-5 md:px-12 md:py-6">
         <div
           className={`absolute inset-0 transition-all duration-500 ${
             scrolled
-              ? 'bg-[#FCFBF9]/80 backdrop-blur-lg shadow-[0_1px_0_rgba(20,19,17,0.04)]'
+              ? 'bg-[#07080c]/75 backdrop-blur-lg shadow-[0_1px_0_rgba(255,255,255,0.06)]'
               : 'bg-transparent'
           }`}
         />
         <nav className="relative mx-auto flex max-w-6xl items-center justify-between">
           <Link
             href="/"
-            className="font-mono text-sm tracking-[0.22em] text-[#141311]/40 transition-colors duration-300 hover:text-[#141311]"
+            className="font-mono text-sm tracking-[0.22em] text-white/45 transition-colors duration-300 hover:text-white"
           >
             j0
           </Link>
-
-          <ul className="flex items-center gap-5 md:gap-8">
+          <ul className="flex items-center gap-6 md:gap-8">
             {navLinks.map(({ href, label }) => (
               <MagneticNavLink
                 key={href}
