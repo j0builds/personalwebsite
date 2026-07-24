@@ -51,7 +51,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${newsreader.variable} ${spaceMono.variable}`}>
-      <body className="bg-[#070c1a] text-white font-sans antialiased">
+      <body className="bg-[#FCFBF9] text-[#141311] font-sans antialiased">
         <SmoothScroll />
         <CustomCursor />
         <ComfortTint />

@@ -32,10 +32,10 @@ export function ComfortTint() {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 2.2, ease: 'easeInOut' }}
-          className="fixed inset-0 pointer-events-none z-[9998]"
+          className="pointer-events-none fixed inset-0 z-[9998]"
           style={{
             background:
-              'radial-gradient(ellipse at 45% 35%, rgba(127, 176, 230, 0.1) 0%, rgba(7, 12, 26, 0.02) 55%, transparent 100%)',
+              'radial-gradient(ellipse at 40% 30%, rgba(200, 190, 170, 0.1) 0%, rgba(252, 251, 249, 0.02) 55%, transparent 100%)',
           }}
           aria-hidden
         />

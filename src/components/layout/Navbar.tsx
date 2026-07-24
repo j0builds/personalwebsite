@@ -49,15 +49,15 @@ function MagneticNavLink({
         href={href}
         className={`relative text-sm tracking-wide transition-colors duration-300 ${
           isActive
-            ? 'text-white'
-            : 'text-white/45 hover:text-white/80'
+            ? 'text-[#141311]'
+            : 'text-[#141311]/40 hover:text-[#141311]/75'
         }`}
       >
         {label}
         {isActive && (
           <motion.div
             layoutId="nav-indicator"
-            className="absolute -bottom-1 left-0 right-0 h-px bg-white/50"
+            className="absolute -bottom-1 left-0 right-0 h-px bg-[#141311]/35"
             transition={{ type: 'spring', stiffness: 380, damping: 30 }}
           />
         )}
@@ -83,7 +83,7 @@ export function Navbar() {
   return (
     <header className="fixed top-0 left-0 right-0 z-50">
       <motion.div
-        className="absolute top-0 left-0 right-0 h-[2px] bg-white/15 origin-left z-10"
+        className="absolute top-0 left-0 right-0 z-10 h-[1px] origin-left bg-[#141311]/10"
         style={{ scaleX }}
       />
 
@@ -91,14 +91,14 @@ export function Navbar() {
         <div
           className={`absolute inset-0 transition-all duration-500 ${
             scrolled
-              ? 'bg-[#070c1a]/75 backdrop-blur-lg shadow-[0_1px_0_rgba(255,255,255,0.06)]'
-              : 'bg-[#070c1a]/35 backdrop-blur-md'
+              ? 'bg-[#FCFBF9]/80 backdrop-blur-lg shadow-[0_1px_0_rgba(20,19,17,0.04)]'
+              : 'bg-transparent'
           }`}
         />
-        <nav className="relative flex items-center justify-between max-w-6xl mx-auto">
+        <nav className="relative mx-auto flex max-w-6xl items-center justify-between">
           <Link
             href="/"
-            className="font-mono text-sm tracking-widest text-white/50 hover:text-white transition-colors duration-300"
+            className="font-mono text-sm tracking-[0.22em] text-[#141311]/40 transition-colors duration-300 hover:text-[#141311]"
           >
             j0
           </Link>

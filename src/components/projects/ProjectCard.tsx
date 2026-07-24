@@ -23,11 +23,11 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
       }}
       className={project.featured ? 'md:col-span-2' : ''}
     >
-      <TiltCard className="relative group block p-6 rounded-xl border border-white/10 bg-white/[0.045] backdrop-blur-sm hover:border-white/24 hover:bg-white/[0.09] transition-colors duration-300 overflow-hidden">
+      <TiltCard className="group relative block overflow-hidden rounded-2xl border border-[#141311]/08 bg-[#FCFBF9]/55 p-6 transition-colors duration-300 hover:border-[#141311]/16 hover:bg-[#FCFBF9]/85">
         {project.image && (
           <div
-            className={`relative w-full h-48 mb-5 rounded-lg overflow-hidden ${
-              project.id === 'lamlab' ? 'bg-black/70' : 'bg-white/5'
+            className={`relative mb-5 h-48 w-full overflow-hidden rounded-xl ${
+              project.id === 'lamlab' ? 'bg-[#141311]' : 'bg-[#141311]/04'
             }`}
           >
             <Image
@@ -44,13 +44,13 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
           </div>
         )}
 
-        <h3 className="text-lg font-medium text-white/90 mb-2 group-hover:text-white transition-colors duration-300">
+        <h3 className="mb-2 text-lg font-medium text-[#141311]/85 transition-colors duration-300 group-hover:text-[#141311]">
           {project.link ? (
             <a
               href={project.link}
               target={project.external ? '_blank' : undefined}
               rel={project.external ? 'noopener noreferrer' : undefined}
-              className="hover:underline underline-offset-4"
+              className="underline-offset-4 hover:underline"
             >
               {project.title}
             </a>
@@ -59,7 +59,7 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
           )}
         </h3>
 
-        <p className="text-sm text-white/55 leading-relaxed mb-4 group-hover:text-white/70">
+        <p className="mb-4 text-sm leading-relaxed text-[#141311]/5 group-hover:text-[#141311]/65">
           {project.description}
         </p>
 
@@ -67,7 +67,7 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
           {project.tags.map((tag) => (
             <span
               key={tag}
-              className="px-2.5 py-1 text-xs font-mono text-white/55 bg-white/[0.06] rounded-md border border-white/10"
+              className="rounded-md border border-[#141311]/08 bg-[#141311]/[0.03] px-2.5 py-1 font-mono text-xs text-[#141311]/45"
             >
               {tag}
             </span>
