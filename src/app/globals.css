@@ -1,18 +1,37 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-background: #07080c;
+  --color-background: #06070b;
   --color-foreground: #f4f1ea;
 
   --font-sans: var(--font-sans-body);
   --font-mono: var(--font-space-mono);
 
-  --animate-aurora-1: aurora-1 48s ease-in-out infinite;
+  --animate-aurora-1: aurora-1 34s ease-in-out infinite;
+  --animate-aurora-2: aurora-2 46s ease-in-out infinite;
+  --animate-aurora-3: aurora-3 40s ease-in-out infinite;
+  --animate-aurora-drift: aurora-drift 60s linear infinite;
 }
 
 @keyframes aurora-1 {
-  0%, 100% { transform: scale(1.1) translate(0, 0); }
-  50% { transform: scale(1.14) translate(-1.5%, 1%); }
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(4%, -3%) scale(1.08); }
+}
+
+@keyframes aurora-2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-3.5%, 2.5%) scale(1.06); }
+}
+
+@keyframes aurora-3 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(2.5%, -2%) scale(1.1); }
+}
+
+@keyframes aurora-drift {
+  0% { transform: translateY(0); opacity: 0.3; }
+  50% { transform: translateY(-1.5%); opacity: 0.4; }
+  100% { transform: translateY(0); opacity: 0.3; }
 }
 
 @layer base {
