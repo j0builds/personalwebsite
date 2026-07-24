@@ -5,6 +5,7 @@ import { Footer } from '@/components/layout/Footer'
 import { SmoothScroll } from '@/components/shared/SmoothScroll'
 import { CustomCursor } from '@/components/shared/CustomCursor'
 import { ComfortTint } from '@/components/shared/ComfortTint'
+import { AuroraBackground } from '@/components/home/AuroraBackground'
 import './globals.css'
 
 const newsreader = Newsreader({
@@ -50,13 +51,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${newsreader.variable} ${spaceMono.variable}`}>
-      <body className="bg-[#f7f6f4] text-neutral-900 font-sans antialiased">
+      <body className="bg-[#070c1a] text-white font-sans antialiased">
         <SmoothScroll />
         <CustomCursor />
         <ComfortTint />
+        <AuroraBackground />
         <Navbar />
-        <main className="min-h-screen">{children}</main>
-        <Footer />
+        <main className="relative z-10 min-h-screen">{children}</main>
+        <div className="relative z-10">
+          <Footer />
+        </div>
       </body>
     </html>
   )

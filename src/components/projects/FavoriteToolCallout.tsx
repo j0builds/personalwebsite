@@ -59,7 +59,7 @@ export function FavoriteToolCallout() {
           />
         </svg>
 
-        <p className="text-xs font-mono text-neutral-400 tracking-wider uppercase mb-4">
+        <p className="text-xs font-mono text-white/40 tracking-wider uppercase mb-4">
           my favorite AI tool
         </p>
 
@@ -86,12 +86,12 @@ export function FavoriteToolCallout() {
               strokeLinecap="round"
             />
           </svg>
-          <span className="text-2xl md:text-3xl font-mono font-medium text-neutral-800 tracking-tight">
+          <span className="text-2xl md:text-3xl font-mono font-medium text-white/90 tracking-tight">
             Claude Code
           </span>
         </div>
 
-        <p className="text-xs md:text-sm text-neutral-400 leading-relaxed">
+        <p className="text-xs md:text-sm text-white/45 leading-relaxed">
           this entire site was pair-programmed with Claude
         </p>
       </div>

@@ -35,7 +35,7 @@ export function ComfortTint() {
           className="fixed inset-0 pointer-events-none z-[9998]"
           style={{
             background:
-              'radial-gradient(ellipse at 40% 30%, rgba(180, 190, 175, 0.08) 0%, rgba(247, 246, 244, 0.02) 55%, transparent 100%)',
+              'radial-gradient(ellipse at 45% 35%, rgba(127, 176, 230, 0.1) 0%, rgba(7, 12, 26, 0.02) 55%, transparent 100%)',
           }}
           aria-hidden
         />

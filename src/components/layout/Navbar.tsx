@@ -49,15 +49,15 @@ function MagneticNavLink({
         href={href}
         className={`relative text-sm tracking-wide transition-colors duration-300 ${
           isActive
-            ? 'text-neutral-900'
-            : 'text-neutral-400 hover:text-neutral-600'
+            ? 'text-white'
+            : 'text-white/45 hover:text-white/80'
         }`}
       >
         {label}
         {isActive && (
           <motion.div
             layoutId="nav-indicator"
-            className="absolute -bottom-1 left-0 right-0 h-px bg-neutral-500"
+            className="absolute -bottom-1 left-0 right-0 h-px bg-white/50"
             transition={{ type: 'spring', stiffness: 380, damping: 30 }}
           />
         )}
@@ -82,9 +82,8 @@ export function Navbar() {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50">
-      {/* Scroll progress bar */}
       <motion.div
-        className="absolute top-0 left-0 right-0 h-[2px] bg-neutral-900/10 origin-left z-10"
+        className="absolute top-0 left-0 right-0 h-[2px] bg-white/15 origin-left z-10"
         style={{ scaleX }}
       />
 
@@ -92,14 +91,14 @@ export function Navbar() {
         <div
           className={`absolute inset-0 transition-all duration-500 ${
             scrolled
-              ? 'bg-[#f7f6f4]/88 backdrop-blur-lg shadow-[0_1px_0_rgba(28,27,25,0.04)]'
-              : 'bg-[#f7f6f4]/70 backdrop-blur-md'
+              ? 'bg-[#070c1a]/75 backdrop-blur-lg shadow-[0_1px_0_rgba(255,255,255,0.06)]'
+              : 'bg-[#070c1a]/35 backdrop-blur-md'
           }`}
         />
         <nav className="relative flex items-center justify-between max-w-6xl mx-auto">
           <Link
             href="/"
-            className="font-mono text-sm tracking-widest text-neutral-400 hover:text-neutral-900 transition-colors duration-300"
+            className="font-mono text-sm tracking-widest text-white/50 hover:text-white transition-colors duration-300"
           >
             j0
           </Link>

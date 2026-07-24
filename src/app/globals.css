@@ -1,26 +1,26 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-background: #f7f6f4;
-  --color-foreground: #1c1b19;
+  --color-background: #070c1a;
+  --color-foreground: #f5f7fb;
 
   --font-sans: var(--font-sans-body);
   --font-mono: var(--font-space-mono);
 
-  --color-brand-green: #3d5c4a;
+  --color-brand-green: #7fb0e6;
 
-  --animate-aurora-1: aurora-1 36s ease-in-out infinite;
-  --animate-aurora-2: aurora-2 44s ease-in-out infinite;
+  --animate-aurora-1: aurora-1 42s ease-in-out infinite;
+  --animate-aurora-2: aurora-2 56s ease-in-out infinite;
 }
 
 @keyframes aurora-1 {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  50% { transform: translate(40px, -30px) scale(1.06); }
+  0%, 100% { transform: translate(0, 0) scale(1.05); }
+  50% { transform: translate(-1.5%, 1%) scale(1.08); }
 }
 
 @keyframes aurora-2 {
   0%, 100% { transform: translate(0, 0) scale(1); }
-  50% { transform: translate(-35px, 25px) scale(1.04); }
+  50% { transform: translate(2%, -1.5%) scale(1.03); }
 }
 
 @layer base {
@@ -47,8 +47,8 @@
   }
 
   ::selection {
-    background-color: rgba(61, 92, 74, 0.14);
-    color: #1c1b19;
+    background-color: rgba(127, 176, 230, 0.28);
+    color: #ffffff;
   }
 
   ::-webkit-scrollbar {
@@ -60,11 +60,11 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    background: rgba(28, 27, 25, 0.1);
+    background: rgba(255, 255, 255, 0.14);
     border-radius: 999px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: rgba(28, 27, 25, 0.18);
+    background: rgba(255, 255, 255, 0.24);
   }
 }

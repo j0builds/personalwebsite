@@ -37,7 +37,7 @@ export function Hero() {
     >
       <motion.p
         variants={line}
-        className="text-neutral-400/90 text-sm font-mono tracking-[0.22em] mb-5"
+        className="text-white/50 text-sm font-mono tracking-[0.22em] mb-5"
       >
         hey, i&apos;m
       </motion.p>
@@ -47,7 +47,7 @@ export function Hero() {
           text="Joseph Ayinde"
           delay={400}
           speed={45}
-          className="text-4xl md:text-6xl lg:text-7xl font-mono font-normal tracking-tight text-neutral-900"
+          className="text-4xl md:text-6xl lg:text-7xl font-mono font-normal tracking-tight text-white"
         />
       </motion.h1>
 
@@ -60,7 +60,7 @@ export function Hero() {
         >
           <LamLogo
             variant="lockup"
-            tone="dark"
+            tone="light"
             markClassName="h-11 w-11 md:h-12 md:w-12"
             priority
           />
@@ -70,15 +70,15 @@ export function Hero() {
 
       <motion.p
         variants={line}
-        className="text-lg md:text-xl text-neutral-500/95 leading-[1.7] max-w-xl mb-10"
+        className="text-lg md:text-xl text-white/70 leading-[1.7] max-w-xl mb-10"
       >
         co-founder &amp; ceo — full-time building a world where humans and
         machines can learn together. polymath. Tar Heel. SF Bay Area.
         <br />
         <span className="inline-flex items-center gap-2 mt-2">
           <span className="relative flex h-1.5 w-1.5 shrink-0">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#3d5c4a]/50 opacity-60" />
-            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#3d5c4a]/80" />
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-300/50 opacity-60" />
+            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-sky-300/90" />
           </span>
           <span>
             full-time on{' '}
@@ -86,7 +86,7 @@ export function Hero() {
               href="https://lamlab.ai"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-neutral-800 underline underline-offset-4 decoration-neutral-300 hover:decoration-neutral-500 transition-colors duration-300"
+              className="text-white underline underline-offset-4 decoration-white/30 hover:decoration-white/70 transition-colors duration-300"
             >
               The Learning and Memory Lab
             </a>
@@ -98,14 +98,14 @@ export function Hero() {
         <MagneticButton className="inline-block">
           <Link
             href="/projects"
-            className="block px-6 py-3 text-sm font-mono tracking-wide border border-neutral-300/80 text-neutral-600 hover:border-neutral-500 hover:text-neutral-900 transition-all duration-300 rounded-md"
+            className="block px-6 py-3 text-sm font-mono tracking-wide border border-white/25 text-white/80 hover:border-white/55 hover:text-white transition-all duration-300 rounded-md"
           >
             view work
           </Link>
         </MagneticButton>
         <Link
           href="/about"
-          className="text-sm text-neutral-400 hover:text-neutral-600 transition-colors duration-300 underline underline-offset-4 decoration-neutral-300 hover:decoration-neutral-400"
+          className="text-sm text-white/45 hover:text-white/80 transition-colors duration-300 underline underline-offset-4 decoration-white/25 hover:decoration-white/50"
         >
           about me
         </Link>

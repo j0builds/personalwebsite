@@ -23,11 +23,11 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
       }}
       className={project.featured ? 'md:col-span-2' : ''}
     >
-      <TiltCard className="relative group block p-6 rounded-xl border border-neutral-200 bg-white/60 backdrop-blur-sm hover:border-neutral-300 hover:bg-white/80 transition-colors duration-300 overflow-hidden shadow-sm hover:shadow-md">
+      <TiltCard className="relative group block p-6 rounded-xl border border-white/10 bg-white/[0.045] backdrop-blur-sm hover:border-white/24 hover:bg-white/[0.09] transition-colors duration-300 overflow-hidden">
         {project.image && (
           <div
             className={`relative w-full h-48 mb-5 rounded-lg overflow-hidden ${
-              project.id === 'lamlab' ? 'bg-black' : 'bg-neutral-100'
+              project.id === 'lamlab' ? 'bg-black/70' : 'bg-white/5'
             }`}
           >
             <Image
@@ -44,7 +44,7 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
           </div>
         )}
 
-        <h3 className="text-lg font-medium text-neutral-800 mb-2 group-hover:text-neutral-900 transition-colors duration-300">
+        <h3 className="text-lg font-medium text-white/90 mb-2 group-hover:text-white transition-colors duration-300">
           {project.link ? (
             <a
               href={project.link}
@@ -59,7 +59,7 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
           )}
         </h3>
 
-        <p className="text-sm text-neutral-500 leading-relaxed mb-4 group-hover:text-neutral-600">
+        <p className="text-sm text-white/55 leading-relaxed mb-4 group-hover:text-white/70">
           {project.description}
         </p>
 
@@ -67,7 +67,7 @@ export function ProjectCard({ project, index }: ProjectCardProps) {
           {project.tags.map((tag) => (
             <span
               key={tag}
-              className="px-2.5 py-1 text-xs font-mono text-neutral-500 bg-neutral-100 rounded-md border border-neutral-200"
+              className="px-2.5 py-1 text-xs font-mono text-white/55 bg-white/[0.06] rounded-md border border-white/10"
             >
               {tag}
             </span>
