@@ -1,48 +1,47 @@
+import { ContactCTA } from '@/components/sections/ContactCTA'
+import { ResearchList } from '@/components/sections/ResearchList'
+import { WorkIndex } from '@/components/sections/WorkIndex'
+import { MaskedLine } from '@/components/shared/Reveal'
 import { projects, publications } from '@/lib/data'
-import { ProjectGrid } from '@/components/projects/ProjectGrid'
-import { SectionHeader } from '@/components/projects/SectionHeader'
-import { PaperCutout } from '@/components/projects/PaperCutout'
-import { FavoriteToolCallout } from '@/components/projects/FavoriteToolCallout'
-import { PageTransition } from '@/components/shared/PageTransition'
 
 export const metadata = {
-  title: 'Projects',
+  title: 'Work',
   description:
     'Research and products from Joseph Ayinde — The Learning and Memory Lab, Lucy, Butterfly, and more.',
 }
 
 export default function ProjectsPage() {
-  const built = projects.filter((p) => p.category === 'built')
+  const builtCount = projects.filter((p) => p.category === 'built').length
 
   return (
-    <PageTransition>
-      <div className="max-w-5xl mx-auto px-6 md:px-12 pt-32 pb-24">
-        <section className="mb-24">
-          <SectionHeader
-            title="Publications"
-            description="research at the intersection of neuroscience, AI, and learning"
-          />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10">
-            {publications.map((pub, i) => (
-              <PaperCutout key={pub.id} publication={pub} index={i} />
-            ))}
+    <>
+      <section className="px-6 pt-36 pb-4 md:px-12 md:pt-44">
+        <div className="mx-auto grid max-w-7xl gap-10 md:grid-cols-12">
+          <div className="md:col-span-9">
+            <p className="eyebrow mb-8">Work &amp; Research</p>
+            <h1 className="font-display text-6xl leading-[0.9] tracking-[-0.03em] md:text-8xl lg:text-[8.5rem]">
+              <MaskedLine delay={0.1}>Built, studied,</MaskedLine>
+              <MaskedLine delay={0.2}>
+                <span className="italic text-paper/75">remembered</span>
+                <span className="text-signal">.</span>
+              </MaskedLine>
+            </h1>
           </div>
-        </section>
-
-        <section className="mb-24">
-          <SectionHeader
-            title="Built"
-            description="things brought from idea to reality"
-          />
-          <ProjectGrid projects={built} />
-        </section>
-
-        <div className="flex justify-center">
-          <div className="max-w-sm">
-            <FavoriteToolCallout />
-          </div>
+          <dl className="grid grid-cols-2 gap-6 self-end md:col-span-3">
+            <div>
+              <dt className="eyebrow mb-1">Products</dt>
+              <dd className="font-display text-5xl">{String(builtCount).padStart(2, '0')}</dd>
+            </div>
+            <div>
+              <dt className="eyebrow mb-1">Papers</dt>
+              <dd className="font-display text-5xl">{String(publications.length).padStart(2, '0')}</dd>
+            </div>
+          </dl>
         </div>
-      </div>
-    </PageTransition>
+      </section>
+      <WorkIndex index="01" />
+      <ResearchList index="02" />
+      <ContactCTA />
+    </>
   )
 }
