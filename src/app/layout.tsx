@@ -1,38 +1,48 @@
-import type { Metadata } from 'next'
-import { Newsreader, Space_Mono } from 'next/font/google'
+import type { Metadata, Viewport } from 'next'
+import { Geist, Geist_Mono, Instrument_Serif } from 'next/font/google'
 import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
 import { SmoothScroll } from '@/components/shared/SmoothScroll'
 import { CustomCursor } from '@/components/shared/CustomCursor'
-import { ComfortTint } from '@/components/shared/ComfortTint'
-import { AuroraBackground } from '@/components/home/AuroraBackground'
+import { CommandMenu } from '@/components/shared/CommandMenu'
+import { SITE_CONFIG } from '@/lib/constants'
 import './globals.css'
 
-const newsreader = Newsreader({
+const geist = Geist({
   subsets: ['latin'],
-  variable: '--font-sans-body',
+  variable: '--font-geist',
   display: 'swap',
 })
 
-const spaceMono = Space_Mono({
+const geistMono = Geist_Mono({
   subsets: ['latin'],
-  weight: ['400', '700'],
-  variable: '--font-space-mono',
+  variable: '--font-geist-mono',
   display: 'swap',
 })
+
+const instrumentSerif = Instrument_Serif({
+  subsets: ['latin'],
+  weight: '400',
+  style: ['normal', 'italic'],
+  variable: '--font-instrument-serif',
+  display: 'swap',
+})
+
+const description =
+  'Co-founder & CEO of The Learning and Memory Lab. Building a world where humans and machines can learn together. Polymath. Tar Heel. SF Bay Area.'
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_CONFIG.url),
   title: {
     default: 'Joseph Ayinde | Co-Founder & CEO, The Learning and Memory Lab',
     template: '%s | Joseph Ayinde',
   },
-  description:
-    'Co-founder & CEO of The Learning and Memory Lab. Building a world where humans and machines can learn together. Polymath. Tar Heel. SF Bay Area.',
+  description,
   openGraph: {
     title: 'Joseph Ayinde (j0)',
     description:
       'Co-founder & CEO @ The Learning and Memory Lab. Humans + machines learning together.',
-    url: 'https://josephayinde.com',
+    url: SITE_CONFIG.url,
     siteName: 'Joseph Ayinde',
     type: 'website',
   },
@@ -44,23 +54,28 @@ export const metadata: Metadata = {
   },
 }
 
+export const viewport: Viewport = {
+  themeColor: '#09090a',
+}
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={`${newsreader.variable} ${spaceMono.variable}`}>
-      <body className="bg-[#0a0a0b] text-[#f4f1ea] font-sans antialiased">
+    <html
+      lang="en"
+      className={`${geist.variable} ${geistMono.variable} ${instrumentSerif.variable}`}
+    >
+      <body className="bg-ink font-sans text-paper antialiased">
         <SmoothScroll />
         <CustomCursor />
-        <ComfortTint />
-        <AuroraBackground />
+        <CommandMenu />
+        <div className="grain" aria-hidden />
         <Navbar />
         <main className="relative z-10 min-h-screen">{children}</main>
-        <div className="relative z-10">
-          <Footer />
-        </div>
+        <Footer />
       </body>
     </html>
   )

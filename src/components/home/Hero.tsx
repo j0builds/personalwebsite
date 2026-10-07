@@ -1,115 +1,115 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import Image from 'next/image'
 import Link from 'next/link'
+import { NeuralField } from '@/components/home/NeuralField'
+import { LamMark } from '@/components/shared/LamMark'
+import { LocalTime } from '@/components/shared/LocalTime'
 import { MagneticButton } from '@/components/shared/MagneticButton'
+import { MaskedLine } from '@/components/shared/Reveal'
+import { SITE_CONFIG } from '@/lib/constants'
 
-const container = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.12, delayChildren: 0.15 },
-  },
-} as const
+const EASE = [0.22, 1, 0.36, 1] as const
 
-const item = {
-  hidden: { opacity: 0, y: 24 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.85, ease: [0.22, 1, 0.36, 1] as const },
-  },
-} as const
+const fadeUp = (delay: number) => ({
+  initial: { opacity: 0, y: 18 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.9, delay, ease: EASE },
+})
 
 export function Hero() {
   return (
-    <section className="relative z-10 flex min-h-screen items-center px-6 md:px-12 lg:px-16">
-      <div className="mx-auto grid w-full max-w-6xl items-center gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:gap-8">
-        <motion.div
-          variants={container}
-          initial="hidden"
-          animate="visible"
-          className="max-w-xl"
+    <section className="relative flex min-h-[100svh] flex-col overflow-hidden px-6 pt-28 pb-8 md:px-12 md:pt-32">
+      <NeuralField className="absolute inset-0 h-full w-full [mask-image:radial-gradient(ellipse_at_60%_40%,black_35%,transparent_80%)]" />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -top-40 right-[-10%] h-[620px] w-[620px] rounded-full bg-signal/10 blur-[140px]"
+      />
+
+      <div className="relative mx-auto flex w-full max-w-7xl flex-1 flex-col">
+        <motion.a
+          {...fadeUp(0.1)}
+          href={SITE_CONFIG.companyUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group inline-flex w-fit items-center gap-2.5 rounded-full border border-paper/12 bg-ink/40 py-1.5 pr-4 pl-2 text-xs text-paper/70 backdrop-blur-md transition-colors duration-300 hover:border-paper/30 hover:text-paper"
         >
-          <motion.a
-            variants={item}
-            href="https://lamlab.ai"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mb-10 inline-flex items-center gap-3 text-white/70 transition-colors duration-300 hover:text-white"
-          >
-            <Image
-              src="/assets/brand/lam.png"
-              alt=""
-              width={40}
-              height={40}
-              priority
-              className="h-9 w-9"
-              aria-hidden
-            />
-            <span className="font-sans text-sm leading-tight tracking-tight">
-              <span className="block">The Learning</span>
-              <span className="block">and Memory Lab</span>
-            </span>
-          </motion.a>
+          <span className="h-2 w-2 animate-pulse-dot rounded-full bg-signal" />
+          <span>Currently building Lucy at The Learning and Memory Lab</span>
+          <span className="transition-transform duration-300 group-hover:translate-x-0.5">→</span>
+        </motion.a>
 
-          <motion.h1
-            variants={item}
-            className="mb-6 font-sans text-5xl font-medium tracking-tight text-white md:text-6xl lg:text-7xl"
-          >
-            Joseph Ayinde
-          </motion.h1>
-
-          <motion.p
-            variants={item}
-            className="mb-5 max-w-md font-sans text-xl leading-snug text-white/75 md:text-2xl"
-          >
-            building a world where humans and machines can learn together.
+        <div className="mt-auto pt-16">
+          <motion.p {...fadeUp(0.25)} className="eyebrow mb-6">
+            (j0) — Polymath · Tar Heel · SF Bay Area
           </motion.p>
 
-          <motion.p
-            variants={item}
-            className="mb-10 font-mono text-xs tracking-[0.18em] text-white/40 uppercase"
-          >
-            Co-Founder &amp; CEO · Full-time · SF
-          </motion.p>
+          <h1 className="font-display text-[19vw] leading-[0.86] tracking-[-0.035em] text-paper md:text-[13vw] xl:text-[12rem]">
+            <MaskedLine delay={0.2}>Joseph</MaskedLine>
+            <MaskedLine delay={0.32} className="pl-[8vw] md:pl-[14vw]">
+              <span className="italic text-paper/90">Ayinde</span>
+              <span className="text-signal">.</span>
+            </MaskedLine>
+          </h1>
 
-          <motion.div variants={item} className="flex items-center gap-6">
-            <MagneticButton className="inline-block">
-              <a
-                href="https://lamlab.ai"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block rounded-full bg-white px-7 py-3 font-mono text-sm tracking-wide text-[#0a0a0b] transition-opacity duration-300 hover:opacity-90"
-              >
-                enter Lam Lab
-              </a>
-            </MagneticButton>
-            <Link
-              href="/about"
-              className="font-mono text-sm tracking-wide text-white/45 underline decoration-white/20 underline-offset-4 transition-colors duration-300 hover:text-white/80 hover:decoration-white/45"
+          <div className="mt-10 grid gap-10 border-t hairline pt-8 md:grid-cols-12 md:gap-6">
+            <motion.p
+              {...fadeUp(0.6)}
+              className="max-w-md text-xl leading-snug text-paper/80 md:col-span-5 md:text-2xl"
             >
-              about me
-            </Link>
-          </motion.div>
-        </motion.div>
+              Building a world where humans and machines can{' '}
+              <span className="font-display text-[1.15em] italic text-paper">learn together</span>.
+            </motion.p>
 
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.9, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-          className="relative mx-auto flex h-[260px] w-[260px] items-center justify-center md:h-[360px] md:w-[360px] lg:h-[420px] lg:w-[420px]"
-        >
-          <Image
-            src="/assets/brand/lam.png"
-            alt="The Learning and Memory Lab"
-            width={420}
-            height={420}
-            priority
-            className="h-full w-full object-contain"
-          />
-        </motion.div>
+            <motion.dl
+              {...fadeUp(0.7)}
+              className="grid grid-cols-2 gap-x-6 gap-y-4 text-sm md:col-span-4 md:col-start-6"
+            >
+              <div>
+                <dt className="eyebrow mb-1">Role</dt>
+                <dd className="text-paper/80">Co-founder &amp; CEO</dd>
+              </div>
+              <div>
+                <dt className="eyebrow mb-1">Company</dt>
+                <dd className="flex items-center gap-2 text-paper/80">
+                  <LamMark className="h-4 w-4" /> Lam Lab
+                </dd>
+              </div>
+              <div>
+                <dt className="eyebrow mb-1">Based</dt>
+                <dd className="text-paper/80">San Francisco</dd>
+              </div>
+              <div>
+                <dt className="eyebrow mb-1">Local time</dt>
+                <dd className="text-paper/80 tabular-nums">
+                  <LocalTime />
+                </dd>
+              </div>
+            </motion.dl>
+
+            <motion.div
+              {...fadeUp(0.8)}
+              className="flex items-start gap-5 md:col-span-3 md:col-start-10 md:justify-end"
+            >
+              <MagneticButton className="inline-block">
+                <a
+                  href={SITE_CONFIG.companyUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block rounded-full bg-paper px-6 py-3 text-sm font-medium text-ink transition-transform duration-300 hover:scale-[1.03]"
+                >
+                  Enter Lam Lab ↗
+                </a>
+              </MagneticButton>
+              <Link
+                href="/about"
+                className="py-3 text-sm text-paper/55 underline decoration-paper/20 underline-offset-4 transition-colors duration-300 hover:text-paper hover:decoration-paper/60"
+              >
+                About me
+              </Link>
+            </motion.div>
+          </div>
+        </div>
       </div>
     </section>
   )

@@ -4,6 +4,7 @@ export interface Project {
   description: string
   category: 'research' | 'built'
   tags: string[]
+  meta?: string
   image?: string
   link?: string
   external?: boolean
@@ -21,4 +22,11 @@ export interface Publication {
   featured?: boolean
   doi?: string
   link?: string
+}
+
+export interface Chapter {
+  id: string
+  age: string
+  title: string
+  body: string
 }

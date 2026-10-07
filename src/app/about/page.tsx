@@ -1,6 +1,8 @@
-import { BioSection } from '@/components/about/BioSection'
-import { ContactSection } from '@/components/about/ContactSection'
-import { PageTransition } from '@/components/shared/PageTransition'
+import { AboutIntro } from '@/components/about/AboutIntro'
+import { FieldNotes } from '@/components/about/FieldNotes'
+import { Chapters } from '@/components/sections/Chapters'
+import { ContactCTA } from '@/components/sections/ContactCTA'
+import { Marquee } from '@/components/sections/Marquee'
 
 export const metadata = {
   title: 'About',
@@ -10,11 +12,12 @@ export const metadata = {
 
 export default function AboutPage() {
   return (
-    <PageTransition>
-      <div className="max-w-3xl mx-auto px-6 md:px-12 pt-32 pb-24">
-        <BioSection />
-        <ContactSection />
-      </div>
-    </PageTransition>
+    <>
+      <AboutIntro />
+      <FieldNotes />
+      <Chapters index="01" />
+      <Marquee />
+      <ContactCTA />
+    </>
   )
 }

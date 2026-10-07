@@ -1,4 +1,54 @@
-import type { Project, Publication } from './types'
+import type { Chapter, Project, Publication } from './types'
+
+export const chapters: Chapter[] = [
+  {
+    id: 'six',
+    age: '6',
+    title: 'First build',
+    body: 'Built a flashcard game on an Apple iPod — and was aired on the local news.',
+  },
+  {
+    id: 'nineteen',
+    age: '19',
+    title: 'HEALLY & the operating room',
+    body: 'Built HEALLY into a globally recognized company with over $150,000 in funding and world-class industry partnerships. Flew alone to Australia for a neurosurgical apprenticeship under Dr. Antonio Di Ieva and Dr. Eric Suero Molina.',
+  },
+  {
+    id: 'twenty',
+    age: '20',
+    title: 'Science & business',
+    body: 'Won a first international science award and a first national business award, and worked at Scale AI.',
+  },
+  {
+    id: 'twenty-one',
+    age: '21',
+    title: 'Research at scale',
+    body: 'Researched through the NSF and the US DOD.',
+  },
+  {
+    id: 'twenty-two',
+    age: '22',
+    title: 'Tar Heel → Carnegie Mellon',
+    body: 'Graduated from UNC Chapel Hill (May 2025) with degrees in Biology, Neuroscience, and Chemistry, then was selected as a Neuroscience and Machine Learning Scholar at Carnegie Mellon University.',
+  },
+  {
+    id: 'now',
+    age: 'Now',
+    title: 'The Learning and Memory Lab',
+    body: 'Co-founder & CEO, full-time in SF. Building Lucy — an AI-native L&D platform for humans and machines — backed by angels from Stanford to the US Military, and affiliated with Founders, Inc. and The Residency.',
+  },
+]
+
+export const affiliations = [
+  'UNC Chapel Hill',
+  'Carnegie Mellon',
+  'The Residency',
+  'Founders, Inc.',
+  'Scale AI',
+  'NSF',
+  'US DOD',
+  'Macquarie University',
+]
 
 export const publications: Publication[] = [
   {
@@ -48,6 +98,7 @@ export const projects: Project[] = [
   {
     id: 'lamlab',
     title: 'The Learning and Memory Lab',
+    meta: 'Co-founder & CEO · Now',
     description:
       'Building Lucy, an AI-native L&D platform for humans and machines — so your company becomes a system that learns and consolidates itself. Backed by angels from Stanford to the US Military. Affiliated with Founders, Inc. and The Residency (Sam Altman).',
     category: 'built',
@@ -60,6 +111,7 @@ export const projects: Project[] = [
   {
     id: 'butterfly',
     title: 'Butterfly',
+    meta: 'Carnegie Mellon',
     description:
       'Desktop app that watches what you learn across your screen, builds a digital twin of your knowledge, and predicts what you are about to forget before you forget it. Built at Carnegie Mellon with the #1 learning science lab in the world.',
     category: 'built',
@@ -69,6 +121,7 @@ export const projects: Project[] = [
   {
     id: 'tutr',
     title: 'Tutr',
+    meta: 'Conversational learning',
     description:
       'The future of conversational learning. Neuroscience-grounded agentic tutoring delivered through SMS.',
     category: 'built',
@@ -80,6 +133,7 @@ export const projects: Project[] = [
   {
     id: 'heally',
     title: 'HEALLY',
+    meta: 'First company',
     description:
       'Early company that grew into a globally recognized learning platform with $150K+ in funding and world-class industry partnerships — the foundation for what became The Learning and Memory Lab.',
     category: 'built',
