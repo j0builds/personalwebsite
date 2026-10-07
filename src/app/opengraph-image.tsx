@@ -48,7 +48,7 @@ export default function OpengraphImage() {
           <div style={{ fontSize: 150, lineHeight: 0.9, letterSpacing: -5, display: 'flex' }}>
             Joseph Ayinde<span style={{ color: '#7af0b0' }}>.</span>
           </div>
-          <div style={{ marginTop: 28, fontSize: 36, opacity: 0.7 }}>
+          <div style={{ marginTop: 28, fontSize: 32, opacity: 0.7 }}>
             Building a world where humans and machines can learn together.
           </div>
         </div>

@@ -35,7 +35,9 @@ function ChapterRow({
         <span className="font-display text-5xl tracking-normal text-paper normal-case md:hidden">
           {chapter.age}
         </span>
-        {chapter.age === 'Now' ? 'Present' : `Age ${chapter.age}`}
+        <span className={chapter.age === 'Now' ? '' : 'hidden md:inline'}>
+          {chapter.age === 'Now' ? 'Present' : `Age ${chapter.age}`}
+        </span>
       </p>
       <h3 className="mb-4 font-display text-3xl leading-tight text-paper md:text-5xl">
         {chapter.title}
@@ -53,7 +55,7 @@ export function Chapters({ index = '02' }: { index?: string }) {
   const current = chapters[active]
 
   return (
-    <section id="chapters" className="px-6 py-28 md:px-12 md:py-40">
+    <section id="chapters" className="px-6 py-24 md:px-12 md:py-32">
       <div className="mx-auto max-w-7xl">
         <SectionHeading
           index={index}

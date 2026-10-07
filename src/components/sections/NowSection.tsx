@@ -19,7 +19,7 @@ export function NowSection() {
   const scale = useTransform(scrollYProgress, [0, 0.5, 1], [0.86, 1, 0.92])
 
   return (
-    <section id="now" className="px-6 py-28 md:px-12 md:py-40">
+    <section id="now" className="px-6 py-24 md:px-12 md:py-32">
       <div className="mx-auto max-w-7xl">
         <Reveal>
           <p className="eyebrow mb-10">

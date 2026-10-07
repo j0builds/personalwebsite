@@ -105,7 +105,7 @@ export function NeuralField({ className = '' }: { className?: string }) {
           ctx.strokeStyle =
             heat > 0.15
               ? `rgba(${SIGNAL}, ${proximity * (0.08 + heat * 0.45)})`
-              : `rgba(${PAPER}, ${proximity * 0.09})`
+              : `rgba(${PAPER}, ${proximity * 0.16})`
           ctx.lineWidth = 0.6 + heat * 0.6
           ctx.beginPath()
           ctx.moveTo(a.x, a.y)
@@ -121,6 +121,19 @@ export function NeuralField({ className = '' }: { className?: string }) {
               b.cool = 24
             }
           }
+        }
+      }
+
+      if (pointer.active) {
+        for (const n of nodes) {
+          const d = Math.hypot(pointer.x - n.x, pointer.y - n.y)
+          if (d > CURSOR_RADIUS) continue
+          ctx.strokeStyle = `rgba(${SIGNAL}, ${(1 - d / CURSOR_RADIUS) * 0.35})`
+          ctx.lineWidth = 0.7
+          ctx.beginPath()
+          ctx.moveTo(pointer.x, pointer.y)
+          ctx.lineTo(n.x, n.y)
+          ctx.stroke()
         }
       }
 
@@ -143,14 +156,14 @@ export function NeuralField({ className = '' }: { className?: string }) {
       }
 
       for (const n of nodes) {
-        const r = 1.1 + n.a * 2.2
+        const r = 1.3 + n.a * 2.2
         if (n.a > 0.2) {
           ctx.fillStyle = `rgba(${SIGNAL}, ${n.a * 0.18})`
           ctx.beginPath()
           ctx.arc(n.x, n.y, r * 4, 0, Math.PI * 2)
           ctx.fill()
         }
-        ctx.fillStyle = n.a > 0.2 ? `rgba(${SIGNAL}, ${0.5 + n.a * 0.5})` : `rgba(${PAPER}, 0.32)`
+        ctx.fillStyle = n.a > 0.2 ? `rgba(${SIGNAL}, ${0.5 + n.a * 0.5})` : `rgba(${PAPER}, 0.5)`
         ctx.beginPath()
         ctx.arc(n.x, n.y, r, 0, Math.PI * 2)
         ctx.fill()

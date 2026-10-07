@@ -6,7 +6,7 @@ export function WorkIndex({ index = '03' }: { index?: string }) {
   const built = projects.filter((p) => p.category === 'built')
 
   return (
-    <section id="work" className="px-6 py-28 md:px-12 md:py-40">
+    <section id="work" className="px-6 py-24 md:px-12 md:py-32">
       <div className="mx-auto max-w-7xl">
         <SectionHeading
           index={index}
@@ -42,7 +42,7 @@ export function WorkIndex({ index = '03' }: { index?: string }) {
                     <span className="font-mono text-xs text-paper/35 md:col-span-1">
                       {String(i + 1).padStart(2, '0')}
                     </span>
-                    <h3 className="font-display text-4xl leading-none tracking-[-0.01em] text-paper transition-transform duration-500 group-hover:translate-x-2 md:col-span-6 md:text-6xl">
+                    <h3 className="font-display text-4xl leading-none tracking-[-0.01em] text-paper transition-transform duration-500 md:group-hover:translate-x-2 md:col-span-6 md:text-6xl">
                       {p.title}
                     </h3>
                     <span className="hidden text-sm text-paper/45 md:col-span-4 md:block">

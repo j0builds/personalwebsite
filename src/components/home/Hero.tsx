@@ -44,7 +44,7 @@ export function Hero() {
             (j0) — Polymath · Tar Heel · SF Bay Area
           </motion.p>
 
-          <h1 className="font-display text-[19vw] leading-[0.86] tracking-[-0.035em] text-paper md:text-[15vw] xl:text-[13.5rem]">
+          <h1 className="font-display text-[19vw] leading-[0.86] tracking-[-0.035em] text-paper md:text-[13vw] xl:text-[12rem]">
             <MaskedLine delay={0.2}>Joseph</MaskedLine>
             <MaskedLine delay={0.32} className="pl-[8vw] md:pl-[14vw]">
               <span className="italic text-paper/90">Ayinde</span>
@@ -63,7 +63,7 @@ export function Hero() {
 
             <motion.dl
               {...fadeUp(0.7)}
-              className="grid grid-cols-2 gap-x-6 gap-y-4 text-sm md:col-span-4 md:col-start-7"
+              className="grid grid-cols-2 gap-x-6 gap-y-4 text-sm md:col-span-4 md:col-start-6"
             >
               <div>
                 <dt className="eyebrow mb-1">Role</dt>
@@ -89,7 +89,7 @@ export function Hero() {
 
             <motion.div
               {...fadeUp(0.8)}
-              className="flex items-start gap-5 md:col-span-3 md:justify-end"
+              className="flex items-start gap-5 md:col-span-3 md:col-start-10 md:justify-end"
             >
               <MagneticButton className="inline-block">
                 <a

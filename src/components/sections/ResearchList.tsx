@@ -6,11 +6,13 @@ import { publications } from '@/lib/data'
 import { Reveal } from '@/components/shared/Reveal'
 import { SectionHeading } from './SectionHeading'
 
+const sorted = [...publications].sort((a, b) => b.year - a.year)
+
 export function ResearchList({ index = '04' }: { index?: string }) {
-  const [open, setOpen] = useState<string | null>(publications[0]?.id ?? null)
+  const [open, setOpen] = useState<string | null>(sorted[0]?.id ?? null)
 
   return (
-    <section id="research" className="px-6 py-28 md:px-12 md:py-40">
+    <section id="research" className="px-6 py-24 md:px-12 md:py-32">
       <div className="mx-auto max-w-7xl">
         <SectionHeading
           index={index}
@@ -25,7 +27,7 @@ export function ResearchList({ index = '04' }: { index?: string }) {
         />
 
         <ol className="border-b hairline">
-          {publications.map((pub, i) => {
+          {sorted.map((pub, i) => {
             const isOpen = open === pub.id
             const panelId = `pub-${pub.id}`
             return (

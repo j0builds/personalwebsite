@@ -69,7 +69,7 @@ export function Footer() {
 
         <p
           aria-hidden
-          className="pointer-events-none mt-20 select-none font-display text-[15.5vw] leading-[0.8] tracking-[-0.04em] whitespace-nowrap text-paper/[0.07]"
+          className="pointer-events-none mt-20 select-none font-display text-[20vw] leading-[0.8] tracking-[-0.04em] whitespace-nowrap text-paper/[0.07]"
         >
           Joseph Ayinde
         </p>

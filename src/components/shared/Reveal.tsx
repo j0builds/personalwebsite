@@ -41,7 +41,7 @@ export function MaskedLine({
   className?: string
 }) {
   return (
-    <span className={`block overflow-hidden pb-[0.08em] ${className}`}>
+    <span className={`-mb-[0.14em] block overflow-hidden pb-[0.14em] ${className}`}>
       <motion.span
         className="block"
         initial={{ y: '105%' }}

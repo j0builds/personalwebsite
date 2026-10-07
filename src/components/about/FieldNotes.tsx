@@ -9,9 +9,22 @@ const notes = [
     aspect: 'aspect-[4/3]',
   },
   {
+    src: '/assets/images/cmu.jpg',
+    alt: 'Selfie of Joseph wearing headphones outdoors',
+    caption: 'Pittsburgh — Carnegie Mellon',
+    aspect: 'aspect-[3/4]',
+  },
+  {
     src: '/assets/images/launch.jpg',
     alt: 'Joseph sitting beside an Innovate Carolina sign at UNC',
     caption: 'Innovate Carolina — UNC',
+    aspect: 'aspect-[4/3]',
+    position: 'object-[70%_50%]',
+  },
+  {
+    src: '/assets/images/soccer.jpg',
+    alt: 'Joseph diving for a save as a goalkeeper',
+    caption: 'Between the posts',
     aspect: 'aspect-[3/4]',
   },
   {
@@ -21,22 +34,10 @@ const notes = [
     aspect: 'aspect-[4/3]',
   },
   {
-    src: '/assets/images/soccer.jpg',
-    alt: 'Joseph diving for a save as a goalkeeper',
-    caption: 'Between the posts',
-    aspect: 'aspect-[3/4]',
-  },
-  {
-    src: '/assets/images/cmu.jpg',
-    alt: 'Selfie of Joseph wearing headphones outdoors',
-    caption: 'Pittsburgh — Carnegie Mellon',
-    aspect: 'aspect-[3/4]',
-  },
-  {
     src: '/assets/images/saywordfc.jpg',
     alt: 'Joseph with his soccer team on matchday',
     caption: 'Matchday',
-    aspect: 'aspect-[4/3]',
+    aspect: 'aspect-[3/4]',
   },
 ]
 
@@ -48,7 +49,7 @@ export function FieldNotes() {
         <p className="eyebrow hidden md:block">Scroll →</p>
       </div>
       <ul
-        className="flex snap-x snap-mandatory items-end gap-4 overflow-x-auto px-6 pb-6 [scrollbar-width:none] md:gap-6 md:px-12 [&::-webkit-scrollbar]:hidden"
+        className="flex snap-x snap-mandatory scroll-px-6 items-end gap-4 overflow-x-auto px-6 pb-6 [scrollbar-width:none] md:scroll-px-12 md:gap-6 md:px-12 [&::-webkit-scrollbar]:hidden"
         data-lenis-prevent
       >
         {notes.map((n, i) => (
@@ -65,7 +66,7 @@ export function FieldNotes() {
                   alt={n.alt}
                   fill
                   sizes="(max-width: 768px) 72vw, 24vw"
-                  className="object-cover grayscale-[0.4] transition-all duration-700 group-hover:scale-[1.04] group-hover:grayscale-0"
+                  className={`object-cover grayscale-[0.4] transition-all duration-700 group-hover:scale-[1.04] group-hover:grayscale-0 ${n.position ?? ''}`}
                 />
               </div>
               <figcaption className="mt-3 flex items-baseline gap-3 text-xs text-paper/50">
