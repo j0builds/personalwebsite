@@ -175,8 +175,9 @@ export function WindowHome() {
           </Reveal>
           <Reveal delay={0.45}>
             <p className="mt-7 max-w-[440px] text-[16px] leading-[1.65] opacity-80 [text-wrap:pretty]">
-              I&rsquo;m Joseph Ayinde. I build things where neuroscience meets software. There&rsquo;s
-              no rush here; this page will wait while you do.
+              I&rsquo;m Joseph Ayinde. I run The Learning and Memory Lab, where we&rsquo;re
+              building a world in which humans and machines learn together. There&rsquo;s no rush
+              here; this page will wait while you do.
             </p>
             <Notes />
           </Reveal>
@@ -187,6 +188,9 @@ export function WindowHome() {
             <nav className="mt-12 flex flex-wrap gap-x-6 gap-y-2 text-[14px]">
               <Link href={LINKS.work.href} className={linkClass}>Work</Link>
               <Link href={LINKS.about.href} className={linkClass}>About</Link>
+              <a href={LINKS.lab.href} target="_blank" rel="noreferrer" className={linkClass}>
+                {LINKS.lab.label} &#8599;
+              </a>
               <a href={LINKS.email.href} className={linkClass}>Email</a>
               {SOCIALS.map((s) => (
                 <a key={s.href} href={s.href} target="_blank" rel="noreferrer" className={`${linkClass} opacity-70 hover:opacity-100`}>

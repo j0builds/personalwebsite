@@ -56,7 +56,7 @@ export default function ProjectsPage() {
                     rel={p.external ? 'noreferrer' : undefined}
                     className="mt-4 inline-block text-[14px] underline decoration-current/30 decoration-[1px] underline-offset-[5px] transition-[text-decoration-color] duration-300 hover:decoration-current"
                   >
-                    {p.link.replace(/^https?:\/\//, '')} &#8599;
+                    {p.link.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '')} &#8599;
                   </a>
                 )}
               </div>

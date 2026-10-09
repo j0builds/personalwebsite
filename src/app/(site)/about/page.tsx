@@ -1,12 +1,11 @@
 import Image from 'next/image'
 import { Reveal } from '@/components/site/Reveal'
 import { LINKS, SOCIALS } from '@/components/site/links'
-import { experiences } from '@/lib/data'
 
 export const metadata = {
   title: 'About',
   description:
-    'Joseph Ayinde | CMU Scholar, CEO of Cognition, neurosurgery researcher.',
+    'Joseph Ayinde | Co-Founder & CEO of The Learning and Memory Lab. Polymath. Tar Heel. SF Bay Area.',
 }
 
 const PHOTOS = [
@@ -35,6 +34,8 @@ const PHOTOS = [
 
 const serif = 'font-[family-name:var(--font-instrument)]'
 const prose = 'text-[17px] leading-[1.75] opacity-85 [text-wrap:pretty]'
+const inlineLink =
+  'underline decoration-current/30 decoration-[1px] underline-offset-[5px] transition-[text-decoration-color] duration-300 hover:decoration-current'
 
 export default function AboutPage() {
   return (
@@ -48,34 +49,38 @@ export default function AboutPage() {
 
       <Reveal delay={0.2} className="mt-12 max-w-[640px] space-y-6">
         <p className={prose}>
-          I&rsquo;m from Greensboro, North Carolina, and I&rsquo;m a dual citizen of the United
-          States and Nigeria. Most of my work happens at the edges: between biology and technology,
-          between neuroscience and artificial intelligence, between what we know and what
-          we&rsquo;re still finding out.
+          I&rsquo;m from Greensboro, North Carolina, a dual citizen of the United States and
+          Nigeria, and these days I live in the San Francisco Bay Area. Most of my work happens at
+          the edges: between biology and technology, between how people learn and how machines do.
         </p>
         <p className={prose}>
-          I arrived at UNC Chapel Hill at 18 as one of 25 students worldwide selected for the
-          Chancellor&rsquo;s Science Scholars program, and graduated with honors in biology,
-          neuroscience and chemistry.
+          I&rsquo;m the co-founder and CEO of{' '}
+          <a href={LINKS.lab.href} target="_blank" rel="noreferrer" className={inlineLink}>
+            The Learning and Memory Lab
+          </a>
+          . We&rsquo;re building Lucy, an AI-native learning and development platform for humans
+          and machines. We&rsquo;re backed by angels from Stanford to the US military, and
+          affiliated with Founders, Inc. and The Residency.
         </p>
         <p className={prose}>
-          In 2023 I became the first undergraduate intern at the world&rsquo;s first computational
-          neurosurgery lab, in Sydney. I shadowed more than 80 operations and led a research
-          project on AI ethics in neurosurgery under Prof. Antonio Di Ieva.
+          It started early. At 6 I built a flashcard game on an iPod and ended up on the local
+          news. At 18 I arrived at UNC Chapel Hill as one of 25 students worldwide selected for the
+          Chancellor&rsquo;s Science Scholars program.
         </p>
         <p className={prose}>
-          I co-founded Cognition (formerly HEALLY), a cognitive OS for learning. We prototyped and
-          tested a non-invasive EEG-AI brain-computer interface, ran human-subject usability
-          trials, and raised more than $150K with partners including Google DeepMind, NVIDIA and
-          Carnegie Mellon&rsquo;s LearnLab.
+          At 19 I grew HEALLY into a globally recognised learning company with more than $150K in
+          funding, and flew alone to Sydney for a neurosurgical apprenticeship under Dr. Antonio Di
+          Ieva and Dr. Eric Suero Molina, in the world&rsquo;s first computational neurosurgery lab.
         </p>
         <p className={prose}>
-          My research spans operator theory for learning dynamics and evolutionary biology, the
-          latter on an NSF-funded project in the Pfennig Lab. In 2025 I was a Computational Models
-          of Learning Scholar at Carnegie Mellon&rsquo;s LearnLab.
+          At 20 I won my first international science award and my first national business award,
+          and worked at Scale AI. At 21 I did research through the NSF and the US Department of
+          Defense. In May 2025 I graduated from UNC with degrees in biology, neuroscience and
+          chemistry, and went on to Carnegie Mellon as a Neuroscience and Machine Learning Scholar.
         </p>
         <p className={prose}>
-          Today I work on growth at Willow and do content engineering at Chatbase.
+          The throughline is learning itself: how people remember, how machines adapt, and how both
+          get better together. That&rsquo;s what the lab is for.
         </p>
       </Reveal>
 
@@ -101,38 +106,13 @@ export default function AboutPage() {
         </div>
       </Reveal>
 
-      <section className="mt-24">
-        <Reveal>
-          <h2 className={`${serif} text-[clamp(32px,4vw,44px)] leading-none`}>Along the way</h2>
-        </Reveal>
-        <ol className="mt-8 border-t border-current/15">
-          {experiences.map((e) => (
-            <Reveal
-              as="li"
-              key={e.id}
-              y={6}
-              duration={1}
-              className="grid grid-cols-1 gap-1 border-b border-current/15 py-5 sm:grid-cols-[200px_1fr] sm:gap-8"
-            >
-              <span className="pt-[3px] text-[13px] tabular-nums opacity-60">{e.period}</span>
-              <div className="max-w-[640px]">
-                <p className="text-[16px] font-medium">{e.role}</p>
-                <p className="mt-0.5 text-[15px] opacity-75">{e.organization}</p>
-                {e.description && (
-                  <p className="mt-2 text-[14px] leading-[1.65] opacity-65">{e.description}</p>
-                )}
-              </div>
-            </Reveal>
-          ))}
-        </ol>
-      </section>
-
       <section className="mt-24 max-w-[640px]">
         <Reveal>
           <h2 className={`${serif} text-[clamp(32px,4vw,44px)] leading-none`}>Write to me</h2>
           <p className={`${prose} mt-6`}>
-            I&rsquo;m always glad to hear from fellow builders, researchers and anyone who&rsquo;s
-            curious. Email is the best way to reach me.
+            I&rsquo;m always glad to hear from founders, operators, investors, and HR and L&amp;D
+            leaders who care about how humans and machines learn together. Email is the best way to
+            reach me.
           </p>
           <a
             href={LINKS.email.href}

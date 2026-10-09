@@ -10,15 +10,6 @@ export interface Project {
   featured?: boolean
 }
 
-export interface Experience {
-  id: string
-  role: string
-  organization: string
-  period: string
-  description?: string
-  image?: string
-}
-
 export interface Publication {
   id: string
   title: string

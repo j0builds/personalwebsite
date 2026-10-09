@@ -1,4 +1,4 @@
-import type { Project, Experience, Publication } from './types'
+import type { Project, Publication } from './types'
 
 export const publications: Publication[] = [
   {
@@ -46,122 +46,44 @@ export const publications: Publication[] = [
 
 export const projects: Project[] = [
   {
-    id: 'cognition',
-    title: 'Cognition: The Cognitive OS',
+    id: 'lamlab',
+    title: 'The Learning and Memory Lab',
     description:
-      "The world's first Social Intelligence Network. A drop-in intelligence layer that transforms any software into a living system that converses, remembers, and reinforces growth. Prototyped and tested a non-invasive EEG-AI brain-computer interface with human-subject usability testing. $150K+ raised; partners include Google DeepMind, NVIDIA, CMU LearnLab.",
+      'Building Lucy, an AI-native L&D platform for humans and machines — so your company becomes a system that learns and consolidates itself. Backed by angels from Stanford to the US Military. Affiliated with Founders, Inc. and The Residency (Sam Altman).',
     category: 'built',
-    tags: ['Next.js', 'TypeScript', 'AI', 'EEG', 'BCI', 'Python'],
-    image: '/assets/images/cognition.jpg',
-    link: 'https://cognitionus.com',
+    tags: ['AI', 'L&D', 'Memory', 'Enterprise', 'Neuroscience'],
+    image: '/assets/brand/lam.png',
+    link: 'https://lamlab.ai',
     external: true,
     featured: true,
   },
   {
-    id: 'heally',
-    title: 'HEALLY',
+    id: 'butterfly',
+    title: 'Butterfly',
     description:
-      'An AI-powered learning ecosystem. Personalized education platform leveraging machine learning to adapt content delivery to individual cognitive profiles.',
+      'Desktop app that watches what you learn across your screen, builds a digital twin of your knowledge, and predicts what you are about to forget before you forget it. Built at Carnegie Mellon with the #1 learning science lab in the world.',
     category: 'built',
-    tags: ['AI', 'EdTech', 'Machine Learning'],
+    tags: ['Electron', 'AI', 'Memory', 'Learning Science'],
     featured: false,
   },
   {
     id: 'tutr',
     title: 'Tutr',
     description:
-      'An AI SMS agent for on-demand tutoring. Text-based intelligent tutoring system delivering personalized academic support through conversational AI.',
+      'The future of conversational learning. Neuroscience-grounded agentic tutoring delivered through SMS.',
     category: 'built',
     tags: ['AI', 'SMS', 'NLP', 'EdTech'],
+    link: 'https://www.hellotutr.com/',
+    external: true,
     featured: false,
   },
-]
-
-export const experiences: Experience[] = [
   {
-    id: 'willow',
-    role: 'Growth',
-    organization: 'Willow',
-    period: 'Jan 2026 – Present',
-  },
-  {
-    id: 'chatbase',
-    role: 'Content Engineer',
-    organization: 'Chatbase',
-    period: '2025 – Present',
+    id: 'heally',
+    title: 'HEALLY',
     description:
-      'Content engineering for AI-powered chatbot platform.',
-  },
-  {
-    id: 'cognition',
-    role: 'CEO & Co-Founder',
-    organization: 'Cognition (formerly HEALLY)',
-    period: 'Nov 2022 – Aug 2025',
-    description:
-      'Built the Cognitive OS for Learning. Prototyped non-invasive EEG-AI BCI. $150K+ raised. Partners: Google DeepMind, NVIDIA, CMU LearnLab, CARTA.',
-    image: '/assets/images/cognition.jpg',
-  },
-  {
-    id: 'cmu',
-    role: 'Computational Models of Learning Scholar',
-    organization: 'Carnegie Mellon University LearnLab',
-    period: 'May – Sept 2025',
-    description:
-      '#1 learning science lab in the world. 7-month institutional partnership. Prototyped AI hardware and software on the KLI framework.',
-    image: '/assets/images/cmu.jpg',
-  },
-  {
-    id: 'scale-ai',
-    role: 'AI Specialist',
-    organization: 'Scale AI',
-    period: '2024',
-    description:
-      'Prompt engineering and feedback loop refinement for AI algorithms in biological contexts.',
-  },
-  {
-    id: 'pfennig-lab',
-    role: 'Independent Project Leader & Lab Assistant',
-    organization: 'Pfennig Lab, UNC',
-    period: 'Nov 2023 – May 2024',
-    description:
-      '$500K NSF research project. Sanger sequencing, NGS, gel electrophoresis, DNA analysis.',
-  },
-  {
-    id: 'neurosurgery',
-    role: 'Research Project Leader & Intern',
-    organization: 'Computational Neurosurgery Lab, Macquarie University Hospital',
-    period: 'Jun – Aug 2023',
-    description:
-      "World's first undergraduate intern in the world's first Computational Neurosurgery lab. 80+ operations shadowed.",
-  },
-  {
-    id: 'residency',
-    role: 'Delta Finalist',
-    organization: "The Residency (Sam Altman's Accelerator)",
-    period: '2025',
-    description: '20 of 1,500 companies selected worldwide.',
-  },
-  {
-    id: 'launch',
-    role: 'Summer Venture Fellow',
-    organization: 'LAUNCH Chapel Hill Accelerator',
-    period: 'May – Aug 2024',
-    description:
-      '1 of 10 ventures across North Carolina. Mentored by Harvard Business School faculty.',
-  },
-  {
-    id: 'lingoace',
-    role: 'Mathematics Tutor',
-    organization: 'LingoAce',
-    period: '2022 – 2023',
-    description:
-      'Selected to tutor STEM subjects. Specialized in general chemistry and calculus for K-12 students.',
-  },
-  {
-    id: 'unc',
-    role: 'B.S. Biology, Neuroscience, Chemistry (Honors)',
-    organization: 'UNC Chapel Hill',
-    period: '2021 – 2025',
-    description: "Chancellor's Science Scholar, 1 of 25 selected worldwide. Honors Carolina.",
+      'Early company that grew into a globally recognized learning platform with $150K+ in funding and world-class industry partnerships — the foundation for what became The Learning and Memory Lab.',
+    category: 'built',
+    tags: ['AI', 'EdTech', 'Machine Learning'],
+    featured: false,
   },
 ]
