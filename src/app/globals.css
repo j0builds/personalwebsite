@@ -1,0 +1,80 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-background: #fafafa;
+  --color-foreground: #171717;
+
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-space-mono);
+
+  --color-brand-green: #008753;
+}
+
+@layer base {
+  body {
+    background: var(--color-background);
+    color: var(--color-foreground);
+  }
+
+  html:not([data-gate='open']) {
+    overflow: hidden;
+  }
+
+  html[data-gate='open'] .penalty-gate {
+    display: none;
+  }
+
+  .penalty-gate,
+  .penalty-gate * {
+    cursor: default;
+  }
+
+  .penalty-gate button:enabled {
+    cursor: pointer;
+  }
+
+  ::selection {
+    background-color: color-mix(in srgb, currentColor 22%, transparent);
+    color: inherit;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.12);
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.2);
+  }
+}
+
+.window-cloud {
+  position: absolute;
+  border-radius: 9999px;
+  background: radial-gradient(closest-side, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0));
+  filter: blur(18px);
+  animation: window-drift 210s linear infinite;
+}
+
+@keyframes window-drift {
+  from {
+    transform: translateX(-12vw);
+  }
+  to {
+    transform: translateX(28vw);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .window-cloud {
+    animation: none;
+  }
+}
