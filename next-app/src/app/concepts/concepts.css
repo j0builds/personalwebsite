@@ -1,0 +1,52 @@
+.window-cloud {
+  position: absolute;
+  border-radius: 9999px;
+  background: radial-gradient(closest-side, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0));
+  filter: blur(18px);
+  animation: window-drift 210s linear infinite;
+}
+
+@keyframes window-drift {
+  from {
+    transform: translateX(-12vw);
+  }
+  to {
+    transform: translateX(28vw);
+  }
+}
+
+@keyframes pitch-keeper {
+  0%,
+  100% {
+    transform: translateX(-1.5px);
+  }
+  50% {
+    transform: translateX(1.5px);
+  }
+}
+
+.pitch-keeper {
+  animation: pitch-keeper 7s ease-in-out infinite;
+}
+
+@keyframes pitch-breathe {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+.pitch-glow {
+  animation: pitch-breathe 12s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .window-cloud,
+  .pitch-keeper,
+  .pitch-glow {
+    animation: none;
+  }
+}
