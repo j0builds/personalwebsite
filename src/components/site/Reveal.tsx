@@ -28,9 +28,14 @@ export function Reveal({
   return (
     <Tag
       className={className}
-      initial={{ opacity: 0, y: reduce ? 0 : y }}
+      initial={{ opacity: 0, y }}
       animate={open ? { opacity: 1, y: 0 } : undefined}
-      transition={{ duration: reduce ? 0.3 : duration, delay: reduce ? 0 : delay, ease: EASE }}
+      transition={{
+        duration: reduce ? 0.3 : duration,
+        delay: reduce ? 0 : delay,
+        ease: EASE,
+        y: reduce ? { duration: 0 } : { duration, delay, ease: EASE },
+      }}
     >
       {children}
     </Tag>
