@@ -1,18 +1,24 @@
 import Link from 'next/link'
+import { Sky } from '@/components/site/Sky'
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen flex items-center justify-center px-6">
-      <div className="text-center">
-        <h1 className="text-6xl font-mono text-neutral-300 mb-4">404</h1>
-        <p className="text-neutral-500 mb-8">This page doesn&apos;t exist.</p>
+    <Sky>
+      <main className="mx-auto flex min-h-[100svh] max-w-[1240px] flex-col justify-center px-6 sm:px-10">
+        <p className="text-[14px] opacity-65">404</p>
+        <h1 className="mt-4 font-[family-name:var(--font-instrument)] text-[clamp(44px,6.4vw,84px)] leading-[0.98] tracking-[-0.015em]">
+          This page drifted off.
+        </h1>
+        <p className="mt-6 max-w-[440px] text-[16px] leading-[1.65] opacity-80 [text-wrap:balance]">
+          Nothing lost, though. The front door is still where you left it.
+        </p>
         <Link
           href="/"
-          className="px-6 py-3 text-sm font-mono tracking-wide border border-neutral-300 text-neutral-600 hover:border-neutral-500 hover:text-neutral-900 transition-all duration-300 rounded-lg"
+          className="mt-10 self-start text-[14px] underline decoration-current/30 decoration-[1px] underline-offset-[5px] transition-[text-decoration-color] duration-300 hover:decoration-current"
         >
-          go home
+          Back to the window
         </Link>
-      </div>
-    </div>
+      </main>
+    </Sky>
   )
 }
