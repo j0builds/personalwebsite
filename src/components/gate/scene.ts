@@ -666,3 +666,89 @@ export function drawZoneHint(ctx: Ctx, L: Layout, zone: Zone, strength: number) 
   ctx.fillStyle = `rgba(255,255,255,${0.5 * strength})`
   ctx.fillRect(a.x + 1, b.y - 2, b.x - a.x - 2, 2)
 }
+
+// Four floodlight towers at the corners of the ground, so every player throws four soft shadows.
+const FLOODS: [number, number][] = [
+  [0.62, 0.78],
+  [-0.62, 0.78],
+  [0.7, -0.71],
+  [-0.7, -0.71],
+]
+
+/**
+ * Floodlit shadows: a dark contact patch plus one faint streak per tower. `height` is how far the
+ * object is off the grass; airborne things cast shadows that separate and fade.
+ */
+export function drawFloodShadows(
+  ctx: Ctx,
+  L: Layout,
+  x: number,
+  z: number,
+  opts: { width: number; length: number; height?: number; alpha: number },
+) {
+  const { width, length, height = 0, alpha } = opts
+  if (alpha <= 0.005) return
+  const lift = Math.max(0, height)
+  const fade = 1 / (1 + lift * 0.9)
+  for (const [dx, dz] of FLOODS) {
+    const cx = x + dx * (length * 0.5 + lift * 0.7)
+    const cz = z + dz * (length * 0.5 + lift * 0.7)
+    const c = proj(L, cx, 0, cz)
+    const a = proj(L, cx - dx * length * 0.5, 0, cz - dz * length * 0.5)
+    const b = proj(L, cx + dx * length * 0.5, 0, cz + dz * length * 0.5)
+    const major = Math.max(1, Math.hypot(b.x - a.x, b.y - a.y) / 2)
+    const minor = Math.max(1.5, width * 0.5 * c.s * 0.7)
+    ctx.save()
+    ctx.translate(c.x, c.y)
+    ctx.rotate(Math.atan2(b.y - a.y, b.x - a.x))
+    ctx.scale(1, minor / major)
+    const g = ctx.createRadialGradient(0, 0, 0, 0, 0, major)
+    g.addColorStop(0, `rgba(0,0,0,${alpha * 0.55 * fade})`)
+    g.addColorStop(0.55, `rgba(0,0,0,${alpha * 0.28 * fade})`)
+    g.addColorStop(1, 'rgba(0,0,0,0)')
+    ctx.fillStyle = g
+    ctx.beginPath()
+    ctx.arc(0, 0, major, 0, Math.PI * 2)
+    ctx.fill()
+    ctx.restore()
+  }
+  drawGroundShadow(ctx, L, x, z, width * 0.5, alpha * fade * fade)
+}
+
+/** Screen-space vertical band of the crowd, used for camera flashes. */
+export function standsBand(L: Layout): [number, number] {
+  const top = proj(L, 0, 20, 140).y
+  const bottom = proj(L, 0, 1.6, 114).y
+  return [top, bottom]
+}
+
+export function drawFlash(ctx: Ctx, x: number, y: number, r: number, a: number) {
+  const g = ctx.createRadialGradient(x, y, 0, x, y, r)
+  g.addColorStop(0, `rgba(255,255,255,${a})`)
+  g.addColorStop(0.25, `rgba(230,238,255,${a * 0.45})`)
+  g.addColorStop(1, 'rgba(230,238,255,0)')
+  ctx.fillStyle = g
+  ctx.fillRect(x - r, y - r, r * 2, r * 2)
+}
+
+export interface Particle {
+  x: number
+  y: number
+  z: number
+  vx: number
+  vy: number
+  vz: number
+  life: number
+  max: number
+  size: number
+  color: string
+}
+
+export function drawParticle(ctx: Ctx, L: Layout, p: Particle) {
+  const q = proj(L, p.x, p.y, p.z)
+  const sz = Math.max(1, p.size * q.s)
+  ctx.globalAlpha = Math.min(1, (p.life / p.max) * 2.2)
+  ctx.fillStyle = p.color
+  ctx.fillRect(q.x - sz / 2, q.y - sz / 2, sz, sz)
+  ctx.globalAlpha = 1
+}
