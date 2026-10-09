@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { PenaltyGame, type Phase } from './game'
+import { PenaltyGame, type Phase, type PhaseInfo } from './game'
+import { soundPreferred } from './sfx'
 import { computeLayout, zoneRects, type Layout, type Zone } from './scene'
 import { GATE_ATTEMPTS_KEY, GATE_OPEN_EVENT, GATE_STORAGE_KEY } from './constants'
 import { useVisitor } from '@/components/site/visitor'
@@ -13,17 +14,22 @@ const ZONES: { zone: Zone; label: string; key: string; aria: string }[] = [
   { zone: 1, label: 'Right', key: '→', aria: 'Dive right' },
 ]
 
-const AGAIN_LINES = ['Read him this time.', 'He’s watching you too.', 'Trust the first instinct.', 'One more. Breathe.']
+const AGAIN_LINES = ['Watch where he stands.', 'He’s watching you too.', 'Trust the first read.', 'One more. Breathe.']
 
-function copyFor(phase: Phase, attempt: number, choice?: Zone, ballZone?: Zone, name?: string) {
+function copyFor(phase: Phase, info: PhaseInfo, name?: string) {
+  const { attempt, choice, ballZone, note } = info
   const to = name ? `, ${name}` : ''
-  if (phase === 'saved') return { title: 'Saved.', sub: attempt === 1 ? `First time. Come on in${to}.` : `Come on in${to}.` }
+  if (phase === 'saved') {
+    const lead = note ? `${note} ` : attempt === 1 ? 'First time. ' : ''
+    return { title: 'Saved.', sub: `${lead}Come on in${to}.` }
+  }
   if (phase === 'scored') {
+    if (note) return { title: 'Goal.', sub: note }
     if (ballZone === 0 && choice !== 0) return { title: 'Goal.', sub: 'Chipped down the middle. Cheeky.' }
     if (choice === 0) return { title: 'Goal.', sub: 'He picked a corner.' }
     return { title: 'Goal.', sub: 'He went the other way.' }
   }
-  if (attempt === 1) return { title: 'Pick a side.', sub: 'Guess where he’s putting it.' }
+  if (attempt === 1) return { title: 'Pick a side.', sub: 'Watch how he lines up.' }
   return { title: 'Again.', sub: AGAIN_LINES[(attempt - 2) % AGAIN_LINES.length] }
 }
 
@@ -39,7 +45,8 @@ export function PenaltyGate() {
   const [leaving, setLeaving] = useState(false)
   const [layout, setLayout] = useState<Layout | null>(null)
   const [phase, setPhase] = useState<Phase>('aim')
-  const [info, setInfo] = useState<{ attempt: number; choice?: Zone; ballZone?: Zone }>({ attempt: 1 })
+  const [info, setInfo] = useState<PhaseInfo>({ attempt: 1 })
+  const [sound, setSound] = useState(soundPreferred)
   const [hover, setHover] = useState<Zone | null>(null)
   const [touch, setTouch] = useState(false)
   const firstName = useVisitor()?.guest?.name.split(' ')[0]
@@ -147,6 +154,14 @@ export function PenaltyGate() {
     return () => window.removeEventListener('keydown', onKey)
   }, [active, choose])
 
+  const toggleSound = () => {
+    const next = !sound
+    setSound(next)
+    const s = gameRef.current?.sound
+    s?.setEnabled(next)
+    if (next) s?.wake()
+  }
+
   const setHoverZone = (z: Zone | null) => {
     setHover(z)
     gameRef.current?.setHover(z)
@@ -155,7 +170,7 @@ export function PenaltyGate() {
   if (!active) return null
 
   const rects = layout ? zoneRects(layout) : null
-  const copy = copyFor(phase, info.attempt, info.choice, info.ballZone, firstName)
+  const copy = copyFor(phase, info, firstName)
   const showCopy = phase !== 'play'
   const canChoose = phase === 'aim'
   const columns =
@@ -230,7 +245,15 @@ export function PenaltyGate() {
           <div className="pointer-events-none absolute left-0 top-0 flex items-center px-5 sm:px-8" style={{ height: 56 }}>
             <span className="font-mono text-[13px] tracking-[0.08em] text-white/70">j0</span>
           </div>
-          <div className="pointer-events-none absolute right-0 top-0 flex items-center px-5 sm:px-8" style={{ height: 56 }}>
+          <div className="absolute right-0 top-0 flex items-center gap-5 px-5 sm:gap-7 sm:px-8" style={{ height: 56 }}>
+            <button
+              type="button"
+              onClick={toggleSound}
+              aria-pressed={sound}
+              className="font-mono text-[10px] uppercase tracking-[0.24em] text-white/40 transition-colors duration-300 hover:text-white/80 sm:text-[11px]"
+            >
+              Sound {sound ? 'on' : 'off'}
+            </button>
             <span className="font-mono text-[10px] uppercase tracking-[0.24em] text-white/40 tabular-nums sm:text-[11px]">
               Attempt {String(info.attempt).padStart(2, '0')}
             </span>
