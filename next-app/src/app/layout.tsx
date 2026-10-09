@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Inter, Space_Mono } from 'next/font/google'
+import { Inter, Instrument_Serif, Space_Mono } from 'next/font/google'
 import { PenaltyGate } from '@/components/gate/PenaltyGate'
 import { GATE_STORAGE_KEY } from '@/components/gate/constants'
 import './globals.css'
@@ -7,6 +7,13 @@ import './globals.css'
 const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter',
+  display: 'swap',
+})
+
+const instrument = Instrument_Serif({
+  subsets: ['latin'],
+  weight: '400',
+  variable: '--font-instrument',
   display: 'swap',
 })
 
@@ -47,7 +54,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${spaceMono.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`${inter.variable} ${instrument.variable} ${spaceMono.variable}`} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: gateScript }} />
       </head>
