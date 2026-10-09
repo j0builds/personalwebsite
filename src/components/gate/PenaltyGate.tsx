@@ -7,6 +7,7 @@ import { soundPreferred } from './sfx'
 import { computeLayout, zoneRects, type Layout, type Zone } from './scene'
 import { GATE_ATTEMPTS_KEY, GATE_OPEN_EVENT, GATE_STORAGE_KEY } from './constants'
 import { useVisitor } from '@/components/site/visitor'
+import { REEL_LENGTH, SaveReel } from './SaveReel'
 
 const ZONES: { zone: Zone; label: string; key: string; aria: string }[] = [
   { zone: -1, label: 'Left', key: '←', aria: 'Dive left' },
@@ -87,6 +88,7 @@ export function PenaltyGate() {
         window.setTimeout(finish, 950)
       },
     })
+    game.saveHold = 0.32 + REEL_LENGTH + 1.3
     gameRef.current = game
 
     const measure = () => {
@@ -162,6 +164,8 @@ export function PenaltyGate() {
     if (next) s?.wake()
   }
 
+  const shutter = useCallback(() => gameRef.current?.sound.shutter(), [])
+
   const setHoverZone = (z: Zone | null) => {
     setHover(z)
     gameRef.current?.setHover(z)
@@ -172,6 +176,14 @@ export function PenaltyGate() {
   const rects = layout ? zoneRects(layout) : null
   const copy = copyFor(phase, info, firstName)
   const showCopy = phase !== 'play'
+  // On wide screens the photos land on the side away from the dive, so the save itself stays in view.
+  const reel = layout
+    ? {
+        top: layout.headY + 78,
+        bottom: layout.H - 28,
+        shift: layout.W >= 768 ? (info.choice === 1 ? -1 : 1) * Math.min(layout.W * 0.2, 300) : 0,
+      }
+    : null
   const canChoose = phase === 'aim'
   const columns =
     layout && rects
@@ -209,6 +221,16 @@ export function PenaltyGate() {
 
       {layout && (
         <>
+          {reel && (
+            <SaveReel
+              run={phase === 'saved'}
+              centerX={layout.W / 2 + reel.shift}
+              centerY={(reel.top + reel.bottom) / 2}
+              maxHeight={reel.bottom - reel.top}
+              maxWidth={layout.W - (layout.W < 768 ? 120 : 56) - 2 * Math.abs(reel.shift)}
+              onShutter={shutter}
+            />
+          )}
           <div
             className="pointer-events-none absolute inset-x-0 flex h-[96px] flex-col items-center justify-start text-center sm:h-[104px]"
             style={{ top: Math.round(layout.headY - 48) }}

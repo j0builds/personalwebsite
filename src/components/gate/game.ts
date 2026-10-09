@@ -160,6 +160,8 @@ export class PenaltyGame {
   private particles: Particle[] = []
   private flashes: { x: number; y: number; r: number; born: number; life: number }[] = []
   readonly sound = new MatchSound()
+  /** Seconds the saved frame holds after the ball arrives, so anything layered over it can play out. */
+  saveHold = 0
 
   constructor(
     private canvas: HTMLCanvasElement,
@@ -518,7 +520,7 @@ export class PenaltyGame {
           sh.note = this.noteFor(sh)
           this.events.onPhase('saved', { attempt: this.attempt, choice: sh.choice, ballZone: sh.ballZone, note: sh.note })
         })
-      if (t >= sh.arrive + (sh.note ? 2.7 : 2.1))
+      if (t >= sh.arrive + Math.max(this.saveHold, sh.note ? 2.7 : 2.1))
         this.emitOnce('exit', () => {
           this.sound.fadeOut(1.4)
           this.events.onExit()

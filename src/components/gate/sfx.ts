@@ -250,6 +250,28 @@ export class MatchSound {
     o.stop(t + 0.15)
   }
 
+  /** A press camera: mirror up, mirror down. */
+  shutter() {
+    const ac = this.ready()
+    if (!ac) return
+    const t = ac.currentTime
+    for (const [at, gain, freq] of [
+      [0, 0.32, 3200],
+      [0.055, 0.22, 2400],
+    ] as const) {
+      const n = this.src(this.noise!)
+      const bp = ac.createBiquadFilter()
+      bp.type = 'bandpass'
+      bp.frequency.value = freq
+      bp.Q.value = 0.9
+      const g = ac.createGain()
+      this.env(g, t + at, gain, 0.001, 0.035)
+      n.connect(bp).connect(g).connect(this.master!)
+      n.start(t + at, Math.random())
+      n.stop(t + at + 0.08)
+    }
+  }
+
   net() {
     const ac = this.ready()
     if (!ac) return
