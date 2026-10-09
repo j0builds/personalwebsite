@@ -1,10 +1,7 @@
 import type { Metadata } from 'next'
 import { Inter, Space_Mono } from 'next/font/google'
-import { Navbar } from '@/components/layout/Navbar'
-import { Footer } from '@/components/layout/Footer'
-import { SmoothScroll } from '@/components/shared/SmoothScroll'
-import { CustomCursor } from '@/components/shared/CustomCursor'
-import { ComfortTint } from '@/components/shared/ComfortTint'
+import { PenaltyGate } from '@/components/gate/PenaltyGate'
+import { GATE_STORAGE_KEY } from '@/components/gate/constants'
 import './globals.css'
 
 const inter = Inter({
@@ -41,20 +38,22 @@ export const metadata: Metadata = {
   },
 }
 
+// Runs before first paint so a visitor who already made the save never sees the gate flash.
+const gateScript = `try{var s=sessionStorage.getItem('${GATE_STORAGE_KEY}');if(s==='open'||/[?&]gate=open(&|$)/.test(location.search)){document.documentElement.setAttribute('data-gate','open')}}catch(e){}`
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${spaceMono.variable}`}>
+    <html lang="en" className={`${inter.variable} ${spaceMono.variable}`} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: gateScript }} />
+      </head>
       <body className="bg-[#fafafa] text-neutral-900 font-sans antialiased">
-        <SmoothScroll />
-        <CustomCursor />
-        <ComfortTint />
-        <Navbar />
-        <main className="min-h-screen">{children}</main>
-        <Footer />
+        <PenaltyGate />
+        {children}
       </body>
     </html>
   )

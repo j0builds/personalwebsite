@@ -37,22 +37,29 @@
   body {
     background: var(--color-background);
     color: var(--color-foreground);
-    cursor: none;
   }
 
-  @media (hover: none) {
-    body {
-      cursor: auto;
-    }
+  html:not([data-gate='open']) {
+    overflow: hidden;
   }
 
-  a, button, [data-cursor-hover] {
-    cursor: none;
+  html[data-gate='open'] .penalty-gate {
+    display: none;
   }
 
-  @media (hover: none) {
-    a, button, [data-cursor-hover] {
-      cursor: auto;
+  .penalty-gate,
+  .penalty-gate * {
+    cursor: default;
+  }
+
+  .penalty-gate button:enabled {
+    cursor: pointer;
+  }
+
+  @media (hover: hover) {
+    body:has([data-custom-cursor]),
+    body:has([data-custom-cursor]) :is(a, button, [data-cursor-hover]) {
+      cursor: none;
     }
   }
 

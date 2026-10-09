@@ -124,6 +124,7 @@ export function CustomCursor() {
         lineHeight: 1,
       }}
       aria-hidden
+      data-custom-cursor
     >
       {selecting ? '\u{1F58D}\u{FE0F}' : '\u26BD'}
     </motion.div>
