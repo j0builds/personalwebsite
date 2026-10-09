@@ -9,8 +9,8 @@ export default function NotFound() {
         <h1 className="mt-4 font-[family-name:var(--font-instrument)] text-[clamp(44px,6.4vw,84px)] leading-[0.98] tracking-[-0.015em]">
           This page drifted off.
         </h1>
-        <p className="mt-6 max-w-[440px] text-[16px] leading-[1.65] opacity-80 [text-wrap:balance]">
-          Nothing lost, though. The front door is still where you left it.
+        <p className="mt-6 max-w-[480px] text-[16px] leading-[1.65] opacity-80 [text-wrap:balance]">
+          Nothing lost. The front door is right where you left it.
         </p>
         <Link
           href="/"
