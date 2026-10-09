@@ -153,7 +153,7 @@ function Breathe({ light }: { light: boolean }) {
   )
 }
 
-export function WindowConcept() {
+export function WindowHome() {
   const hour = useLocalHour()
   const sky = skyAt(hour ?? 12)
   const night = hour === null ? 0 : Math.min(1, Math.max(0, (0.34 - lum(sky.top)) / 0.22))
@@ -180,7 +180,7 @@ export function WindowConcept() {
           />
         ))}
       </div>
-      <div aria-hidden className="window-clouds absolute inset-0" style={{ opacity: hour === null ? 0 : 0.55 * (1 - night) ** 2 }}>
+      <div aria-hidden className="absolute inset-0" style={{ opacity: hour === null ? 0 : 0.55 * (1 - night) ** 2 }}>
         <span className="window-cloud left-[-10%] top-[14%] h-[90px] w-[420px]" />
         <span className="window-cloud left-[38%] top-[8%] h-[60px] w-[300px] [animation-delay:-70s]" />
         <span className="window-cloud left-[62%] top-[30%] h-[70px] w-[360px] [animation-delay:-140s]" />

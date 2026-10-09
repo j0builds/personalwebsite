@@ -85,3 +85,26 @@
     background: rgba(0, 0, 0, 0.2);
   }
 }
+
+.window-cloud {
+  position: absolute;
+  border-radius: 9999px;
+  background: radial-gradient(closest-side, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0));
+  filter: blur(18px);
+  animation: window-drift 210s linear infinite;
+}
+
+@keyframes window-drift {
+  from {
+    transform: translateX(-12vw);
+  }
+  to {
+    transform: translateX(28vw);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .window-cloud {
+    animation: none;
+  }
+}
