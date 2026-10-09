@@ -27,6 +27,8 @@ function copyFor(phase: Phase, attempt: number, choice?: Zone, ballZone?: Zone) 
 
 const useIsoLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect
 
+const isOpen = () => document.documentElement.getAttribute('data-gate') === 'open'
+
 export function PenaltyGate() {
   const rootRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -40,7 +42,7 @@ export function PenaltyGate() {
   const [touch, setTouch] = useState(false)
 
   useIsoLayoutEffect(() => {
-    if (document.documentElement.getAttribute('data-gate') === 'open') setActive(false)
+    if (isOpen()) setActive(false)
     setTouch(window.matchMedia('(hover: none)').matches)
   }, [])
 
@@ -55,7 +57,7 @@ export function PenaltyGate() {
   }, [])
 
   useEffect(() => {
-    if (!active) return
+    if (!active || isOpen()) return
     const canvas = canvasRef.current
     const root = rootRef.current
     if (!canvas || !root) return
@@ -75,6 +77,7 @@ export function PenaltyGate() {
     const measure = () => {
       const W = root.clientWidth
       const H = root.clientHeight
+      if (!W || !H) return
       const dpr = Math.min(window.devicePixelRatio || 1, 3)
       game.resize(W, H, dpr)
       setLayout(computeLayout(W, H))
@@ -107,7 +110,7 @@ export function PenaltyGate() {
   }, [])
 
   useEffect(() => {
-    if (!active) return
+    if (!active || isOpen()) return
     const onKey = (e: KeyboardEvent) => {
       if (e.metaKey || e.ctrlKey || e.altKey) return
       const onButton = (e.target as HTMLElement | null)?.closest?.('button')
