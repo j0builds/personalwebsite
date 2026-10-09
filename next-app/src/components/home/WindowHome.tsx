@@ -5,7 +5,8 @@ import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import { Reveal } from '@/components/site/Reveal'
 import { LINKS, SOCIALS } from '@/components/site/links'
-import { LocalTime, Sky, linkClass, useSky } from '@/components/site/Sky'
+import { Sky, formatHour, linkClass, useSky } from '@/components/site/Sky'
+import { greetingFor, notesFor, useVisitor } from '@/components/site/visitor'
 
 const IN = 4
 const OUT = 6
@@ -86,14 +87,85 @@ function Breathe() {
   )
 }
 
+const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+
+function Greeting() {
+  const { hour } = useSky()
+  const v = useVisitor()
+  if (hour === null || !v) return <span>&nbsp;</span>
+  const name = v.guest ? `, ${v.guest.name}` : ''
+  const where = v.city ? `in ${v.city}` : 'where you are'
+  return (
+    <span>
+      {greetingFor(hour)}
+      {name}. It&rsquo;s {formatHour(hour)} {where}.
+    </span>
+  )
+}
+
+function Notes() {
+  const { hour } = useSky()
+  const v = useVisitor()
+  const notes = hour === null || !v ? [] : notesFor(v, hour)
+  return (
+    <p
+      className="mt-4 min-h-[1.6em] max-w-[440px] font-[family-name:var(--font-instrument)] text-[19px] italic leading-[1.4] opacity-80 transition-opacity duration-700 [text-wrap:pretty]"
+      style={{ opacity: notes.length ? undefined : 0 }}
+    >
+      {notes.join(' ')}
+    </p>
+  )
+}
+
+function HowDidYouKnow() {
+  const { hour } = useSky()
+  const v = useVisitor()
+  if (hour === null || !v) return null
+  const items = [
+    `Your clock says ${formatHour(hour)} on a ${DAYS[new Date().getDay()]}.`,
+    `Your timezone is ${v.zone.replace(/_/g, ' ')}.`,
+    `Your browser's language is ${v.lang}.`,
+    v.from ? `You came over from ${v.from}.` : 'You typed the address in, or used a bookmark.',
+    v.visits > 1 ? `This browser has been here ${v.visits} times.` : 'This is the first visit from this browser.',
+  ]
+  if (v.saveAttempts) items.push(`You made the save on try ${v.saveAttempts}.`)
+  if (v.guest) {
+    items.push(`The link you were sent carried your name${v.guest.company ? ` and ${v.guest.company}` : ''}.`)
+  }
+  return (
+    <details className="group relative mt-8 text-[13px]">
+      <summary className="inline-flex cursor-pointer list-none items-center gap-2 opacity-60 transition-opacity duration-300 hover:opacity-100 [&::-webkit-details-marker]:hidden">
+        <span aria-hidden className="inline-block w-3 text-center group-open:hidden">+</span>
+        <span aria-hidden className="hidden w-3 text-center group-open:inline-block">&minus;</span>
+        <span className="underline decoration-current/30 underline-offset-[5px]">How did you know?</span>
+      </summary>
+      <div className="mt-4 max-w-[440px] border-l border-current/20 pl-4 leading-[1.7] md:absolute md:left-0 md:top-full md:w-[440px]">
+        <ul className="opacity-80">
+          {items.map((t) => (
+            <li key={t}>{t}</li>
+          ))}
+        </ul>
+        <p className="mt-3 opacity-60">
+          None of it leaves your browser. There are no analytics or cookies here; the page just asks
+          your browser what it already knows.
+        </p>
+        <p className="mt-3 opacity-60">
+          Sending this to someone? Try{' '}
+          <span className="font-[family-name:var(--font-space-mono)] text-[12px]">/hi/their-name</span>.
+        </p>
+      </div>
+    </details>
+  )
+}
+
 export function WindowHome() {
   return (
     <Sky>
       <main className="mx-auto grid min-h-[100svh] max-w-[1240px] grid-cols-1 items-center gap-12 px-6 pb-24 pt-14 sm:px-10 md:grid-cols-[1.08fr_0.92fr] md:gap-16 md:pb-16">
         <div className="max-w-[560px]">
           <Reveal delay={0.1}>
-            <p className="text-[14px] tracking-[0.01em] opacity-70">
-              <LocalTime />
+            <p className="text-[14px] tracking-[0.01em] opacity-70" suppressHydrationWarning>
+              <Greeting />
             </p>
           </Reveal>
           <Reveal delay={0.25}>
@@ -106,6 +178,7 @@ export function WindowHome() {
               I&rsquo;m Joseph Ayinde. I build things where neuroscience meets software. There&rsquo;s
               no rush here; this page will wait while you do.
             </p>
+            <Notes />
           </Reveal>
           <Reveal delay={0.6} className="mt-10">
             <Breathe />
@@ -121,6 +194,7 @@ export function WindowHome() {
                 </a>
               ))}
             </nav>
+            <HowDidYouKnow />
           </Reveal>
         </div>
 

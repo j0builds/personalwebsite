@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Inter, Instrument_Serif, Space_Mono } from 'next/font/google'
 import { PenaltyGate } from '@/components/gate/PenaltyGate'
 import { GATE_STORAGE_KEY } from '@/components/gate/constants'
+import { SiteSignals } from '@/components/site/SiteSignals'
 import './globals.css'
 
 const inter = Inter({
@@ -25,6 +26,7 @@ const spaceMono = Space_Mono({
 })
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://josephayinde.com'),
   title: {
     default: 'Joseph Ayinde | Builder, Researcher, Dreamer',
     template: '%s | Joseph Ayinde',
@@ -60,6 +62,7 @@ export default function RootLayout({
       </head>
       <body className="bg-[#fafafa] text-neutral-900 font-sans antialiased">
         <PenaltyGate />
+        <SiteSignals />
         {children}
       </body>
     </html>

@@ -4,7 +4,8 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react
 import { AnimatePresence, motion } from 'framer-motion'
 import { PenaltyGame, type Phase } from './game'
 import { computeLayout, zoneRects, type Layout, type Zone } from './scene'
-import { GATE_OPEN_EVENT, GATE_STORAGE_KEY } from './constants'
+import { GATE_ATTEMPTS_KEY, GATE_OPEN_EVENT, GATE_STORAGE_KEY } from './constants'
+import { useVisitor } from '@/components/site/visitor'
 
 const ZONES: { zone: Zone; label: string; key: string; aria: string }[] = [
   { zone: -1, label: 'Left', key: '←', aria: 'Dive left' },
@@ -14,8 +15,9 @@ const ZONES: { zone: Zone; label: string; key: string; aria: string }[] = [
 
 const AGAIN_LINES = ['Read him this time.', 'He’s watching you too.', 'Trust the first instinct.', 'One more. Breathe.']
 
-function copyFor(phase: Phase, attempt: number, choice?: Zone, ballZone?: Zone) {
-  if (phase === 'saved') return { title: 'Saved.', sub: attempt === 1 ? 'First time. Come on in.' : 'Come on in.' }
+function copyFor(phase: Phase, attempt: number, choice?: Zone, ballZone?: Zone, name?: string) {
+  const to = name ? `, ${name}` : ''
+  if (phase === 'saved') return { title: 'Saved.', sub: attempt === 1 ? `First time. Come on in${to}.` : `Come on in${to}.` }
   if (phase === 'scored') {
     if (ballZone === 0 && choice !== 0) return { title: 'Goal.', sub: 'Chipped down the middle. Cheeky.' }
     if (choice === 0) return { title: 'Goal.', sub: 'He picked a corner.' }
@@ -40,6 +42,7 @@ export function PenaltyGate() {
   const [info, setInfo] = useState<{ attempt: number; choice?: Zone; ballZone?: Zone }>({ attempt: 1 })
   const [hover, setHover] = useState<Zone | null>(null)
   const [touch, setTouch] = useState(false)
+  const firstName = useVisitor()?.guest?.name.split(' ')[0]
 
   useIsoLayoutEffect(() => {
     if (isOpen()) setActive(false)
@@ -64,6 +67,11 @@ export function PenaltyGate() {
 
     const game = new PenaltyGame(canvas, {
       onPhase: (p, i) => {
+        if (p === 'saved') {
+          try {
+            sessionStorage.setItem(GATE_ATTEMPTS_KEY, String(i.attempt))
+          } catch {}
+        }
         setPhase(p)
         setInfo(i)
       },
@@ -147,7 +155,7 @@ export function PenaltyGate() {
   if (!active) return null
 
   const rects = layout ? zoneRects(layout) : null
-  const copy = copyFor(phase, info.attempt, info.choice, info.ballZone)
+  const copy = copyFor(phase, info.attempt, info.choice, info.ballZone, firstName)
   const showCopy = phase !== 'play'
   const canChoose = phase === 'aim'
   const columns =
@@ -191,7 +199,7 @@ export function PenaltyGate() {
             style={{ top: Math.round(layout.headY - 48) }}
           >
             <p className="font-mono text-[10px] uppercase leading-none tracking-[0.34em] text-white/45 sm:text-[11px]">
-              One save to enter
+              One save to enter{firstName ? `, ${firstName}` : ''}
             </p>
             <div className="relative mt-3 h-[56px] w-full sm:mt-4 sm:h-[64px]" aria-live="polite">
               <AnimatePresence mode="wait">

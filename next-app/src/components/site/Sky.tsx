@@ -59,13 +59,19 @@ function skyAt(hour: number) {
   return { top: mix(hex(a.top), hex(b.top), s), bottom: mix(hex(a.bottom), hex(b.bottom), s) }
 }
 
-const subscribeMinute = (onChange: () => void) => {
+/** Zenith and horizon colours of the sky at `hour`, as CSS. */
+export function skyColors(hour: number) {
+  const { top, bottom } = skyAt(hour)
+  return { top: css(top), bottom: css(bottom), light: lum(mix(top, bottom, 0.55)) > 0.5 }
+}
+
+export const subscribeMinute = (onChange: () => void) => {
   const id = window.setInterval(onChange, 15_000)
   return () => window.clearInterval(id)
 }
 
 // `?hour=19.5` previews any time of day.
-const readHour = () => {
+export const readHour = () => {
   const override = new URLSearchParams(location.search).get('hour')
   const forced = override === null ? NaN : Number(override)
   if (forced >= 0 && forced < 24) return forced
