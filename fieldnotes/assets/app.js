@@ -7,11 +7,11 @@ const id=()=>crypto.randomUUID();
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const node=key=>board.nodes.find(n=>n.id===key);
 function status(text,kind=''){const e=$('#status');e.textContent=text;e.className='status '+kind;const js=$('#journal-save');if(js)js.textContent=text;}
-function error(text){$('#error').textContent=text;$('#error').hidden=!text;}
+function error(text){$('#error').textContent=text;$('#error').hidden=!text;const writer=$('#writer-save-error');if(writer){writer.textContent=text;writer.hidden=!text;}const recovery=$('#writer-recovery');if(recovery)recovery.hidden=!text;const retry=$('#writer-retry');if(retry)retry.hidden=conflict;}
 function snapshot(){return JSON.stringify(board);}
 function checkpoint(){history.push(snapshot());if(history.length>100)history.shift();future=[];updateHistory();}
 function updateHistory(){$('#undo').disabled=!history.length;$('#redo').disabled=!future.length;}
-function changed(){changeVersion++;dirty=true;status('Unsaved changes…','dirty');clearTimeout(saveTimer);saveTimer=setTimeout(save,350);}
+function changed(){changeVersion++;dirty=true;status(conflict?'Not saved · resolve the conflict':saveFailure?'Not saved · retrying':'Unsaved changes…',conflict||saveFailure?'failed':'dirty');clearTimeout(saveTimer);saveTimer=setTimeout(save,350);}
 async function save(){
  clearTimeout(saveTimer);if(conflict||!loaded)return;if(saving){pending=true;return;}if(!dirty)return;
  saving=true;pending=false;$('#retry').hidden=true;const sent=snapshot(),sentVersion=changeVersion,requests=[...pendingAIRequests.values()],baseBoard=lastSyncedBoard;saveFailure=null;status('Saving privately…','dirty');
@@ -115,7 +115,7 @@ $('#file').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{if(f.si
  const journalById=new Map((board.journalEntries||[]).map(e=>[e.id,e]));for(const entry of incomingJournal)if(!journalById.has(entry.id))journalById.set(entry.id,entry);merged.journalEntries=[...journalById.values()];
  checkpoint();board=merged;render();fit();changed();error('Imported new cards, connections, and reflections. Existing IDs were kept; undo reverses this import.');
  }catch(err){error(err.message);}e.target.value='';};
-(async()=>{try{const [a,b]=await Promise.all([fetch('/api/board'),fetch('/api/library')]);if(!a.ok||!b.ok)throw Error('Unable to open private storage');const record=await a.json();board=record.board;lastSyncedBoard=structuredClone(board);serverJobs=record.jobs||[];revision=record.revision;library=await b.json();loaded=true;render();status('Saved privately'+(record.savedAt?' · '+new Date(record.savedAt).toLocaleString():''));if(revision===0)fit();const params=new URLSearchParams(location.search);if(params.get('card')&&node(params.get('card')))focusNode(node(params.get('card')));else if(params.get('view')!=='map')$('#open-journal').click();}catch(e){status('Could not open board','failed');error(e.message+' Check your session and storage configuration, then reload.');}})();
+async function startFieldnotes(){try{const [a,b]=await Promise.all([fetch('/api/board'),fetch('/api/library')]);if(!a.ok||!b.ok)throw Error('Unable to open private storage');const record=await a.json();board=record.board;lastSyncedBoard=structuredClone(board);serverJobs=record.jobs||[];revision=record.revision;library=await b.json();loaded=true;render();status('Saved privately'+(record.savedAt?' · '+new Date(record.savedAt).toLocaleString():''));if(revision===0)fit();const params=new URLSearchParams(location.search);if(params.get('card')&&node(params.get('card')))focusNode(node(params.get('card')));else if(params.get('view')!=='map')$('#open-journal').click();}catch(e){status('Could not open board','failed');error(e.message+' Check your session and storage configuration, then reload.');}}
 
 // Reconcile worker results with edits in this tab; never replace the writer's input.
 let refreshing=false;

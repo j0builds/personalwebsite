@@ -37,3 +37,18 @@ test('save acknowledgement releases captured entry while newer typing remains di
  requests[0].resolve({ok:true,json:async()=>({revision:1,savedAt:new Date().toISOString()})});await saved;
  assert.equal(vm.runInContext('dirty',ctx),true);assert.equal(vm.runInContext('board.journalDraft',ctx),'newer');assert.equal(requests.length,1);
 });
+test('save conflict remains visible in writer after subsequent typing',async()=>{
+ const app=await readFile(new URL('../assets/app.js',import.meta.url),'utf8');const els=new Map();const document={querySelector:s=>{if(!els.has(s))els.set(s,{});return els.get(s);}};
+ const ctx=vm.createContext({document,crypto:{randomUUID:()=>''},setTimeout,clearTimeout,Date,Promise,fetch:async()=>({ok:false,status:409,json:async()=>({error:'Another window saved a newer version.'})})});
+ vm.runInContext(app.slice(0,app.indexOf("window.addEventListener('beforeunload'")),ctx);
+ await vm.runInContext("board={journalDraft:'keep me'};loaded=true;changed();save();",ctx);
+ vm.runInContext("board.journalDraft='keep me too';changed();clearTimeout(saveTimer)",ctx);
+ assert.equal(els.get('#writer-save-error').hidden,false);assert.match(els.get('#writer-save-error').textContent,/newer version/);assert.match(els.get('#journal-save').textContent,/Not saved/);assert.equal(vm.runInContext('board.journalDraft',ctx),'keep me too');assert.equal(els.get('#writer-recovery').hidden,false);
+});
+test('fast initial fetch opens writer after bridge finishes loading handlers',async()=>{
+ const app=await readFile(new URL('../assets/app.js',import.meta.url),'utf8');const bridge=await readFile(new URL('../assets/bridge.js',import.meta.url),'utf8');
+ assert.ok(bridge.indexOf('await startFieldnotes()')>bridge.indexOf("'journal.js'"));
+ const start=app.slice(app.indexOf('async function startFieldnotes()'),app.indexOf('\n',app.indexOf('async function startFieldnotes()')));let opened=0;
+ const ctx=vm.createContext({fetch:async url=>({ok:true,json:async()=>url.endsWith('board')?{board:{nodes:[]},revision:1}:[]}),structuredClone,URLSearchParams,location:{search:''},render(){},status(){},$:()=>({click(){opened++;}})});
+ vm.runInContext(start,ctx);assert.equal(opened,0);await vm.runInContext('startFieldnotes()',ctx);assert.equal(opened,1);
+});

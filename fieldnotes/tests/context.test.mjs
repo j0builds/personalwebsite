@@ -12,3 +12,14 @@ test('AI request includes eligible history and returns an auditable context rece
 });
 test('a personal correction cannot resurrect the superseded public account',()=>{const b=structuredClone(board);b.journalEntries.find(e=>e.id==='fix').contextScope='personal';const s=companySources(b);assert.ok(!s.entries.some(e=>e.id==='entry:a'||e.id==='entry:fix'));});
 test('unavailable local AI preserves the journal workflow',async()=>{const {synthesize}=await import('../lib/synthesis.mjs');const original=globalThis.fetch;globalThis.fetch=async()=>{throw Error('offline')};try{await assert.rejects(synthesize('Test',board,'think'),{message:'AI_NOT_CONFIGURED'});}finally{globalThis.fetch=original;}});
+test('synthesis context excludes unrelated records instead of padding history',()=>{
+ const b={nodes:[{id:'h',kind:'idea',candidateKey:'alex',title:'Alex Example',body:'No interview recorded. Stage: Considering'}],journalEntries:[{id:'strategy',text:'Conference outreach uses targeted invitations.'}]};
+ const p=buildContext(b,'Plan conference outreach and invitations',0,{relevantOnly:true});
+ assert.deepEqual(p.sources.map(s=>s.id),['entry:strategy']);assert.equal(p.coverage.omittedSources,1);
+});
+
+test('strategy thoughts mentioning a person do not pull their hiring status into inference',async()=>{
+ const {synthesize}=await import('../lib/synthesis.mjs');const original=globalThis.fetch;let input;globalThis.fetch=async(u,o)=>{input=JSON.parse(JSON.parse(o.body).messages[1].content);return {ok:true,json:async()=>({message:{content:JSON.stringify({summary:'Strategy',updates:[],perspectives:[]})}})};};
+ const b={nodes:[{id:'alex',kind:'idea',title:'Alex Example',candidateKey:'alex',body:'No interview recorded'}],journalEntries:[]};
+ try{await synthesize('Outline conference strategy and send to Alex Example',b,'think');assert.equal(input.companyContext.sources.length,0);await synthesize('Should I interview Alex Example?',b,'think');assert.equal(input.companyContext.sources.length,1);}finally{globalThis.fetch=original;}
+});

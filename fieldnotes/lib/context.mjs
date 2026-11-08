@@ -11,13 +11,13 @@ export function companySources(board){
  const cardSources=(board.nodes||[]).filter(n=>n.kind!=='region'&&!excluded.has(n.sourceEntry)&&!superseded.has(n.sourceEntry)&&!tainted.has(n.id)&&n.contextScope!=='personal').map((n,i)=>({id:'card:'+n.id,type:n.candidateKey?'person':n.kind,date:null,title:n.title,text:n.body,url:'/?card='+encodeURIComponent(n.id),order:i,sourceEntry:n.sourceEntry||null}));
  return {entries:entrySources,cards:cardSources,excludedCount:excluded.size,supersededCount:superseded.size};
 }
-export function buildContext(board,query='',revision=0,{excludeEntryId=null,budget=24000}={}){
+export function buildContext(board,query='',revision=0,{excludeEntryId=null,budget=24000,relevantOnly=false,excludePeople=false}={}){
  const all=companySources(board),terms=tokens(query);
  const rank=(s,i)=>{const hay=tokens(s.title+' '+s.text);let relevance=0;for(const t of terms)if(hay.has(t))relevance++;return relevance*100+(s.type==='decision'?12:0)+i/Math.max(1,all.entries.length+all.cards.length);};
- const sources=[...all.entries.filter(e=>e.id!=='entry:'+excludeEntryId),...all.cards];
+ const sources=[...all.entries.filter(e=>e.id!=='entry:'+excludeEntryId),...all.cards.filter(c=>!excludePeople||c.type!=='person')];
  const ordered=sources.map((s,i)=>({s,score:rank(s,i)})).sort((a,b)=>b.score-a.score);
  const selected=[];let chars=0;
- for(const {s} of ordered){if(selected.length>=24)break;const limit=terms.size?1600:1000;let excerpt=s.text.slice(0,limit);
+ for(const {s,score} of ordered){if(relevantOnly&&terms.size&&score<100)continue;if(selected.length>=24)break;const limit=terms.size?1600:1000;let excerpt=s.text.slice(0,limit);
   // Center an excerpt on a query match so older details are retrievable beyond the first paragraph.
   if(terms.size){const lower=s.text.toLowerCase();const hits=[...terms].map(t=>lower.indexOf(t)).filter(i=>i>=0);const first=hits.length?Math.min(...hits):0;if(first>500)excerpt=s.text.slice(Math.max(0,first-250),first+limit-250);}
   const out={id:s.id,type:s.type,date:s.date,title:s.title,excerpt,url:s.url,truncated:excerpt.length<s.text.length};const size=JSON.stringify(out).length;if(chars+size>budget)continue;selected.push(out);chars+=size;
