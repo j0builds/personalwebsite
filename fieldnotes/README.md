@@ -18,6 +18,12 @@ Export/Import in board tools gives portable JSON backups (exports contain plaint
 
 Ollama runs Qwen3 4B on localhost11434, with cloud calls disabled in this app. No AI Gateway, paid APIs, external database, or JavaScript runtime dependencies. AI may be wrong: automatic hiring updates require exact current-entry evidence and unique candidate matching; Think never mutates cards. Company context uses bounded source retrieval, not a claim to know every historical detail.
 
+## Durable AI jobs
+
+“Save & update cards” saves the entry and an AI job atomically in the encrypted local record. Wait for the saved confirmation; then the tab can close. The local server processes jobs serially, commits results and hiring updates together, and resumes interrupted work after restart. The Mac must be awake with the server and Ollama running; sleeping or shutdown delays work until it resumes. Failures retry three times, then appear as needing a retry. Reopen the entry and submit again to retry.
+
+Open tabs poll for results and merge independent edits. Same-field conflicts stop saving with an export/reload message; newer manual card edits are not silently replaced. Think results remain exploratory. AI proposals for ordinary map cards still require review; evidence-grounded hiring updates apply automatically. Jobs share the encrypted state and its backups, never the website host. Terminal job metadata is retained for the latest 200 jobs; the original entries and results remain in the journal.
+
 ## Website deployment
 
 `npm run build` copies only the static interface to public/. Vercel hosts these public code assets; it holds no journal data. /story is a static shell that reads the local server after unlocking. The public personal website remains unchanged. Draft PR7 stages these changes in the same repository.

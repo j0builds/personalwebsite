@@ -15,8 +15,11 @@ http.createServer(async(req,res)=>{
  if(origin){res.setHeader('Access-Control-Allow-Origin',origin);res.setHeader('Vary','Origin');res.setHeader('Access-Control-Allow-Methods','GET, POST, OPTIONS');res.setHeader('Access-Control-Allow-Headers','Authorization, Content-Type, X-Atlas-Write');res.setHeader('Access-Control-Allow-Private-Network','true');}
  if(req.method==='OPTIONS'){res.writeHead(204);return res.end();}
  if(req.method==='GET'&&req.url==='/health'){res.setHeader('Cache-Control','no-store');res.end(JSON.stringify({local:true}));return;}
- if(req.method==='GET'&&(['/','/bridge.js','/app.js','/hiring.js','/journal.js','/style.css','/story.css'].includes(req.url)||(req.url.startsWith('/story')&&!req.headers.authorization))){
+ if(req.method==='GET'&&(['/','/bridge.js','/app.js','/hiring.js','/merge.js','/journal.js','/style.css','/story.css'].includes(req.url)||(req.url.startsWith('/story')&&!req.headers.authorization))){
   const file=req.url==='/'||req.url.startsWith('/story')?'index.html':req.url.slice(1);try{res.setHeader('Content-Type',file.endsWith('.js')?'text/javascript':file.endsWith('.css')?'text/css':'text/html');res.setHeader('Cache-Control','no-store');return res.end(await readFile(new URL('../assets/'+file,import.meta.url)));}catch{res.writeHead(404);return res.end();}
  }
  return handler(req,res);
 }).listen(8891,'127.0.0.1',()=>console.log('Fieldnotes local server ready at http://127.0.0.1:8891'));
+
+const {createWorker}=await import('../lib/jobs.mjs');
+const worker=createWorker();await worker.start();

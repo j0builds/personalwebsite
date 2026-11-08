@@ -17,32 +17,21 @@ function setup(){
  const finish=i=>requests[i].resolve({ok:true,json:async()=>result});
  return {$,ctx,run,type,requests,saves,finish};
 }
-test('AI waits for save, never disables writing, deduplicates and preserves newer drafts across modes',async()=>{
- const h=setup(),ack=deferred();h.ctx.saveThrough=()=>ack.promise;
- h.type('Met Example Person');h.$('#synthesize').onclick();h.$('#synthesize').onclick();await tick();
- assert.equal(h.requests.length,0);assert.equal(h.$('#daily-entry').disabled,false);assert.equal(h.$('#save-entry').disabled,false);
- ack.resolve();await tick();assert.equal(h.requests.length,1);
- h.type('A newer journal draft');h.$('#mode-think').onclick();h.type('Could we try a different tool?');
- h.finish(0);await h.run('aiQueue');
- assert.equal(h.$('#daily-entry').value,'Could we try a different tool?');assert.equal(h.ctx.board.journalDraft,'A newer journal draft');assert.equal(h.ctx.board.thoughtDraft,'Could we try a different tool?');
- assert.equal(h.requests[0].input.mode,'journal');assert.equal(h.ctx.board.journalEntries[0].hiringReceipt.length,1);assert.equal(h.run('activeEntry'),null);
-});
-test('queued notes run serially while plain save remains available; manual card edits survive',async()=>{
- const h=setup();h.type('Met Example Person');h.$('#synthesize').onclick();await tick();
- h.type('Next note');h.$('#synthesize').onclick();await tick();assert.equal(h.requests.length,1);
- h.type('Third note');await h.$('#save-entry').onclick();assert.equal(h.ctx.board.journalEntries.length,3);
- h.ctx.board.nodes[0].body='Stage: Manually updated';h.finish(0);await tick();assert.equal(h.requests.length,2);assert.equal(h.ctx.board.nodes[0].body,'Stage: Manually updated');
- h.finish(1);await h.run('aiQueue');assert.equal(h.$('#daily-entry').value,'Third note');assert.equal(h.requests[1].input.entry,'Next note');
-});
-test('changed scope discards late result; save failure never starts AI',async()=>{
- const h=setup();h.type('Met Example Person');h.$('#synthesize').onclick();await tick();h.ctx.board.journalEntries[0].contextScope='personal';h.finish(0);await h.run('aiQueue');assert.equal(h.ctx.board.journalEntries[0].proposal,null);
- const f=setup();f.ctx.saveThrough=async()=>{throw Error('Disk unavailable');};f.type('Unsaved note');f.$('#synthesize').onclick();await f.run('aiQueue');assert.equal(f.requests.length,0);assert.match(f.$('#ai-status').textContent,/Disk unavailable/);assert.equal(f.$('#daily-entry').value,'Unsaved note');
+test('AI submission captures an entry and durable request without disabling writing',async()=>{
+ const h=setup();h.ctx.serverJobs=[];h.ctx.pendingAIRequests=new Map();
+ h.type('Met Example Person');h.$('#synthesize').onclick();h.$('#synthesize').onclick();
+ assert.equal(h.ctx.pendingAIRequests.size,1);assert.equal(h.ctx.board.journalEntries.length,1);
+ assert.equal(h.$('#daily-entry').disabled,false);assert.equal(h.$('#save-entry').disabled,false);assert.equal(h.requests.length,0);
+ h.type('Newer thought');h.$('#mode-think').onclick();h.type('A different angle');
+ assert.equal(h.ctx.board.journalDraft,'Newer thought');assert.equal(h.ctx.board.thoughtDraft,'A different angle');
+ assert.equal(h.ctx.board.journalEntries[0].text,'Met Example Person');
 });
 test('save acknowledgement releases captured entry while newer typing remains dirty',async()=>{
  const app=await readFile(new URL('../assets/app.js',import.meta.url),'utf8');const elements=new Map();const document={querySelector:s=>{if(!elements.has(s))elements.set(s,{});return elements.get(s);}};
- const requests=[];const ctx=vm.createContext({document,crypto:{randomUUID:()=>''},setTimeout,clearTimeout,Date,Promise,fetch:async()=>{const d=deferred();requests.push(d);return d.promise;}});
+ const requests=[];const ctx=vm.createContext({document,structuredClone,syncInspectorFields:()=>{},crypto:{randomUUID:()=>''},setTimeout,clearTimeout,Date,Promise,fetch:async()=>{const d=deferred();requests.push(d);return d.promise;}});
+ vm.runInContext(await readFile(new URL('../assets/merge.js',import.meta.url),'utf8'),ctx);
  vm.runInContext(app.slice(0,app.indexOf("window.addEventListener('beforeunload'")),ctx);
- vm.runInContext("board={journalDraft:'first'};loaded=true;changed();",ctx);
+ vm.runInContext("board={journalDraft:'first'};loaded=true;renderNodes=()=>{};renderNav=()=>{};syncInspectorFields=()=>{};changed();",ctx);
  const saved=vm.runInContext('saveThrough(changeVersion)',ctx);await tick();
  vm.runInContext("board.journalDraft='newer';changed();clearTimeout(saveTimer);",ctx);
  requests[0].resolve({ok:true,json:async()=>({revision:1,savedAt:new Date().toISOString()})});await saved;

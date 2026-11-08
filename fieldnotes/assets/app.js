@@ -1,7 +1,8 @@
 'use strict';
 const $=s=>document.querySelector(s), canvas=$('#canvas'),world=$('#world');
-let board,library,revision=0,selected=null,selectedEdge=null,tool='select',linkFrom=null,gesture=null,space=false;
+let board,library,lastSyncedBoard,serverJobs=[],revision=0,selected=null,selectedEdge=null,tool='select',linkFrom=null,gesture=null,space=false;
 let history=[],future=[],saving=false,pending=false,dirty=false,conflict=false,saveTimer,editTimer,loaded=false,changeVersion=0,savedVersion=0,saveFailure=null;
+const pendingAIRequests=new Map();
 const id=()=>crypto.randomUUID();
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const node=key=>board.nodes.find(n=>n.id===key);
@@ -13,10 +14,14 @@ function updateHistory(){$('#undo').disabled=!history.length;$('#redo').disabled
 function changed(){changeVersion++;dirty=true;status('Unsaved changes…','dirty');clearTimeout(saveTimer);saveTimer=setTimeout(save,350);}
 async function save(){
  clearTimeout(saveTimer);if(conflict||!loaded)return;if(saving){pending=true;return;}if(!dirty)return;
- saving=true;pending=false;$('#retry').hidden=true;const sent=snapshot(),sentVersion=changeVersion;saveFailure=null;status('Saving privately…','dirty');
- try{const r=await fetch('/api/board',{method:'POST',headers:{'Content-Type':'application/json','X-Atlas-Write':'1'},body:JSON.stringify({revision,board:JSON.parse(sent)})});const result=await r.json();if(!r.ok){if(r.status===409)conflict=true;throw Error(result.error||'Save failed');}
- revision=result.revision;savedVersion=sentVersion;dirty=snapshot()!==sent;status(dirty?'Saving latest changes…':'Saved privately · '+new Date(result.savedAt).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}),dirty?'dirty':'');error('');
- }catch(e){saveFailure=e;dirty=true;$('#retry').hidden=conflict;status('Not saved · export a backup','failed');error(e.message+' Your changes remain in this window.');pending=false;
+ saving=true;pending=false;$('#retry').hidden=true;const sent=snapshot(),sentVersion=changeVersion,requests=[...pendingAIRequests.values()],baseBoard=lastSyncedBoard;saveFailure=null;status('Saving privately…','dirty');
+ try{const r=await fetch('/api/board',{method:'POST',headers:{'Content-Type':'application/json','X-Atlas-Write':'1'},body:JSON.stringify({revision,board:JSON.parse(sent),baseBoard,requests})});const result=await r.json();if(!r.ok){if(r.status===409)conflict=true;throw Error(result.error||'Save failed');}
+ revision=result.revision;savedVersion=sentVersion;
+ const remote=result.board||JSON.parse(sent);
+ const previous=board;board=globalThis.fieldnotesMerge(JSON.parse(sent),board,remote);syncInspectorFields(previous);lastSyncedBoard=structuredClone(remote);serverJobs=result.jobs||serverJobs;
+ for(const request of requests)pendingAIRequests.delete(request.id);
+ dirty=pendingAIRequests.size>0||snapshot()!==JSON.stringify(remote);if(!gesture){renderNodes();renderNav();}if(typeof refreshAIStatus==='function')refreshAIStatus();status(dirty?'Saving latest changes…':'Saved privately · '+new Date(result.savedAt).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}),dirty?'dirty':'');error('');
+ }catch(e){if(e.message.startsWith('Concurrent edit'))conflict=true;saveFailure=e;dirty=true;$('#retry').hidden=conflict;status('Not saved · export a backup','failed');error(e.message+' Your changes remain in this window.');pending=false;
  }finally{saving=false;if(!conflict&&dirty&&pending)setTimeout(save,50);}
 }
 // Wait for this edit's acknowledgement, not for all later typing to stop.
@@ -46,6 +51,12 @@ function renderEdges(){
  $('#edges').innerHTML=board.edges.map(e=>{const a=node(e.from),b=node(e.to);if(!a||!b)return '';const x1=a.x+130,y1=a.y+height(a.id)/2,x2=b.x+130,y2=b.y+height(b.id)/2;const dx=x2-x1,dy=y2-y1;const horizontal=Math.abs(dx)>Math.abs(dy);const ax=horizontal?a.x+(dx>=0?260:0):x1,ay=horizontal?y1:a.y+(dy>=0?height(a.id):0),bx=horizontal?b.x+(dx>=0?0:260):x2,by=horizontal?y2:b.y+(dy>=0?0:height(b.id));const path=horizontal?`M ${ax} ${ay} C ${(ax+bx)/2} ${ay}, ${(ax+bx)/2} ${by}, ${bx} ${by}`:`M ${ax} ${ay} C ${ax} ${(ay+by)/2}, ${bx} ${(ay+by)/2}, ${bx} ${by}`;return `<g data-edge="${esc(e.id)}"><path class="edge ${selectedEdge===e.id?'selected':''}" d="${path}"/><path class="hit" d="${path}"/><text x="${(ax+bx)/2}" y="${(ay+by)/2-8}" text-anchor="middle">${esc(e.label||'connects')}</text></g>`;}).join('');
 }
 function renderNav(){$('#regions').innerHTML=board.nodes.filter(n=>n.kind==='region').map(n=>`<button data-jump="${esc(n.id)}">${esc(n.title)}</button>`).join('');}
+function syncInspectorFields(previous){
+ const before=previous?.nodes?.find(n=>n.id===selected),after=node(selected);if(!before||!after)return;
+ for(const [field,selector] of Object.entries({title:'#title',body:'#body',kind:'#kind',region:'#parent',x:'#node-x',y:'#node-y'})){
+  const input=$(selector);if(input.value===String(before[field]??'')&&before[field]!==after[field])input.value=String(after[field]??'');
+ }
+}
 function renderInspector(){
  const n=node(selected),e=board.edges.find(e=>e.id===selectedEdge);$('#inspector').hidden=!n&&!e;$('#edit-form').hidden=!n;$('#edge-form').hidden=!e;$('#frameworks').replaceChildren();$('#relations').replaceChildren();if(!n&&!e)return;
  if(e){$('#edge-label').value=e.label||'';$('#relations').textContent=`${node(e.from).title} → ${node(e.to).title}`;return;}
@@ -104,4 +115,19 @@ $('#file').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{if(f.si
  const journalById=new Map((board.journalEntries||[]).map(e=>[e.id,e]));for(const entry of incomingJournal)if(!journalById.has(entry.id))journalById.set(entry.id,entry);merged.journalEntries=[...journalById.values()];
  checkpoint();board=merged;render();fit();changed();error('Imported new cards, connections, and reflections. Existing IDs were kept; undo reverses this import.');
  }catch(err){error(err.message);}e.target.value='';};
-(async()=>{try{const [a,b]=await Promise.all([fetch('/api/board'),fetch('/api/library')]);if(!a.ok||!b.ok)throw Error('Unable to open private storage');const record=await a.json();board=record.board;revision=record.revision;library=await b.json();loaded=true;render();status('Saved privately'+(record.savedAt?' · '+new Date(record.savedAt).toLocaleString():''));if(revision===0)fit();const params=new URLSearchParams(location.search);if(params.get('card')&&node(params.get('card')))focusNode(node(params.get('card')));else if(params.get('view')!=='map')$('#open-journal').click();}catch(e){status('Could not open board','failed');error(e.message+' Check your session and storage configuration, then reload.');}})();
+(async()=>{try{const [a,b]=await Promise.all([fetch('/api/board'),fetch('/api/library')]);if(!a.ok||!b.ok)throw Error('Unable to open private storage');const record=await a.json();board=record.board;lastSyncedBoard=structuredClone(board);serverJobs=record.jobs||[];revision=record.revision;library=await b.json();loaded=true;render();status('Saved privately'+(record.savedAt?' · '+new Date(record.savedAt).toLocaleString():''));if(revision===0)fit();const params=new URLSearchParams(location.search);if(params.get('card')&&node(params.get('card')))focusNode(node(params.get('card')));else if(params.get('view')!=='map')$('#open-journal').click();}catch(e){status('Could not open board','failed');error(e.message+' Check your session and storage configuration, then reload.');}})();
+
+// Reconcile worker results with edits in this tab; never replace the writer's input.
+let refreshing=false;
+async function refreshFromServer(){
+ if(!loaded||saving||refreshing||conflict)return;refreshing=true;
+ try{
+  const r=await fetch('/api/board');if(!r.ok)return;const remote=await r.json();if(saving||remote.revision<=revision)return;
+  const previous=board;board=globalThis.fieldnotesMerge(lastSyncedBoard,board,remote.board);syncInspectorFields(previous);lastSyncedBoard=structuredClone(remote.board);revision=remote.revision;serverJobs=remote.jobs||[];
+  dirty=pendingAIRequests.size>0||snapshot()!==JSON.stringify(remote.board);renderNodes();renderNav();
+  if(typeof journalHistory==='function'){journalHistory();refreshAIStatus();}
+ }catch(e){if(e.message.startsWith('Concurrent edit')){conflict=true;error(e.message);status('Conflicting changes · export a backup','failed');}}
+ finally{refreshing=false;}
+}
+setInterval(refreshFromServer,2000);
+window.addEventListener('focus',refreshFromServer);

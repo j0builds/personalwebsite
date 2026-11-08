@@ -11,7 +11,7 @@
   const error=overlay.querySelector('#connect-error');error.textContent='Connecting to your Mac…';
   try{const r=await fetch('/api/board');if(!r.ok){error.textContent='That local key did not match.';return;}await r.json();sessionStorage.setItem('fieldnotes-local-key',key);
    if(location.pathname.startsWith('/story')){const r=await fetch(location.pathname+location.search);if(!r.ok)throw Error();const html=await r.text();const doc=new DOMParser().parseFromString(html,'text/html');document.title=doc.title;document.body.innerHTML=doc.body.innerHTML;const css=document.createElement('link');css.rel='stylesheet';css.href='/story.css';document.head.append(css);return;}
-   overlay.remove();for(const file of ['app.js','hiring.js','journal.js']){const s=document.createElement('script');s.src='/'+file;await new Promise((resolve,reject)=>{s.onload=resolve;s.onerror=reject;document.body.append(s);});}
+   overlay.remove();for(const file of ['merge.js','app.js','hiring.js','journal.js']){const s=document.createElement('script');s.src='/'+file;await new Promise((resolve,reject)=>{s.onload=resolve;s.onerror=reject;document.body.append(s);});}
   }catch{error.textContent='Cannot reach the local server. Open Start Fieldnotes on this Mac, then try again.';}
  }
  overlay.querySelector('form').onsubmit=e=>{e.preventDefault();key=overlay.querySelector('input').value.trim();open();};if(key)open();

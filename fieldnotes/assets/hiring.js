@@ -22,3 +22,5 @@ function applyHiringUpdates(board,entry,baseline){
  return {updated,skipped};
 }
 if(typeof module!=='undefined')module.exports={applyHiringUpdates};
+
+globalThis.applyFieldnotesHiringUpdates=applyHiringUpdates;

@@ -30,3 +30,12 @@ test('context read token cannot read board, write, or retrieve personal sources'
  assert.equal((await request('/story',{headers})).statusCode,303);
  delete process.env.CONTEXT_READ_TOKEN_HASH;
 });
+
+test('stale model evidence becomes a verbatim named-person note, never an inferred field change',()=>{
+ const entry='Example Person: Stage: Interview. Next step: send portfolio.';
+ const board={nodes:[{id:'person',title:'Example Person',candidateKey:'example',body:'Stage: Considering'}]};
+ const raw={summary:'Considering',updates:[],hiringUpdates:[{nodeId:'person',mention:'Example Person',note:'Considering',evidence:'Stage: Considering',fields:[]}]};
+ const result=cleanResult(raw,entry,board,'journal');assert.equal(result.hiringUpdates.length,1);assert.equal(result.hiringUpdates[0].evidence,entry);assert.deepEqual(result.hiringUpdates[0].fields,[]);assert.equal(result.summary,entry);
+ assert.equal(cleanResult(raw,'Example Personson sent a note.',board,'journal').hiringUpdates.length,0);
+ assert.equal(cleanResult(raw,entry,board,'think').hiringUpdates.length,0);
+});
