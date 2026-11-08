@@ -11,3 +11,8 @@ test('AI request includes eligible history and returns an auditable context rece
  try{const result=await synthesize('Should we use a contractor?',board,'think');assert.ok(sent.messages[1].content.includes('Maybe try a contractor'));assert.ok(!sent.messages[1].content.includes('Secret personal'));assert.ok(!sent.messages[1].content.includes('Personal-derived note'));assert.ok(result.contextUsed.sources.some(s=>s.id==='entry:t'));assert.equal(result.updates.length,0);}finally{globalThis.fetch=originalFetch;if(originalKey===undefined)delete process.env.AI_GATEWAY_API_KEY;else process.env.AI_GATEWAY_API_KEY=originalKey;}
 });
 test('a personal correction cannot resurrect the superseded public account',()=>{const b=structuredClone(board);b.journalEntries.find(e=>e.id==='fix').contextScope='personal';const s=companySources(b);assert.ok(!s.entries.some(e=>e.id==='entry:a'||e.id==='entry:fix'));});
+test('Gateway billing refusal is distinguished from a storage failure',async()=>{
+ const {synthesize}=await import('../lib/synthesis.mjs');const previous=globalThis.fetch;
+ globalThis.fetch=async()=>({ok:false,status:403,json:async()=>({error:{message:'AI Gateway requires a valid credit card on file to service requests.'}})});
+ try{await assert.rejects(synthesize('Fictional test',board,'think','test-only-oidc'),{message:'AI_BILLING_REQUIRED'});}finally{globalThis.fetch=previous;}
+});
