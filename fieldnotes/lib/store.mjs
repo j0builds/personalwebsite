@@ -1,10 +1,11 @@
-import {get,put} from '@vercel/blob';
+import {get,put,BlobPreconditionFailedError} from '@vercel/blob';
 import {readFile} from 'node:fs/promises';
 import {seal,unseal} from './security.mjs';
 const path='fieldnotes/state.enc';
 export class Conflict extends Error{}
 export async function readState(){
- const result=await get(path,{access:'private',useCache:false});
+ // Compression weakens the HTTP ETag, which cannot be used for conditional writes.
+ const result=await get(path,{access:'private',useCache:false,headers:{'Accept-Encoding':'identity'}});
  if(!result)return {record:JSON.parse(await readFile(new URL('../assets/seed.json',import.meta.url),'utf8')),etag:null};
  return {record:unseal(await new Response(result.stream).text()),etag:result.blob.etag};
 }
@@ -13,7 +14,7 @@ export async function saveState(board,revision){
  const next={board,revision:revision+1,savedAt:new Date().toISOString()};
  // Preserve recovery copy before overwrite; state CAS prevents lost updates.
  if(etag)await put(`fieldnotes/history/${record.revision}-${Date.now()}.enc`,seal(record),{access:'private',addRandomSuffix:true,contentType:'application/octet-stream'});
- try{await put(path,seal(next),{access:'private',addRandomSuffix:false,allowOverwrite:!!etag,...(etag?{ifMatch:etag}:{}),contentType:'application/octet-stream'});}catch(e){if(e.name==='BlobPreconditionFailedError'||e.name==='BlobAlreadyExistsError')throw new Conflict();throw e;}
+ try{await put(path,seal(next),{access:'private',addRandomSuffix:false,allowOverwrite:!!etag,...(etag?{ifMatch:etag}:{}),contentType:'application/octet-stream'});}catch(e){if(e instanceof BlobPreconditionFailedError||e.name==='BlobAlreadyExistsError')throw new Conflict();throw e;}
  return {revision:next.revision,savedAt:next.savedAt};
 }
 export function validateBoard(b){
