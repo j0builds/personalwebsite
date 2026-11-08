@@ -1,7 +1,7 @@
 'use strict';
 const $=s=>document.querySelector(s), canvas=$('#canvas'),world=$('#world');
 let board,library,revision=0,selected=null,selectedEdge=null,tool='select',linkFrom=null,gesture=null,space=false;
-let history=[],future=[],saving=false,pending=false,dirty=false,conflict=false,saveTimer,editTimer,loaded=false;
+let history=[],future=[],saving=false,pending=false,dirty=false,conflict=false,saveTimer,editTimer,loaded=false,changeVersion=0,savedVersion=0,saveFailure=null;
 const id=()=>crypto.randomUUID();
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const node=key=>board.nodes.find(n=>n.id===key);
@@ -10,14 +10,24 @@ function error(text){$('#error').textContent=text;$('#error').hidden=!text;}
 function snapshot(){return JSON.stringify(board);}
 function checkpoint(){history.push(snapshot());if(history.length>100)history.shift();future=[];updateHistory();}
 function updateHistory(){$('#undo').disabled=!history.length;$('#redo').disabled=!future.length;}
-function changed(){dirty=true;status('Unsaved changes…','dirty');clearTimeout(saveTimer);saveTimer=setTimeout(save,350);}
+function changed(){changeVersion++;dirty=true;status('Unsaved changes…','dirty');clearTimeout(saveTimer);saveTimer=setTimeout(save,350);}
 async function save(){
  clearTimeout(saveTimer);if(conflict||!loaded)return;if(saving){pending=true;return;}if(!dirty)return;
- saving=true;pending=false;$('#retry').hidden=true;const sent=snapshot();status('Saving privately…','dirty');
+ saving=true;pending=false;$('#retry').hidden=true;const sent=snapshot(),sentVersion=changeVersion;saveFailure=null;status('Saving privately…','dirty');
  try{const r=await fetch('/api/board',{method:'POST',headers:{'Content-Type':'application/json','X-Atlas-Write':'1'},body:JSON.stringify({revision,board:JSON.parse(sent)})});const result=await r.json();if(!r.ok){if(r.status===409)conflict=true;throw Error(result.error||'Save failed');}
- revision=result.revision;dirty=snapshot()!==sent;status(dirty?'Saving latest changes…':'Saved privately · '+new Date(result.savedAt).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}),dirty?'dirty':'');error('');
- }catch(e){dirty=true;$('#retry').hidden=conflict;status('Not saved · export a backup','failed');error(e.message+' Your changes remain in this window.');pending=false;
+ revision=result.revision;savedVersion=sentVersion;dirty=snapshot()!==sent;status(dirty?'Saving latest changes…':'Saved privately · '+new Date(result.savedAt).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}),dirty?'dirty':'');error('');
+ }catch(e){saveFailure=e;dirty=true;$('#retry').hidden=conflict;status('Not saved · export a backup','failed');error(e.message+' Your changes remain in this window.');pending=false;
  }finally{saving=false;if(!conflict&&dirty&&pending)setTimeout(save,50);}
+}
+// Wait for this edit's acknowledgement, not for all later typing to stop.
+async function saveThrough(target=changeVersion){
+ const deadline=Date.now()+20000;
+ while(savedVersion<target){
+  if(conflict)throw Error('Another window saved a newer version. Export your changes before reloading.');
+  if(Date.now()>deadline)throw Error('Saving is taking longer than expected. Keep this window open.');
+  if(!saving){await save();if(saveFailure)throw saveFailure;}
+  else await new Promise(resolve=>setTimeout(resolve,20));
+ }
 }
 window.addEventListener('beforeunload',e=>{if(dirty||saving){e.preventDefault();e.returnValue='';}});
 window.addEventListener('online',()=>{if(dirty&&!conflict)save();});

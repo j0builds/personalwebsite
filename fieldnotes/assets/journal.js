@@ -1,5 +1,6 @@
 'use strict';
-let journalBusy=false,activeEntry=null,journalMode="journal";
+let journalBusy=false,activeEntry=null,journalMode="journal",editorVersion=0;
+const aiJobs=new Map();let aiQueue=Promise.resolve();
 const draftKey=()=>journalMode==='think'?'thoughtDraft':'journalDraft';
 const synthesisLabel=()=>journalMode==='think'?'Explore angles →':'Save & update cards →';
 const jdialog=$('#journal-dialog');
@@ -11,30 +12,51 @@ $('#toggle-tools').onclick=()=>{const active=document.body.classList.toggle('edi
 function journalError(message){$('#journal-error').hidden=!message;$('#journal-error').textContent=message;}
 function localDate(){return new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});}
 function journalHistory(){const query=($('#journal-search').value||'').toLowerCase();const entries=(board.journalEntries||[]).filter(e=>(e.mode||'journal')===journalMode).filter(e=>[e.text,e.date,e.proposal?.summary||''].join(' ').toLowerCase().includes(query));$('#journal-entries').innerHTML=entries.slice().reverse().map(e=>`<article class="journal-record"><h3>${esc(e.date)} · ${e.hiringReceipt?.length?'Hiring updated':e.mode==='think'?'Thinking aloud':e.applied?'Added to map':e.proposal?'Ready for review':'Saved reflection'}</h3><p>${esc(e.proposal?.summary||e.text.slice(0,180))}</p><button data-reflection="${esc(e.id)}">${e.applied?'Read reflection':'Continue reflection'}</button></article>`).join('')||(query?'<p>No reflections match this search.</p>':'<p>Your story starts with the next entry.</p>');}
-$('#open-journal').onclick=()=>{if(!loaded)return;if(journalBusy){jdialog.showModal();return;}$('#journal-date').textContent=localDate().toUpperCase();$('#daily-entry').value=board[draftKey()]||'';$('#journal-result').hidden=true;activeEntry=null;journalError('');$('#journal-search').value='';journalHistory();jdialog.showModal();$('#daily-entry').focus();};
+$('#open-journal').onclick=()=>{if(!loaded)return;if(journalBusy){jdialog.showModal();return;}editorVersion++;$('#journal-date').textContent=localDate().toUpperCase();$('#daily-entry').value=board[draftKey()]||'';$('#journal-result').hidden=true;activeEntry=null;journalError('');$('#journal-search').value='';journalHistory();jdialog.showModal();$('#daily-entry').focus();};
 $('#close-journal').onclick=()=>jdialog.close();
-$('#daily-entry').oninput=()=>{board[draftKey()]=$('#daily-entry').value;$('#journal-result').hidden=true;activeEntry=null;changed();$('#journal-save').textContent='Draft will autosave with your board';};
+$('#daily-entry').oninput=()=>{editorVersion++;board[draftKey()]=$('#daily-entry').value;$('#journal-result').hidden=true;activeEntry=null;changed();$('#journal-save').textContent='Draft will autosave with your board';};
 function showProposal(entry){activeEntry=entry;$('#journal-result').hidden=!entry.proposal;if(!entry.proposal)return;$('#journal-summary').textContent=entry.proposal.summary;renderReflectionExtras(entry);$('#journal-proposals').innerHTML=entry.proposal.updates.map((u,i)=>{const route=u.regionIds.map(r=>node(r)?.title).filter(Boolean).join(' · ')||'Unsorted';const prior=u.existingNodeId?node(u.existingNodeId):null;return `<article class="proposal"><label><input type="checkbox" data-update="${i}" ${entry.applied?'disabled':''} checked><div><div class="proposal-route">${esc(u.kind)} · ${esc(route)}${prior?' · append to '+esc(prior.title):''}</div><h3>${esc(u.title)}</h3><p>${esc(u.body)}</p></div></label><details><summary>From your entry</summary><p>${esc(u.evidence)}</p></details></article>`;}).join('');$('#apply-journal').disabled=!!entry.applied||!entry.proposal.updates.length;$('#apply-journal').textContent=entry.applied?'Already added':'Add to my map';}
-$('#journal-entries').onclick=e=>{if(journalBusy)return;const b=e.target.closest('[data-reflection]');if(!b)return;const entry=board.journalEntries.find(e=>e.id===b.dataset.reflection);$('#daily-entry').value=entry.text;$('#company-context').checked=entry.contextScope!=='personal';showProposal(entry);journalError('');};
-$('#synthesize').onclick=async()=>{
- if(journalBusy||!loaded)return;const text=$('#daily-entry').value.trim();if(!text){journalError('Tell me a little about what happened first.');return;}
- const prior=(board.journalEntries||[]).find(e=>e.text===text&&(e.mode||'journal')===journalMode&&(e.applied||e.hiringApplied));if(prior){syncScope(prior);changed();showProposal(prior);$('#journal-save').textContent='This reflection is already on your map';return;}
- journalBusy=true;$('#daily-entry').disabled=true;$('#save-entry').disabled=true;$('#synthesize').disabled=true;$('#synthesize').textContent=journalMode==='think'?'Exploring…':'Updating cards…';journalError('');
+$('#journal-entries').onclick=e=>{if(journalBusy)return;const b=e.target.closest('[data-reflection]');if(!b)return;editorVersion++;const entry=board.journalEntries.find(e=>e.id===b.dataset.reflection);$('#daily-entry').value=entry.text;$('#company-context').checked=entry.contextScope!=='personal';showProposal(entry);journalError('');};
+function aiStatus(message){$('#ai-status').textContent=message;}
+function stillViewing(job){return editorVersion===job.editorVersion&&journalMode===job.mode&&$('#daily-entry').value.trim()===job.text;}
+function matchingEntry(job){return board.journalEntries?.find(e=>e.id===job.id&&e.text===job.text&&(e.mode||'journal')===job.mode&&e.contextScope===job.scope);}
+function queueSynthesis(entry,target){
+ if(aiJobs.has(entry.id)){aiStatus('Already queued · keep writing');return;}
+ const job={id:entry.id,text:entry.text,mode:entry.mode||'journal',scope:entry.contextScope,editorVersion,target};
+ aiJobs.set(job.id,job);aiStatus('Saving entry · AI queued');
+ aiQueue=aiQueue.then(async()=>{
+  try{
+   await saveThrough(job.target);
+   if(!matchingEntry(job))throw Error('Entry changed; run AI again when ready.');
+   aiStatus('Entry saved · AI working in the background · keep writing');
+   const baseline=Object.fromEntries(board.nodes.filter(n=>n.candidateKey).map(n=>[n.id,n.body]));
+   const r=await fetch('/api/synthesize',{method:'POST',headers:{'Content-Type':'application/json','X-Atlas-Write':'1'},body:JSON.stringify({entry:job.text,mode:job.mode})});
+   const proposal=await r.json();if(!r.ok)throw Error(proposal.error||'Synthesis unavailable.');
+   // Undo, import, a privacy change, or another edit may have replaced the entry.
+   const current=matchingEntry(job);if(!current)throw Error('Entry changed; AI result was not applied.');
+   current.proposal=proposal;
+   if(job.mode==='journal'&&!current.hiringApplied&&(proposal.hiringUpdates||[]).length){checkpoint();applyHiringUpdates(board,current,baseline);render();}
+   changed();await saveThrough(changeVersion);
+   if(stillViewing(job))showProposal(current);
+   journalHistory();aiStatus(current.hiringReceipt?.length?'Saved · hiring cards updated':'Saved · reflection ready in Earlier reflections');
+  }catch(e){aiStatus('AI update incomplete: '+e.message+' Your writing is retained; use Save entry if a save error is shown.');}
+  finally{aiJobs.delete(job.id);if(aiJobs.size)aiStatus('AI queued · '+aiJobs.size+' remaining · keep writing');}
+ });
+}
+function captureEntry(){
+ const text=$('#daily-entry').value.trim();if(!text)throw Error('A word, a sentence, a little of today. Start anywhere.');
  board.journalEntries=board.journalEntries||[];
- let entry=board.journalEntries.find(e=>e.text===text&&(e.mode||'journal')===journalMode&&!e.applied);
+ let entry=board.journalEntries.find(e=>e.text===text&&(e.mode||'journal')===journalMode);
  if(!entry){entry=createEntry(text);board.journalEntries.push(entry);}
- syncScope(entry);board[draftKey()]=text;changed();await save();for(let attempt=0;attempt<30&&(dirty||saving)&&!conflict;attempt++){await new Promise(resolve=>setTimeout(resolve,200));if(!saving)await save();}
- if(dirty||saving){journalError('Wait for the board to finish saving, then try again.');journalBusy=false;$('#daily-entry').disabled=false;$('#save-entry').disabled=false;$('#synthesize').disabled=false;$('#synthesize').textContent=synthesisLabel();return;}
- try{
-  const baseline=Object.fromEntries(board.nodes.filter(n=>n.candidateKey).map(n=>[n.id,n.body]));
-  const r=await fetch('/api/synthesize',{method:'POST',headers:{'Content-Type':'application/json','X-Atlas-Write':'1'},body:JSON.stringify({entry:text,mode:journalMode})});const proposal=await r.json();if(!r.ok)throw Error(proposal.error||'Synthesis unavailable.');
-  entry.proposal=proposal;
-  if(journalMode==='journal'&&!entry.hiringApplied&&(proposal.hiringUpdates||[]).length){checkpoint();applyHiringUpdates(board,entry,baseline);render();}
-  changed();await save();for(let attempt=0;attempt<30&&(dirty||saving)&&!conflict;attempt++){await new Promise(resolve=>setTimeout(resolve,200));if(!saving)await save();}
-  showProposal(entry);journalHistory();$('#journal-save').textContent=dirty||saving?'Updates not yet saved · check the save error':entry.hiringReceipt?.length?'Saved · hiring cards updated':journalMode==='think'?'Saved · possibilities, not commitments':'Saved · no automatic hiring changes';
- }catch(e){journalError(e.message);$('#journal-save').textContent='Your reflection is saved. You can retry later.';journalHistory();}
- finally{journalBusy=false;$('#daily-entry').disabled=false;$('#save-entry').disabled=false;$('#synthesize').disabled=false;$('#synthesize').textContent=synthesisLabel();}
+ syncScope(entry);board[draftKey()]=$('#daily-entry').value;changed();return entry;
+}
+$('#synthesize').onclick=()=>{
+ if(!loaded)return;
+ try{journalError('');const entry=captureEntry();queueSynthesis(entry,changeVersion);void save();journalHistory();}
+ catch(e){journalError(e.message);}
 };
+// The journal is durable before AI starts; unfinished AI needs this tab to stay open.
+window.addEventListener('beforeunload',e=>{if(aiJobs.size){e.preventDefault();e.returnValue='';}});
 $('#apply-journal').onclick=()=>{
  const entry=activeEntry;if(!entry?.proposal||entry.applied)return;
  const selectedUpdates=Array.from($('#journal-proposals').querySelectorAll('input:checked')).map(e=>entry.proposal.updates[Number(e.dataset.update)]);if(!selectedUpdates.length){journalError('Choose at least one update, or leave this as a journal entry.');return;}
@@ -48,25 +70,17 @@ $('#apply-journal').onclick=()=>{
 
 $('#journal-search').oninput=journalHistory;
 $('#save-entry').onclick=async()=>{
- if(journalBusy||!loaded)return;
- const text=$('#daily-entry').value.trim();
- if(!text){journalError('A word, a sentence, a little of today. Start anywhere.');return;}
- journalError('');journalBusy=true;$('#save-entry').disabled=true;$('#synthesize').disabled=true;$('#daily-entry').disabled=true;
+ if(!loaded)return;const version=editorVersion;
  try{
-  board.journalEntries=board.journalEntries||[];
-  let entry=board.journalEntries.find(e=>e.text===text&&(e.mode||'journal')===journalMode);
-  if(!entry){entry=createEntry(text);board.journalEntries.push(entry);}
-  syncScope(entry);board[draftKey()]=text;changed();await save();
-  for(let attempt=0;attempt<30&&(dirty||saving)&&!conflict;attempt++){await new Promise(resolve=>setTimeout(resolve,200));if(!saving)await save();}
-  if(dirty||saving)throw Error('Your entry is still in this window. Resolve the save error before leaving.');
-  activeEntry=entry;journalHistory();$('#journal-save').textContent='Entry saved privately · no AI used';
+  journalError('');const entry=captureEntry();await saveThrough(changeVersion);
+  if(editorVersion===version){activeEntry=entry;$('#journal-save').textContent='Entry saved privately';}
+  journalHistory();
  }catch(e){journalError(e.message);}
- finally{journalBusy=false;$('#save-entry').disabled=false;$('#synthesize').disabled=false;$('#daily-entry').disabled=false;}
 };
 
 function setJournalMode(mode){
  if(journalBusy)return;
- journalMode=mode;activeEntry=null;
+ editorVersion++;journalMode=mode;activeEntry=null;
  $('#mode-journal').setAttribute('aria-pressed',String(mode==='journal'));$('#mode-think').setAttribute('aria-pressed',String(mode==='think'));
  $('#journal-heading').textContent=mode==='think'?'Let it be unfinished.':'Start anywhere.';
  $('.journal-intro').textContent=mode==='think'?'A decision, a possibility, a tangle of thoughts. Put it here.':'What happened, what changed, what’s on your mind.';
