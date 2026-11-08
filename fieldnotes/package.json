@@ -1,0 +1,18 @@
+{
+  "name": "j0-fieldnotes-private-staging",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "dev": "node dev.mjs"
+  },
+  "engines": {
+    "node": "22.x"
+  },
+  "dependencies": {
+    "@vercel/blob": "2.8.2"
+  },
+  "overrides": {
+    "zod": "4.6.6"
+  }
+}

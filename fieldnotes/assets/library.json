@@ -1,0 +1,370 @@
+{
+  "version": 1,
+  "sourceChecked": "2026-11-07",
+  "regions": [
+    {
+      "id": "R01",
+      "title": "Direction and strategy",
+      "question": "Where should we focus, and what will we decline?",
+      "methods": [
+        "F01",
+        "F07",
+        "F05"
+      ],
+      "steps": "Write the constraint and outcome. Compare at least two materially different paths and the status quo. Test the assumption most likely to change the choice. Allocate a bounded commitment and set a review trigger.",
+      "artifacts": "One-page strategy choice; assumption register; stop conditions.",
+      "limits": "Do not treat the dated August command center as verified current strategy.",
+      "path": "02-regions/01-direction-and-strategy.md"
+    },
+    {
+      "id": "R02",
+      "title": "Organization and HR",
+      "question": "How should responsibilities, expectations, and people processes work?",
+      "methods": [
+        "F09",
+        "F01",
+        "F02"
+      ],
+      "steps": "Start with recurring work and decision bottlenecks. Map responsibilities and decision rights. Specify expected outcomes, support, escalation, and review cadence. Pilot a small change before a broad reorganization.",
+      "artifacts": "Role charter; decision-rights map; onboarding checklist; review criteria.",
+      "limits": "This guide covers operating design. Employment policy, compensation compliance, investigations, and termination require separate jurisdiction-specific review.",
+      "path": "02-regions/02-organization-and-hr.md"
+    },
+    {
+      "id": "R03",
+      "title": "Hiring and selection",
+      "question": "Should we hire, for what outcomes, and whom?",
+      "methods": [
+        "F01",
+        "F11",
+        "F12"
+      ],
+      "steps": "Define role outcomes and essential entry competencies. Consider redesigning or stopping work before adding headcount. Set scoring anchors before seeing candidates. Run structured interviews and a bounded work sample. Compare independent evidence, resolve gaps, and document the decision.",
+      "artifacts": "Role scorecard; interview rubric; work-sample brief; evidence-based decision.",
+      "limits": "Do not infer capability from demographic proxies or vague culture fit. Keep candidate records in an appropriately restricted system, not this methods library.",
+      "path": "02-regions/03-hiring-and-selection.md"
+    },
+    {
+      "id": "R04",
+      "title": "People development",
+      "question": "How do we help people grow into more capable work?",
+      "methods": [
+        "F13",
+        "F05",
+        "F04"
+      ],
+      "steps": "Identify a concrete capability gap with the person. Check whether expectations, tools, time, or incentives explain it. Agree a practice task and support. Observe, discuss feedback, repeat, and evaluate transfer against baseline.",
+      "artifacts": "Development plan; practice record; manager support commitments; review evidence.",
+      "limits": "This is development, not a disguised disciplinary process. Course completion alone is not proof of capability.",
+      "path": "02-regions/04-people-development.md"
+    },
+    {
+      "id": "R05",
+      "title": "Product and engineering development",
+      "question": "What should we build, test, release, and maintain?",
+      "methods": [
+        "F05",
+        "F08",
+        "F06",
+        "F03"
+      ],
+      "steps": "State the user problem and success measure. Identify the riskiest assumption. Select a small test or implementation slice. Define acceptance criteria, owner, dependency checks, and rollback before release. Review observed use and delivery estimates afterward.",
+      "artifacts": "Hypothesis; acceptance criteria; experiment or release brief; maintenance owner.",
+      "limits": "These are original operating steps using the linked methods, not a full Scrum or engineering standard. Passing tests is not proof of customer value.",
+      "path": "02-regions/05-product-and-engineering-development.md"
+    },
+    {
+      "id": "R06",
+      "title": "Design workflows",
+      "question": "How do we move from user evidence to a tested experience?",
+      "methods": [
+        "F14",
+        "F05",
+        "F06"
+      ],
+      "steps": "Discover user context. Define the actual task and constraint. Explore multiple concepts. Test prototypes on representative tasks. Record observations separately from interpretations; revise and specify behavior, states, and acceptance checks for implementation.",
+      "artifacts": "Research brief; problem statement; alternatives; prototype test notes; handoff specification.",
+      "limits": "A preference vote is not a usability test. Do not generalize a small qualitative sample into a population percentage.",
+      "path": "02-regions/06-design-workflows.md"
+    },
+    {
+      "id": "R07",
+      "title": "Design ethos",
+      "question": "What principles make our work recognizably ours?",
+      "methods": [
+        "F15",
+        "F02"
+      ],
+      "steps": "Collect examples of excellent and unacceptable experiences. Explain why. Draft a few principles tied to user needs. For each, specify a sacrifice, example, counterexample, and exception. Test them against conflicting real designs before adoption.",
+      "artifacts": "Principle cards; annotated exemplars; trade-off decisions; exceptions log.",
+      "limits": "No brand colors, aesthetic direction, or company principles are adopted by this library. Proposed examples remain drafts until chosen.",
+      "path": "02-regions/07-design-ethos.md"
+    },
+    {
+      "id": "R08",
+      "title": "Brand and positioning",
+      "question": "What should buyers understand, believe, and remember about us?",
+      "methods": [
+        "F16",
+        "F17",
+        "F15"
+      ],
+      "steps": "Identify the buyer and actual alternatives. Connect distinctive capability to value. Choose a clear category and test comprehension. Translate the position into message hierarchy, verbal style, visual principles, and repeatable assets. Measure understanding and recall in context.",
+      "artifacts": "Positioning brief; claim-to-proof table; messaging hierarchy; identity principles.",
+      "limits": "A logo is not positioning. A distinctive claim without evidence creates inconsistency. Brand studies and small interview samples answer different questions.",
+      "path": "02-regions/08-brand-and-positioning.md"
+    },
+    {
+      "id": "R09",
+      "title": "Market and customer learning",
+      "question": "Which audience, channel, or customer problem deserves more investment?",
+      "methods": [
+        "F04",
+        "F05",
+        "F03"
+      ],
+      "steps": "Write the hypothesis and current evidence. Choose an observation or bounded experiment that could disconfirm it. Define success and stop conditions in advance. Compare results with the baseline and record the next allocation decision.",
+      "artifacts": "Experiment brief; observation log; forecast; scale/iterate/stop rationale.",
+      "limits": "Interest, usage, retention, and willingness to pay are different signals. Do not present interviews as causal experiments.",
+      "path": "02-regions/09-market-and-customer-learning.md"
+    },
+    {
+      "id": "R10",
+      "title": "Operations and partnerships",
+      "question": "How should recurring work, vendors, and agreements be managed?",
+      "methods": [
+        "F09",
+        "F10",
+        "F06",
+        "F08"
+      ],
+      "steps": "Define the work and required service level. Compare available arrangements, including internal execution. Establish decision rights and fallback. Review dependencies and failure signals. Record commitments and a review date.",
+      "artifacts": "Operating agreement; vendor comparison; dependency map; decision record.",
+      "limits": "A decision template is not a contract review. Do not confuse a supplier promise with verified capability.",
+      "path": "02-regions/10-operations-and-partnerships.md"
+    }
+  ],
+  "methods": [
+    {
+      "id": "F01",
+      "title": "Structured decision making",
+      "type": "formal method",
+      "when": "The choice is consequential and the problem or objectives are unclear.",
+      "steps": "Define the decision and its owner. Separate desired outcomes from proposed solutions. Generate credible alternatives, including the status quo. Estimate consequences against each objective, expose uncertainty, compare trade-offs, decide, and monitor.",
+      "output": "A clear decision question, alternatives, consequence table, and review trigger.",
+      "limits": "Bad objectives produce a neatly reasoned answer to the wrong question. The framework structures judgment; it does not validate your inputs.",
+      "prompt": "What result matters enough to justify this hire, product, or reorganization?",
+      "source": "https://www.structureddecisionmaking.org/the-steps/",
+      "sourceTitle": "Structured Decision Making: The Steps",
+      "path": "01-methods/F01-structured-decisions.md"
+    },
+    {
+      "id": "F02",
+      "title": "Multi-criteria decision analysis",
+      "type": "formal method",
+      "when": "Options trade off several objectives that cannot sensibly be reduced to money.",
+      "steps": "Eliminate options violating mandatory constraints. Define non-duplicative criteria and anchored preference scales. Weight the value of moving from worst to best on each scale, not abstract importance. Compute weighted scores only when an additive model is appropriate. Vary uncertain scores and weights to test ranking stability.",
+      "output": "A comparison whose recommendation survives plausible changes, or an explicit statement that it does not.",
+      "limits": "Numbers express judgments, not objective truth. Double-counted criteria and arbitrary scales distort rankings. Do not let strengths compensate for a disqualifying constraint.",
+      "prompt": "Which two assumptions would reverse the ranking?",
+      "source": "https://assets.publishing.service.gov.uk/media/5a790545e5274a2acd18b975/1132618.pdf",
+      "sourceTitle": "UK Multi-criteria analysis manual, especially chapter 6",
+      "path": "01-methods/F02-multi-criteria-analysis.md"
+    },
+    {
+      "id": "F03",
+      "title": "Reference-class forecasting",
+      "type": "empirical method",
+      "when": "Estimating time, cost, or demand when comparable completed work exists.",
+      "steps": "Define comparability before selecting examples. Gather actual outcomes, including failures. Use the observed distribution as a baseline; document any adjustment for this case. Report a range or percentile rather than only a point estimate.",
+      "output": "An estimate grounded in comparable outcomes, with sample size and limitations.",
+      "limits": "A cherry-picked or irrelevant class creates false reassurance. Infrastructure evidence does not automatically validate a startup forecast.",
+      "prompt": "What happened on the last comparable projects, including those that slipped?",
+      "source": "https://arxiv.org/abs/1302.3642",
+      "sourceTitle": "Bent Flyvbjerg, From Nobel Prize to Project Management: Getting Risks Right",
+      "path": "01-methods/F03-outside-view.md"
+    },
+    {
+      "id": "F04",
+      "title": "Probabilistic forecasting and updating",
+      "type": "empirical method",
+      "when": "A factual uncertainty will resolve and affect a choice.",
+      "steps": "Define a resolvable event, deadline, and evidence source. Start from a relevant base rate. Record a probability and reasoning, seek contrary evidence, and update with dated reasons. Review many resolved forecasts to assess calibration.",
+      "output": "A falsifiable forecast history.",
+      "limits": "The cited experiments concern geopolitical forecasting. This adaptation is not proof of improved startup outcomes. A probability describes belief, not desirability or a decision by itself.",
+      "prompt": "Will the target user complete the critical task unaided by the test date?",
+      "source": "https://faculty.wharton.upenn.edu/wp-content/uploads/2015/07/2014---psychological-strategies-for-winning-a-tournament.pdf",
+      "sourceTitle": "Mellers et al., Psychological Strategies for Winning a Geopolitical Forecasting Tournament, 2014",
+      "path": "01-methods/F04-forecast-and-update.md"
+    },
+    {
+      "id": "F05",
+      "title": "Value of information",
+      "type": "formal method",
+      "when": "Deciding whether to research, test, or act now.",
+      "steps": "State the best action with current evidence. Identify which unknown could change it. Model possible test results, their probabilities, and the action after each. Compare expected performance after information with the best current action; subtract test and delay costs in compatible units.",
+      "output": "A specific test and a justified research budget or stop decision.",
+      "limits": "Perfect information is an upper bound, not the value of an ordinary test. Weak test accuracy or invented probabilities can erase the apparent benefit.",
+      "prompt": "What result would make us take a different action?",
+      "source": "https://www.usgs.gov/publications/when-do-we-need-more-data-a-primer-calculating-value-information-applied-ecologists",
+      "sourceTitle": "Canessa et al., When do we need more data?, 2015",
+      "path": "01-methods/F05-value-of-information.md"
+    },
+    {
+      "id": "F06",
+      "title": "Premortem",
+      "type": "practitioner method",
+      "when": "Before committing to a plan that is still cheap to change.",
+      "steps": "Assume the plan has failed. Generate plausible causes independently, then compare them. Local adaptation: select the most consequential actionable risks and assign an early signal, mitigation, and owner to each.",
+      "output": "A short risk register with actions.",
+      "limits": "Imagined causes are hypotheses, not measured probabilities. This is not a substitute for technical verification.",
+      "prompt": "It is three months later and this hire or launch failed: what happened?",
+      "source": "https://www.gary-klein.com/premortem",
+      "sourceTitle": "Gary Klein, Premortem",
+      "path": "01-methods/F06-premortem.md"
+    },
+    {
+      "id": "F07",
+      "title": "Robust decision making",
+      "type": "formal method",
+      "when": "Plausible futures differ substantially and probabilities are contested.",
+      "steps": "Set minimum acceptable outcomes. Stress-test options across varied futures, identify failure conditions, and change the strategy to reduce vulnerabilities. Define signals that trigger adaptation.",
+      "output": "A robust option, vulnerability map, and adaptation triggers.",
+      "limits": "A few hand-picked scenarios are a lightweight adaptation, not a full computational RDM study. Robustness can sacrifice upside; identify that cost.",
+      "prompt": "Would this still work if adoption is slow, costs rise, and a key dependency fails?",
+      "source": "https://www.rand.org/pubs/tools/TL320/tool/robust-decision-making.html",
+      "sourceTitle": "RAND, Robust Decision Making",
+      "path": "01-methods/F07-robust-scenarios.md"
+    },
+    {
+      "id": "F08",
+      "title": "One-way and two-way doors",
+      "type": "practitioner heuristic",
+      "when": "Choosing the depth and speed of a decision process.",
+      "steps": "Assess practical reversibility. Use more deliberation for hard-to-reverse choices and a lighter process for reversible ones. Local adaptation: specify rollback cost, time, affected people, decision owner, and review date before acting.",
+      "output": "An appropriate decision process and rollback plan.",
+      "limits": "Reversible does not mean harmless. Reputation, trust, and lost time may remain damaged after rollback. This is management guidance, not a universal scientific threshold.",
+      "prompt": "Can we truly undo this, for everyone affected?",
+      "source": "https://s2.q4cdn.com/299287126/files/doc_financials/annual/2015-Letter-to-Shareholders.PDF",
+      "sourceTitle": "Amazon, 2015 Letter to Shareholders",
+      "path": "01-methods/F08-reversibility.md"
+    },
+    {
+      "id": "F09",
+      "title": "RAPID decision rights",
+      "type": "practitioner method",
+      "when": "A decision stalls because authority or participation is unclear.",
+      "steps": "Name Recommend, Agree, Perform, Input, and Decide roles. Use one recommender and ideally one decider; define governance if a group decides. Assign Agree narrowly for mandatory requirements. Set input deadlines and make the decision and rationale visible.",
+      "output": "A decision-rights map and execution owner.",
+      "limits": "RAPID is not a chronological sequence. Role clarity cannot fix weak evidence or override mandatory requirements. Avoid imposing this overhead on trivial choices.",
+      "prompt": "Who owns the recommendation, and who can actually decide?",
+      "source": "https://www.bain.com/insights/rapid-decision-making/",
+      "sourceTitle": "Bain & Company, RAPID Decision Making",
+      "path": "01-methods/F09-rapid.md"
+    },
+    {
+      "id": "F10",
+      "title": "BATNA and reservation value",
+      "type": "practitioner method",
+      "when": "Evaluating an offer, partnership, or supplier negotiation.",
+      "steps": "Identify realistic alternatives if no agreement is reached. Evaluate costs, risks, timing, and interests; identify the best alternative. Set a reservation value and ambitious target separately. Compare the full proposed package against that alternative.",
+      "output": "A credible fallback and explicit acceptance boundary.",
+      "limits": "A hoped-for offer is not an available alternative. BATNA is an alternative course of action; reservation value is the boundary for accepting a deal.",
+      "prompt": "What will we actually do if this agreement never happens?",
+      "source": "https://www.pon.harvard.edu/daily/business-negotiations/negotiation-preparation-strategies/",
+      "sourceTitle": "Harvard Program on Negotiation, Negotiation Preparation Strategies",
+      "path": "01-methods/F10-batna.md"
+    },
+    {
+      "id": "F11",
+      "title": "Structured interviews",
+      "type": "evidence-informed assessment",
+      "when": "Assessing job-related competencies consistently across candidates.",
+      "steps": "Define competencies from the job. Ask consistent behavioral or situational questions. Use common rating standards and trained assessors. Local adaptation: score independently with observed evidence before a panel discussion, then resolve evidence gaps.",
+      "output": "Comparable evidence against a role scorecard.",
+      "limits": "Consistency does not remove all bias. Vague culture-fit judgments undermine the structure. OPM guidance supplies assessment principles, not company-specific legal compliance.",
+      "prompt": "What would a strong, adequate, and weak answer demonstrate?",
+      "source": "https://www.opm.gov/policy-data-oversight/assessment-and-selection/structured-interviews",
+      "sourceTitle": "US OPM, Structured Interviews",
+      "path": "01-methods/F11-structured-interviews.md"
+    },
+    {
+      "id": "F12",
+      "title": "Work samples and simulations",
+      "type": "evidence-informed assessment",
+      "when": "Testing competencies someone must possess upon entering a role.",
+      "steps": "Choose a representative task and clear evaluation criteria. Give comparable instructions and conditions. Observe both result and relevant process; score against the criteria. Local adaptation: use a bounded fictional task with no production dependency.",
+      "output": "Direct evidence of job-relevant capability.",
+      "limits": "Do not screen out people for a skill the role is designed to teach. Exercise design and evaluator quality matter; a single task samples only part of a job.",
+      "prompt": "What small task most closely resembles the actual work?",
+      "source": "https://www.opm.gov/policy-data-oversight/assessment-and-selection/other-assessment-methods/work-samples-and-simulations/",
+      "sourceTitle": "US OPM, Work Samples and Simulations",
+      "path": "01-methods/F12-work-samples.md"
+    },
+    {
+      "id": "F13",
+      "title": "Performance feedback and practice",
+      "type": "evidence-informed adaptation",
+      "when": "Helping a colleague improve an observable behavior.",
+      "steps": "Local workflow informed by the review: agree a specific capability and baseline. Discuss observed behavior and task impact. Ask for the employee\u2019s explanation. Agree one practice opportunity, support, and a review date. Inspect subsequent work, not only satisfaction with the conversation.",
+      "output": "A development experiment with evidence of transfer to work.",
+      "limits": "Feedback can help or harm depending on how it is given. Do not assume a performance gap is a training gap; tools, workload, incentives, or unclear expectations may be responsible.",
+      "prompt": "What will the person do differently, and where can they practice it?",
+      "source": "https://www.cipd.org/en/knowledge/evidence-reviews/performance-feedback/",
+      "sourceTitle": "CIPD, Performance feedback: An evidence review",
+      "path": "01-methods/F13-development-feedback.md"
+    },
+    {
+      "id": "F14",
+      "title": "Double Diamond",
+      "type": "practitioner method",
+      "when": "Moving from an ambiguous user problem to a tested solution.",
+      "steps": "Discover the problem through research. Define the challenge from evidence. Develop alternative solutions. Deliver by testing, refining, and implementing. Diverge and converge as needed; revisit earlier assumptions when learning contradicts them.",
+      "output": "A justified problem definition and tested candidate solution.",
+      "limits": "This is not a rigid waterfall or proof of demand. A polished prototype can still solve the wrong problem.",
+      "prompt": "What did we learn that changes the problem definition?",
+      "source": "https://www.designcouncil.org.uk/resources/framework-for-innovation/",
+      "sourceTitle": "Design Council, Framework for Innovation",
+      "path": "01-methods/F14-double-diamond.md"
+    },
+    {
+      "id": "F15",
+      "title": "Design principles",
+      "type": "practitioner method",
+      "when": "Making design choices coherent across products and teams.",
+      "steps": "Extract recurring themes from research and design work. Form a small set of memorable principles that guide choices; revise as learning develops. Local adaptation: pair every principle with a trade-off, observable behavior, counterexample, and exception rule.",
+      "output": "A usable design ethos, not a mood board.",
+      "limits": "Principles are value commitments, not universal truths. \u201cBeautiful\u201d or \u201cintuitive\u201d cannot settle a concrete disagreement without examples.",
+      "prompt": "When two attractive designs conflict, which principle decides?",
+      "source": "https://www.designkit.org/methods/27.html",
+      "sourceTitle": "IDEO.org Design Kit, Design Principles",
+      "path": "01-methods/F15-design-principles.md"
+    },
+    {
+      "id": "F16",
+      "title": "Competitive positioning",
+      "type": "practitioner method",
+      "when": "Choosing the market context in which buyers understand your value.",
+      "steps": "Start with what customers would do without the product. Identify differentiated capabilities, translate them into customer value, identify who cares most, and choose a market category that makes that value understandable.",
+      "output": "An evidence-based positioning hypothesis.",
+      "limits": "An attractive claim is not substantiation. Buyers may compare you with manual work or doing nothing, rather than the competitor you watch. Validate understanding with actual prospects.",
+      "prompt": "Which alternative is the buyer replacing, and why is switching worthwhile?",
+      "source": "https://www.aprildunford.com/post/a-quickstart-guide-to-positioning",
+      "sourceTitle": "April Dunford, A Quickstart Guide to Positioning",
+      "path": "01-methods/F16-positioning.md"
+    },
+    {
+      "id": "F17",
+      "title": "Meaningful, Different, Salient",
+      "type": "proprietary practitioner model",
+      "when": "Diagnosing what a brand needs to build in audience perception.",
+      "steps": "Examine relevance to audience needs, perceived difference, and ease of coming to mind. Local adaptation: test message comprehension, alternative comparisons, and unaided recall separately; record audience and buying context.",
+      "output": "A brand hypothesis and a focused measurement plan.",
+      "limits": "Kantar is the model\u2019s commercial provider. Its claims are not independent causal proof for your company; a homemade survey does not reproduce its proprietary measures.",
+      "prompt": "Do buyers understand us, see a reason to choose us, and remember us at the relevant moment?",
+      "source": "https://www.kantar.com/inspiration/brands/what-is-the-meaningful-different-salient-framework",
+      "sourceTitle": "Kantar, Meaningful Different Salient framework",
+      "path": "01-methods/F17-brand-equity.md"
+    }
+  ]
+}

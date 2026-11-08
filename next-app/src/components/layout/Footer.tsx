@@ -1,6 +1,8 @@
 import { SOCIAL_LINKS } from '@/lib/constants'
 
 export function Footer() {
+  const journalUrl = process.env.FIELDNOTES_URL
+  const privateJournal = journalUrl?.startsWith('https://') ? journalUrl : null
   return (
     <footer className="border-t border-neutral-200 px-6 md:px-12 py-8">
       <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
@@ -8,6 +10,7 @@ export function Footer() {
           &copy; {new Date().getFullYear()} Joseph Ayinde
         </p>
         <div className="flex items-center gap-6">
+          {privateJournal && <a href={privateJournal} rel="noreferrer" className="text-xs text-neutral-400 hover:text-neutral-600">Fieldnotes · private ↗</a>}
           <a
             href={SOCIAL_LINKS.github}
             target="_blank"

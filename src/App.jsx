@@ -36,6 +36,7 @@ function App() {
           <GlobalCursor />
           <Navigation />
           <SocialMedia />
+          {import.meta.env.VITE_FIELDNOTES_URL?.startsWith('https://') && <a href={import.meta.env.VITE_FIELDNOTES_URL} rel="noreferrer" style={{position:'fixed',bottom:18,left:24,zIndex:50,fontSize:11,color:'#8b98a5'}}>Fieldnotes · private ↗</a>}
         </ErrorBoundary>
         <Suspense fallback={<LoadingFallback />}>
           <ErrorBoundary>

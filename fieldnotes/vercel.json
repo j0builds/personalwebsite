@@ -1,0 +1,28 @@
+{
+  "version": 2,
+  "framework": null,
+  "functions": {
+    "api/index.mjs": {
+      "includeFiles": "assets/**",
+      "maxDuration": 120
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/api/index?path=$1"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow, noarchive"
+        }
+      ]
+    }
+  ],
+  "outputDirectory": "public"
+}
