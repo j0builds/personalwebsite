@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {readFile} from 'node:fs/promises';
-import {createHandler} from '../api/index.mjs';
+import {createHandler} from '../server/handler.mjs';
 import {issueSession,validSession,seal,unseal,COOKIE} from '../lib/security.mjs';
 import {validateBoard,Conflict} from '../lib/store.mjs';
 import {cleanResult} from '../lib/synthesis.mjs';

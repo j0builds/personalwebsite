@@ -1,21 +1,26 @@
-import {get,put,BlobPreconditionFailedError} from '@vercel/blob';
-import {readFile} from 'node:fs/promises';
+import {readFile,writeFile,mkdir,rename,copyFile,readdir,unlink} from 'node:fs/promises';
+import {join} from 'node:path';
+import {homedir} from 'node:os';
 import {seal,unseal} from './security.mjs';
-const path='fieldnotes/state.enc';
+const directory=process.env.FIELDNOTES_DATA_DIR||join(homedir(),'.fieldnotes-private','journal');
+const path=join(directory,'state.enc');
 export class Conflict extends Error{}
 export async function readState(){
- // Compression weakens the HTTP ETag, which cannot be used for conditional writes.
- const result=await get(path,{access:'private',useCache:false,headers:{'Accept-Encoding':'identity'}});
- if(!result)return {record:JSON.parse(await readFile(new URL('../assets/seed.json',import.meta.url),'utf8')),etag:null};
- return {record:unseal(await new Response(result.stream).text()),etag:result.blob.etag};
+ try{return {record:unseal(await readFile(path,'utf8'))};}catch(e){if(e.code!=='ENOENT')throw e;return {record:JSON.parse(await readFile(new URL('../assets/seed.json',import.meta.url),'utf8'))};}
 }
-export async function saveState(board,revision){
- const {record,etag}=await readState();if(revision!==record.revision)throw new Conflict();
- const next={board,revision:revision+1,savedAt:new Date().toISOString()};
- // Preserve recovery copy before overwrite; state CAS prevents lost updates.
- if(etag)await put(`fieldnotes/history/${record.revision}-${Date.now()}.enc`,seal(record),{access:'private',addRandomSuffix:true,contentType:'application/octet-stream'});
- try{await put(path,seal(next),{access:'private',addRandomSuffix:false,allowOverwrite:!!etag,...(etag?{ifMatch:etag}:{}),contentType:'application/octet-stream'});}catch(e){if(e instanceof BlobPreconditionFailedError||e.name==='BlobAlreadyExistsError')throw new Conflict();throw e;}
- return {revision:next.revision,savedAt:next.savedAt};
+let queue=Promise.resolve();
+export function saveState(board,revision){
+ const operation=queue.then(async()=>{
+  await mkdir(directory,{recursive:true,mode:0o700});
+  const {record}=await readState();if(revision!==record.revision)throw new Conflict();
+  const next={board,revision:revision+1,savedAt:new Date().toISOString()};
+  const backups=join(directory,'backups');await mkdir(backups,{recursive:true,mode:0o700});
+  try{await copyFile(path,join(backups,`${String(record.revision).padStart(10,'0')}.enc`));}catch(e){if(e.code!=='ENOENT')throw e;}
+  const temp=path+'.tmp';await writeFile(temp,seal(next),{mode:0o600});await rename(temp,path);
+  const files=(await readdir(backups)).filter(f=>f.endsWith('.enc')).sort();
+  for(const file of files.slice(0,-100))await unlink(join(backups,file));
+  return {revision:next.revision,savedAt:next.savedAt};
+ });queue=operation.catch(()=>{});return operation;
 }
 export function validateBoard(b){
  if(!b||b.version!==2||!Array.isArray(b.nodes)||!Array.isArray(b.edges)||b.nodes.length>5000||b.edges.length>10000)throw Error('Invalid board');

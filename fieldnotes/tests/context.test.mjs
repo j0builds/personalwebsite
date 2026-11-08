@@ -7,12 +7,8 @@ test('retrieve an older detail, bound packet and exclude current entry from its 
 test('blog escapes stored HTML and query injection',()=>{const b={nodes:[],journalEntries:[{id:'x',date:'today',text:'<script>alert(1)</script>'}]};const html=storyPage(b,'','x');assert.ok(!html.includes('<script>'));assert.match(html,/&lt;script&gt;/);assert.match(storyPage(b,'" onfocus="bad'),/&quot;/);});
 test('AI request includes eligible history and returns an auditable context receipt',async()=>{
  const {synthesize}=await import('../lib/synthesis.mjs');const originalFetch=globalThis.fetch;const originalKey=process.env.AI_GATEWAY_API_KEY;process.env.AI_GATEWAY_API_KEY='test-only';let sent;
- globalThis.fetch=async(_url,options)=>{sent=JSON.parse(options.body);return {ok:true,json:async()=>({choices:[{message:{content:JSON.stringify({summary:'Consider the earlier approach [entry:t].',updates:[],hiringUpdates:[],hiringQuestions:[],perspectives:[]})}}]})};};
+ globalThis.fetch=async(_url,options)=>{sent=JSON.parse(options.body);return {ok:true,json:async()=>({message:{content:JSON.stringify({summary:'Consider the earlier approach [entry:t].',updates:[],hiringUpdates:[],hiringQuestions:[],perspectives:[]})}})};};
  try{const result=await synthesize('Should we use a contractor?',board,'think');assert.ok(sent.messages[1].content.includes('Maybe try a contractor'));assert.ok(!sent.messages[1].content.includes('Secret personal'));assert.ok(!sent.messages[1].content.includes('Personal-derived note'));assert.ok(result.contextUsed.sources.some(s=>s.id==='entry:t'));assert.equal(result.updates.length,0);}finally{globalThis.fetch=originalFetch;if(originalKey===undefined)delete process.env.AI_GATEWAY_API_KEY;else process.env.AI_GATEWAY_API_KEY=originalKey;}
 });
 test('a personal correction cannot resurrect the superseded public account',()=>{const b=structuredClone(board);b.journalEntries.find(e=>e.id==='fix').contextScope='personal';const s=companySources(b);assert.ok(!s.entries.some(e=>e.id==='entry:a'||e.id==='entry:fix'));});
-test('Gateway billing refusal is distinguished from a storage failure',async()=>{
- const {synthesize}=await import('../lib/synthesis.mjs');const previous=globalThis.fetch;
- globalThis.fetch=async()=>({ok:false,status:403,json:async()=>({error:{message:'AI Gateway requires a valid credit card on file to service requests.'}})});
- try{await assert.rejects(synthesize('Fictional test',board,'think','test-only-oidc'),{message:'AI_BILLING_REQUIRED'});}finally{globalThis.fetch=previous;}
-});
+test('unavailable local AI preserves the journal workflow',async()=>{const {synthesize}=await import('../lib/synthesis.mjs');const original=globalThis.fetch;globalThis.fetch=async()=>{throw Error('offline')};try{await assert.rejects(synthesize('Test',board,'think'),{message:'AI_NOT_CONFIGURED'});}finally{globalThis.fetch=original;}});

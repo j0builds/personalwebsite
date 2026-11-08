@@ -21,8 +21,9 @@ export function createHandler(deps={readState,saveState,synthesize}){return asyn
   res.setHeader('Set-Cookie',`${COOKIE}=${issueSession()}; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=28800`);return redirect('/');
  }
  const readerPath=path==='/api/context'||path.startsWith('/api/context/source/');
+ const ownerBearer=validKey((req.headers.authorization||'').replace(/^Bearer /,''));
  const reader=req.method==='GET'&&readerPath&&validContextReader(req);
- if(!reader&&!validSession(sessionFrom(req)))return path.startsWith('/api/')?send(401,{error:'Session ended. Export unsaved changes, then sign in again.'}):redirect('/login');
+ if(!ownerBearer&&!reader&&!validSession(sessionFrom(req)))return path.startsWith('/api/')?send(401,{error:'Session ended. Export unsaved changes, then sign in again.'}):redirect('/login');
  if(req.method==='POST'&&!sameOrigin(req))return send(403,{error:'Same-origin write required'});
  if(path==='/logout'&&req.method==='POST'){res.setHeader('Set-Cookie',`${COOKIE}=; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=0`);return redirect('/login');}
  if(req.method==='GET'&&assets[path]){const file=assets[path];return send(200,await readFile(new URL('../assets/'+file,import.meta.url),'utf8'),mime[file.split('.').pop()]);}
@@ -44,6 +45,6 @@ export function createHandler(deps={readState,saveState,synthesize}){return asyn
  if(path==='/api/board'&&req.method==='POST'){const payload=JSON.parse(await body(req,3_500_000));return send(200,await deps.saveState(validateBoard(payload.board),payload.revision));}
  if(path==='/api/synthesize'&&req.method==='POST'){const payload=JSON.parse(await body(req,60_000));return send(200,await deps.synthesize(payload.entry,(await deps.readState()).record.board,payload.mode,req.headers['x-vercel-oidc-token']));}
  return send(404,{error:'Not found'});
- }catch(e){if(e.message==='AI_BILLING_REQUIRED')return send(503,{error:'AI reflections need billing setup in Vercel AI Gateway. You can still save entries and use your journal.'});if(e.message==='AI_NOT_CONFIGURED')return send(503,{error:'AI reflections are not configured yet. You can still save entries and use your journal.'});if(e instanceof Conflict)return send(409,{error:'Another window saved a newer version. Export your changes before reloading.'});if(e.message==='AUTH_NOT_CONFIGURED')return send(503,{error:'Private staging is locked until owner access is configured.'});if(e.message==='BODY_TOO_LARGE')return send(413,{error:'Entry or board exceeds the save limit.'});if(e instanceof SyntaxError||e.message.startsWith('Invalid ')||e.message==='Missing parent')return send(400,{error:'Invalid request; nothing saved.'});return send(503,{error:'Private storage or synthesis is unavailable. Your unsaved text remains in this window; export it before leaving.'});}
+ }catch(e){if(e.message==='AI_NOT_CONFIGURED')return send(503,{error:'Start Ollama and download qwen3:4b to use local AI. You can still save entries.'});if(e instanceof Conflict)return send(409,{error:'Another window saved a newer version. Export your changes before reloading.'});if(e.message==='AUTH_NOT_CONFIGURED')return send(503,{error:'Private staging is locked until owner access is configured.'});if(e.message==='BODY_TOO_LARGE')return send(413,{error:'Entry or board exceeds the save limit.'});if(e instanceof SyntaxError||e.message.startsWith('Invalid ')||e.message==='Missing parent')return send(400,{error:'Invalid request; nothing saved.'});return send(503,{error:'Private storage or synthesis is unavailable. Your unsaved text remains in this window; export it before leaving.'});}
  };}
 export default createHandler();

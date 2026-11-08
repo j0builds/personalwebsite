@@ -15,7 +15,7 @@ export function validSession(token,now=Date.now()){
  try{const p=JSON.parse(Buffer.from(payload,'base64url'));return p.owner===true&&Number.isFinite(p.expires)&&p.expires>now&&p.expires<=now+8*3600_000;}catch{return false;}
 }
 export function sessionFrom(req){return (req.headers.cookie||'').split(';').map(s=>s.trim()).find(s=>s.startsWith(COOKIE+'='))?.slice(COOKIE.length+1);}
-export function sameOrigin(req){const protocol=process.env.VERCEL?'https':'http';return req.headers.origin===protocol+'://'+req.headers.host;}
+export function sameOrigin(req){return ['http://127.0.0.1:8891','https://private.josephayinde.com','https://j0-fieldnotes-staging.vercel.app'].includes(req.headers.origin)||req.headers.origin==='http://'+req.headers.host;}
 export function seal(value){const iv=randomBytes(12),cipher=createCipheriv('aes-256-gcm',settings().key,iv);const bytes=Buffer.concat([cipher.update(JSON.stringify(value),'utf8'),cipher.final()]);return JSON.stringify({v:1,iv:iv.toString('base64'),tag:cipher.getAuthTag().toString('base64'),data:bytes.toString('base64')});}
 export function unseal(value){const e=JSON.parse(value);if(e.v!==1)throw Error('Invalid encrypted record');const d=createDecipheriv('aes-256-gcm',settings().key,Buffer.from(e.iv,'base64'));d.setAuthTag(Buffer.from(e.tag,'base64'));return JSON.parse(Buffer.concat([d.update(Buffer.from(e.data,'base64')),d.final()]).toString('utf8'));}
 
