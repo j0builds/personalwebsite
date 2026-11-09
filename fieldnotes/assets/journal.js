@@ -11,12 +11,46 @@ function syncScope(entry){entry.contextScope=scope();}
 $('#toggle-tools').onclick=()=>{const active=document.body.classList.toggle('editing');$('#toggle-tools').setAttribute('aria-pressed',String(active));$('#toggle-tools').setAttribute('aria-label',active?'Hide board tools':'Show board tools');renderNodes();};
 function journalError(message){$('#journal-error').hidden=!message;$('#journal-error').textContent=message;}
 function localDate(){return new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});}
-function journalHistory(){const query=($('#journal-search').value||'').toLowerCase();const entries=(board.journalEntries||[]).filter(e=>(e.mode||'journal')===journalMode).filter(e=>[e.text,e.date,e.proposal?.summary||''].join(' ').toLowerCase().includes(query));$('#journal-entries').innerHTML=entries.slice().reverse().map(e=>`<article class="journal-record"><h3>${esc(e.date)} · ${e.hiringReceipt?.length?'Hiring updated':e.mode==='think'?'Thinking aloud':e.applied?'Added to map':e.proposal?'Ready for review':'Saved reflection'}</h3><p>${esc(e.proposal?.summary||e.text.slice(0,180))}</p><button data-reflection="${esc(e.id)}">${e.applied?'Read reflection':'Continue reflection'}</button></article>`).join('')||(query?'<p>No reflections match this search.</p>':'<p>Your story starts with the next entry.</p>');}
+let archiveFilter='all',archiveEntryId=null;
+function journalHistory(){
+ const query=($('#journal-search').value||'').toLowerCase();const savedIds=typeof lastSyncedBoard==='undefined'?null:new Set((lastSyncedBoard?.journalEntries||[]).map(e=>e.id));const all=(board.journalEntries||[]).filter(e=>!savedIds||savedIds.has(e.id));
+ const entries=all.filter(e=>archiveFilter==='all'||(e.mode||'journal')===archiveFilter).filter(e=>[e.text,e.date,e.proposal?.summary||''].join(' ').toLowerCase().includes(query));
+ $('#archive-count').textContent=String(all.length);
+ $('#archive-results').textContent=entries.length+' '+(entries.length===1?'entry':'entries');
+ $('#journal-entries').innerHTML=entries.slice().reverse().map(e=>`<button class="archive-row" data-reflection="${esc(e.id)}"><span class="archive-row-meta">${esc(e.date)} · ${e.mode==='think'?'Think':'Journal'}${e.contextScope==='personal'?' · Personal':''}</span><span class="archive-row-title">${esc(e.text.split('\n').find(x=>x.trim())?.slice(0,100)||'Untitled entry')}</span><span class="archive-row-preview">${esc(e.text.slice(0,180))}</span><span class="archive-row-arrow" aria-hidden="true">↗</span></button>`).join('')||'<p class="archive-empty">'+(query?'No entries match. Try another word.':'Nothing here yet. Save a little of today.')+'</p>';
+}
+function closeArchive(){ jdialog.setAttribute('aria-labelledby','journal-heading');$('#writer-page').hidden=false;$('#journal-history').hidden=true;$('#open-archive').setAttribute('aria-expanded','false');$('#open-archive').focus(); }
+$('#open-archive').onclick=()=>{journalHistory();$('#archive-reading').hidden=true;$('#archive-browse').hidden=false;$('#journal-history').hidden=false;jdialog.setAttribute('aria-labelledby','archive-heading');$('#writer-page').hidden=true;jdialog.scrollTop=0;$('#open-archive').setAttribute('aria-expanded','true');$('#journal-search').focus();};
+$('#close-archive').onclick=closeArchive;
+$('#archive-back').onclick=()=>{$('#archive-reading').hidden=true;$('#archive-browse').hidden=false;$('#journal-search').focus();};
+$('.archive-filters').onclick=e=>{const b=e.target.closest('[data-archive-filter]');if(!b)return;archiveFilter=b.dataset.archiveFilter;for(const el of $('.archive-filters').querySelectorAll('button'))el.setAttribute('aria-pressed',String(el===b));journalHistory();};
+function entryArchived(entry,version){
+ journalHistory();$('#archive-confirmation').textContent='Saved to archive';
+ // Only clear the exact submitted draft. Typing while a save is in flight wins.
+ if(editorVersion===version){editorVersion++;board[draftKey()]='';$('#daily-entry').value='';activeEntry=null;$('#journal-result').hidden=true;changed();void save();}
+ const target=$('#open-archive');
+ if(!$('#journal-history').hidden)return;
+ if(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches)return;
+ if(!target.animate)return;
+ target.animate([{opacity:.4},{opacity:1}],{duration:650,easing:'ease-out'});
+ const from=$('#save-entry').getBoundingClientRect(),to=target.getBoundingClientRect();
+ const paper=document.createElement('span');paper.className='archive-flight';paper.setAttribute('aria-hidden','true');paper.style.left=(from.left+from.width/2)+'px';paper.style.top=from.top+'px';jdialog.append(paper);
+ const animation=paper.animate([{opacity:0,transform:'translate(-50%,0) scale(1)'},{opacity:1,offset:.15,transform:'translate(-50%,-12px) rotate(-6deg) scale(1)'},{opacity:0,transform:`translate(${to.left+to.width/2-from.left-from.width/2}px,${to.top-from.top}px) rotate(8deg) scale(.25)`}],{duration:650,easing:'cubic-bezier(.22,.68,0,1)'});
+ animation.finished.catch(()=>{}).finally(()=>paper.remove());
+}
+
 $('#open-journal').onclick=()=>{if(!loaded)return;if(journalBusy){jdialog.showModal();return;}editorVersion++;$('#journal-date').textContent=localDate().toUpperCase();$('#daily-entry').value=board[draftKey()]||'';$('#journal-result').hidden=true;activeEntry=null;journalError('');$('#journal-search').value='';journalHistory();refreshAIStatus();jdialog.showModal();$('#daily-entry').focus();};
 $('#close-journal').onclick=()=>jdialog.close();
-$('#daily-entry').oninput=()=>{editorVersion++;board[draftKey()]=$('#daily-entry').value;$('#journal-result').hidden=true;activeEntry=null;changed();};
+$('#daily-entry').oninput=()=>{$('#archive-confirmation').textContent='';editorVersion++;board[draftKey()]=$('#daily-entry').value;$('#journal-result').hidden=true;activeEntry=null;changed();};
 function showProposal(entry){activeEntry=entry;$('#journal-result').hidden=!entry.proposal;if(!entry.proposal)return;$('#journal-summary').textContent=entry.proposal.summary;renderReflectionExtras(entry);$('#journal-proposals').innerHTML=entry.proposal.updates.map((u,i)=>{const route=u.regionIds.map(r=>node(r)?.title).filter(Boolean).join(' · ')||'Unsorted';const prior=u.existingNodeId?node(u.existingNodeId):null;return `<article class="proposal"><label><input type="checkbox" data-update="${i}" ${entry.applied?'disabled':''} checked><div><div class="proposal-route">${esc(u.kind)} · ${esc(route)}${prior?' · append to '+esc(prior.title):''}</div><h3>${esc(u.title)}</h3><p>${esc(u.body)}</p></div></label><details><summary>From your entry</summary><p>${esc(u.evidence)}</p></details></article>`;}).join('');$('#apply-journal').disabled=!!entry.applied||!entry.proposal.updates.length;$('#apply-journal').textContent=entry.applied?'Already added':'Add to my map';}
-$('#journal-entries').onclick=e=>{if(journalBusy)return;const b=e.target.closest('[data-reflection]');if(!b)return;editorVersion++;const entry=board.journalEntries.find(e=>e.id===b.dataset.reflection);$('#daily-entry').value=entry.text;$('#company-context').checked=entry.contextScope!=='personal';showProposal(entry);journalError('');};
+$('#journal-entries').onclick=e=>{
+ const b=e.target.closest('[data-reflection]');if(!b)return;const entry=board.journalEntries.find(e=>e.id===b.dataset.reflection);if(!entry)return;
+ archiveEntryId=entry.id;$('#archive-notice').textContent='';$('#archive-entry-meta').textContent=entry.date+' · '+(entry.mode==='think'?'Think':'Journal')+(entry.contextScope==='personal'?' · Personal':'');
+ $('#archive-entry-text').textContent=entry.text;
+ $('#archive-reflection').hidden=!entry.proposal;$('#archive-reflection').open=false;
+ $('#archive-reflection-text').textContent=[entry.proposal?.summary,...(entry.proposal?.perspectives||[]).map(p=>p.angle+'\n'+p.thought+'\n'+p.question)].filter(Boolean).join('\n\n');
+ $('#archive-story').href='/story/entry/'+encodeURIComponent(entry.id);$('#archive-browse').hidden=true;$('#archive-reading').hidden=false;$('#archive-back').focus();
+};
 function aiStatus(message){$('#ai-status').textContent=message;}
 function refreshAIStatus(){
  const latest=[...new Map(serverJobs.map(j=>[j.entryId,j])).values()];
@@ -25,7 +59,7 @@ function refreshAIStatus(){
  if(pendingAIRequests.size){aiStatus('Saving entry and AI job…');return;}
  if(active.length){aiStatus('Saved · '+active.length+' AI '+(active.length===1?'update':'updates')+' running on your Mac · safe to close this tab');return;}
  if(failed.length){aiStatus('Entry saved · local AI needs a retry. Open the entry and choose Save & update cards.');return;}
- if(serverJobs.some(j=>j.status==='completed'))aiStatus('Saved · AI updates ready in Earlier reflections');
+ if(serverJobs.some(j=>j.status==='completed'))aiStatus('Saved · AI updates ready in Archive');
  if(activeEntry){const current=board.journalEntries?.find(e=>e.id===activeEntry.id);if(current&&current.text===$('#daily-entry').value.trim()&&(current.mode||'journal')===journalMode)showProposal(current);}
 }
 function queueSynthesis(entry){
@@ -41,9 +75,9 @@ function captureEntry(){
  if(!entry){entry=createEntry(text);board.journalEntries.push(entry);}
  syncScope(entry);board[draftKey()]=$('#daily-entry').value;changed();return entry;
 }
-$('#synthesize').onclick=()=>{
- if(!loaded)return;
- try{journalError('');const entry=captureEntry();queueSynthesis(entry);activeEntry=entry;void save();journalHistory();}
+$('#synthesize').onclick=async()=>{
+ if(!loaded)return;const version=editorVersion;
+ try{journalError('');const entry=captureEntry();queueSynthesis(entry);activeEntry=entry;await saveThrough(changeVersion);entryArchived(entry,version);}
  catch(e){journalError(e.message);}
 };
 $('#apply-journal').onclick=()=>{
@@ -62,8 +96,7 @@ $('#save-entry').onclick=async()=>{
  if(!loaded)return;const version=editorVersion;
  try{
   journalError('');const entry=captureEntry();await saveThrough(changeVersion);
-  if(editorVersion===version){activeEntry=entry;$('#journal-save').textContent='Entry saved privately';}
-  journalHistory();
+  entryArchived(entry,version);
  }catch(e){journalError(e.message);}
 };
 
@@ -102,3 +135,11 @@ const reviseId=new URLSearchParams(location.search).get('revise');if(reviseId){$
 
 $('#writer-retry').onclick=()=>save();
 $('#writer-backup').onclick=()=>{const a=document.createElement('a');const url=URL.createObjectURL(new Blob([$('#daily-entry').value],{type:'text/plain'}));a.href=url;a.download='fieldnotes-unsaved-draft.txt';a.click();setTimeout(()=>URL.revokeObjectURL(url),2000);};
+
+$('#archive-continue').onclick=()=>{
+ const entry=board.journalEntries.find(e=>e.id===archiveEntryId);if(!entry)return;
+ if($('#daily-entry').value.trim()&&$('#daily-entry').value.trim()!==entry.text){$('#archive-notice').textContent='You have a draft in the writer. Save it first; it has been kept exactly as you left it.';return;}
+ closeArchive();setJournalMode(entry.mode||'journal');$('#daily-entry').value=entry.text;$('#company-context').checked=entry.contextScope!=='personal';showProposal(entry);$('#daily-entry').focus();
+};
+
+jdialog.addEventListener?.('cancel',e=>{if(!$('#journal-history').hidden){e.preventDefault();closeArchive();}});

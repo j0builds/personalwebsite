@@ -52,3 +52,30 @@ test('fast initial fetch opens writer after bridge finishes loading handlers',as
  const ctx=vm.createContext({fetch:async url=>({ok:true,json:async()=>url.endsWith('board')?{board:{nodes:[]},revision:1}:[]}),structuredClone,URLSearchParams,location:{search:''},render(){},status(){},$:()=>({click(){opened++;}})});
  vm.runInContext(start,ctx);assert.equal(opened,0);await vm.runInContext('startFieldnotes()',ctx);assert.equal(opened,1);
 });
+test('archive acknowledgement clears only the submitted draft and keeps a saved entry',async()=>{
+ const h=setup();h.type('A saved journal entry');await h.$('#save-entry').onclick();
+ assert.equal(h.ctx.board.journalEntries[0].text,'A saved journal entry');assert.equal(h.$('#daily-entry').value,'');assert.equal(h.ctx.board.journalDraft,'');assert.equal(h.$('#archive-confirmation').textContent,'Saved to archive');assert.match(h.$('#journal-entries').innerHTML,/A saved journal entry/);
+});
+test('failed save neither celebrates nor clears the draft',async()=>{
+ const h=setup();h.ctx.saveThrough=async()=>{throw Error('offline')};h.type('Keep this unsaved note');await h.$('#save-entry').onclick();
+ assert.equal(h.$('#daily-entry').value,'Keep this unsaved note');assert.equal(h.$('#archive-confirmation').textContent,'');assert.equal(h.$('#journal-error').textContent,'offline');
+});
+test('new typing during explicit save is not cleared by archive acknowledgement',async()=>{
+ const h=setup();const d=deferred();h.ctx.saveThrough=()=>d.promise;h.type('First entry');const saving=h.$('#save-entry').onclick();h.type('A newer draft');d.resolve();await saving;
+ assert.equal(h.$('#daily-entry').value,'A newer draft');assert.equal(h.ctx.board.journalDraft,'A newer draft');assert.equal(h.ctx.board.journalEntries[0].text,'First entry');
+});
+test('archive reads full entries across modes without replacing current writing',()=>{
+ const h=setup();h.ctx.board.journalEntries=[{id:'past',mode:'think',date:'Yesterday',text:'An earlier thought',proposal:null}];h.type('Current draft');h.run('journalHistory()');assert.match(h.$('#journal-entries').innerHTML,/An earlier thought/);
+ h.$('#journal-entries').onclick({target:{closest:()=>({dataset:{reflection:'past'}})}});
+ assert.equal(h.$('#archive-entry-text').textContent,'An earlier thought');assert.equal(h.$('#daily-entry').value,'Current draft');h.$('#archive-continue').onclick();assert.match(h.$('#archive-notice').textContent,/draft/);assert.equal(h.$('#daily-entry').value,'Current draft');
+ h.$('#journal-search').value='no match';h.$('#journal-search').oninput();assert.match(h.$('#journal-entries').innerHTML,/No entries match/);
+});
+test('reduced motion skips flight but confirms successful archival',async()=>{
+ const h=setup();h.$('#journal-history').hidden=true;h.ctx.window.matchMedia=()=>({matches:true});let animations=0;h.$('#open-archive').animate=()=>{animations++};h.type('Quiet save');await h.$('#save-entry').onclick();assert.equal(animations,0);assert.equal(h.$('#archive-confirmation').textContent,'Saved to archive');
+});
+test('successful save animates a content-free paper into the archive',async()=>{
+ const h=setup();h.$('#journal-history').hidden=true;h.ctx.window.matchMedia=()=>({matches:false});let flight=0,removed=false;
+ h.$('#open-archive').animate=()=>({});h.$('#open-archive').getBoundingClientRect=()=>({left:600,top:30,width:80});h.$('#save-entry').getBoundingClientRect=()=>({left:400,top:500,width:80});
+ h.ctx.document.createElement=()=>({style:{},setAttribute(){},animate(frames,options){flight++;assert.equal(options.duration,650);return {finished:Promise.resolve()};},remove(){removed=true;}});h.$('#journal-dialog').append=()=>{};
+ h.type('Saved text stays out of the animation');await h.$('#save-entry').onclick();await tick();assert.equal(flight,1);assert.equal(removed,true);
+});
