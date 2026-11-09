@@ -79,3 +79,10 @@ test('successful save animates a content-free paper into the archive',async()=>{
  h.ctx.document.createElement=()=>({style:{},setAttribute(){},animate(frames,options){flight++;assert.equal(options.duration,1000);return {finished:Promise.resolve()};},remove(){removed=true;}});h.$('#journal-dialog').append=()=>{};
  h.type('Saved text stays out of the animation');await h.$('#save-entry').onclick();await tick();assert.equal(flight,1);assert.equal(removed,true);
 });
+test('archive round trip restores text selection and scroll positions',()=>{
+ const h=setup();h.type('An unfinished draft');const input=h.$('#daily-entry');input.selectionStart=3;input.selectionEnd=9;input.selectionDirection='forward';input.scrollTop=40;h.$('#journal-dialog').scrollTop=100;let selection;
+ input.setSelectionRange=(...args)=>selection=args;h.$('#open-archive').onclick();input.scrollTop=0;h.$('#close-archive').onclick();assert.deepEqual(selection,[3,9,'forward']);assert.equal(input.scrollTop,40);assert.equal(h.$('#journal-dialog').scrollTop,100);assert.equal(input.value,'An unfinished draft');
+});
+test('touch archive navigation focuses heading instead of opening search keyboard',()=>{
+ const h=setup();h.ctx.window.matchMedia=()=>({matches:true});let searches=0,headings=0;h.$('#journal-search').focus=()=>searches++;h.$('#archive-heading').focus=()=>headings++;h.$('#open-archive').onclick();assert.equal(searches,0);assert.equal(headings,1);
+});

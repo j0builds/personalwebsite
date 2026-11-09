@@ -11,7 +11,9 @@ function syncScope(entry){entry.contextScope=scope();}
 $('#toggle-tools').onclick=()=>{const active=document.body.classList.toggle('editing');$('#toggle-tools').setAttribute('aria-pressed',String(active));$('#toggle-tools').setAttribute('aria-label',active?'Hide board tools':'Show board tools');renderNodes();};
 function journalError(message){$('#journal-error').hidden=!message;$('#journal-error').textContent=message;}
 function localDate(){return new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});}
-let archiveFilter='all',archiveEntryId=null;
+let archiveFilter='all',archiveEntryId=null,writerPosition=null;
+const touchWriting=()=>!!window.matchMedia?.('(pointer: coarse)').matches;
+function focusWriter(){if(!touchWriting())$('#daily-entry').focus({preventScroll:true});}
 function journalHistory(){
  const query=($('#journal-search').value||'').toLowerCase();const savedIds=typeof lastSyncedBoard==='undefined'?null:new Set((lastSyncedBoard?.journalEntries||[]).map(e=>e.id));const all=(board.journalEntries||[]).filter(e=>!savedIds||savedIds.has(e.id));
  const entries=all.filter(e=>archiveFilter==='all'||(e.mode||'journal')===archiveFilter).filter(e=>[e.text,e.date,e.proposal?.summary||''].join(' ').toLowerCase().includes(query));
@@ -19,10 +21,10 @@ function journalHistory(){
  $('#archive-results').textContent=entries.length+' '+(entries.length===1?'entry':'entries');
  $('#journal-entries').innerHTML=entries.slice().reverse().map(e=>`<button class="archive-row" data-reflection="${esc(e.id)}"><span class="archive-row-meta">${esc(e.date)} · ${e.mode==='think'?'Think':'Journal'}${e.contextScope==='personal'?' · Personal':''}</span><span class="archive-row-title">${esc(e.text.split('\n').find(x=>x.trim())?.slice(0,100)||'Untitled entry')}</span><span class="archive-row-preview">${esc(e.text.slice(0,180))}</span><span class="archive-row-arrow" aria-hidden="true">↗</span></button>`).join('')||'<p class="archive-empty">'+(query?'No entries match. Try another word.':'Nothing here yet. Save a little of today.')+'</p>';
 }
-function closeArchive(){ jdialog.setAttribute('aria-labelledby','journal-heading');$('#writer-page').hidden=false;$('#journal-history').hidden=true;$('#open-archive').setAttribute('aria-expanded','false');$('#open-archive').focus(); }
-$('#open-archive').onclick=()=>{journalHistory();$('#archive-reading').hidden=true;$('#archive-browse').hidden=false;$('#journal-history').hidden=false;jdialog.setAttribute('aria-labelledby','archive-heading');$('#writer-page').hidden=true;jdialog.scrollTop=0;$('#open-archive').setAttribute('aria-expanded','true');$('#journal-search').focus();};
+function closeArchive(){ jdialog.setAttribute('aria-labelledby','journal-heading');$('#writer-page').hidden=false;$('#journal-history').hidden=true;$('#open-archive').setAttribute('aria-expanded','false');if(writerPosition){jdialog.scrollTop=writerPosition.page;const input=$('#daily-entry');input.setSelectionRange?.(writerPosition.start,writerPosition.end,writerPosition.direction);input.scrollTop=writerPosition.text;}$('#open-archive').focus({preventScroll:true}); }
+$('#open-archive').onclick=()=>{const input=$('#daily-entry');writerPosition={page:jdialog.scrollTop||0,text:input.scrollTop||0,start:input.selectionStart||0,end:input.selectionEnd||0,direction:input.selectionDirection||'none'};journalHistory();$('#archive-reading').hidden=true;$('#archive-browse').hidden=false;$('#journal-history').hidden=false;jdialog.setAttribute('aria-labelledby','archive-heading');$('#writer-page').hidden=true;jdialog.scrollTop=0;$('#open-archive').setAttribute('aria-expanded','true');if(touchWriting())$('#archive-heading').focus({preventScroll:true});else $('#journal-search').focus({preventScroll:true});};
 $('#close-archive').onclick=closeArchive;
-$('#archive-back').onclick=()=>{$('#archive-reading').hidden=true;$('#archive-browse').hidden=false;$('#journal-search').focus();};
+$('#archive-back').onclick=()=>{$('#archive-reading').hidden=true;$('#archive-browse').hidden=false;if(touchWriting())$('#archive-heading').focus({preventScroll:true});else $('#journal-search').focus({preventScroll:true});};
 $('.archive-filters').onclick=e=>{const b=e.target.closest('[data-archive-filter]');if(!b)return;archiveFilter=b.dataset.archiveFilter;for(const el of $('.archive-filters').querySelectorAll('button'))el.setAttribute('aria-pressed',String(el===b));journalHistory();};
 function entryArchived(entry,version){
  journalHistory();$('#archive-confirmation').textContent='Saved to archive';
@@ -39,7 +41,7 @@ function entryArchived(entry,version){
  animation.finished.catch(()=>{}).finally(()=>paper.remove());
 }
 
-$('#open-journal').onclick=()=>{if(!loaded)return;if(journalBusy){jdialog.showModal();return;}editorVersion++;$('#journal-date').textContent=localDate().toUpperCase();$('#daily-entry').value=board[draftKey()]||'';$('#journal-result').hidden=true;activeEntry=null;journalError('');$('#journal-search').value='';journalHistory();refreshAIStatus();jdialog.showModal();$('#daily-entry').focus();};
+$('#open-journal').onclick=()=>{if(!loaded)return;if(journalBusy){jdialog.showModal();return;}editorVersion++;$('#journal-date').textContent=localDate().toUpperCase();$('#daily-entry').value=board[draftKey()]||'';$('#journal-result').hidden=true;activeEntry=null;journalError('');$('#journal-search').value='';journalHistory();refreshAIStatus();jdialog.showModal();focusWriter();};
 $('#close-journal').onclick=()=>jdialog.close();
 $('#daily-entry').oninput=()=>{$('#archive-confirmation').textContent='';editorVersion++;board[draftKey()]=$('#daily-entry').value;$('#journal-result').hidden=true;activeEntry=null;changed();};
 function showProposal(entry){activeEntry=entry;$('#journal-result').hidden=!entry.proposal;if(!entry.proposal)return;$('#journal-summary').textContent=entry.proposal.summary;renderReflectionExtras(entry);$('#journal-proposals').innerHTML=entry.proposal.updates.map((u,i)=>{const route=u.regionIds.map(r=>node(r)?.title).filter(Boolean).join(' · ')||'Unsorted';const prior=u.existingNodeId?node(u.existingNodeId):null;return `<article class="proposal"><label><input type="checkbox" data-update="${i}" ${entry.applied?'disabled':''} checked><div><div class="proposal-route">${esc(u.kind)} · ${esc(route)}${prior?' · append to '+esc(prior.title):''}</div><h3>${esc(u.title)}</h3><p>${esc(u.body)}</p></div></label><details><summary>From your entry</summary><p>${esc(u.evidence)}</p></details></article>`;}).join('');$('#apply-journal').disabled=!!entry.applied||!entry.proposal.updates.length;$('#apply-journal').textContent=entry.applied?'Already added':'Add to my map';}
@@ -109,7 +111,7 @@ function setJournalMode(mode){
  $('#daily-entry').placeholder=mode==='think'?'I’m trying to decide whether…':'Today I noticed…';
  $('#daily-entry').value=board[draftKey()]||'';$('#synthesize').textContent=synthesisLabel();$('#journal-result').hidden=true;
  $('#journal-dialog .journal-disclosure:not(#ai-status):not(#revision-note)').textContent=mode==='think'?'Explore angles uses this thought and relevant company history. Thinking stays exploratory; it won’t change hiring cards.':'Saved company entries become context for future reflections. AI updates clearly named hiring cards when requested.';
- $('#journal-search').value='';journalError('');journalHistory();$('#daily-entry').focus();
+ $('#journal-search').value='';journalError('');journalHistory();focusWriter();
 }
 $('#mode-journal').onclick=()=>setJournalMode('journal');$('#mode-think').onclick=()=>setJournalMode('think');
 function renderReflectionExtras(entry){
@@ -139,7 +141,7 @@ $('#writer-backup').onclick=()=>{const a=document.createElement('a');const url=U
 $('#archive-continue').onclick=()=>{
  const entry=board.journalEntries.find(e=>e.id===archiveEntryId);if(!entry)return;
  if($('#daily-entry').value.trim()&&$('#daily-entry').value.trim()!==entry.text){$('#archive-notice').textContent='You have a draft in the writer. Save it first; it has been kept exactly as you left it.';return;}
- closeArchive();setJournalMode(entry.mode||'journal');$('#daily-entry').value=entry.text;$('#company-context').checked=entry.contextScope!=='personal';showProposal(entry);$('#daily-entry').focus();
+ closeArchive();setJournalMode(entry.mode||'journal');$('#daily-entry').value=entry.text;$('#company-context').checked=entry.contextScope!=='personal';showProposal(entry);focusWriter();
 };
 
 jdialog.addEventListener?.('cancel',e=>{if(!$('#journal-history').hidden){e.preventDefault();closeArchive();}});
