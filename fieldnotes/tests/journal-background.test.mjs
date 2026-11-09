@@ -76,6 +76,6 @@ test('reduced motion skips flight but confirms successful archival',async()=>{
 test('successful save animates a content-free paper into the archive',async()=>{
  const h=setup();h.$('#journal-history').hidden=true;h.ctx.window.matchMedia=()=>({matches:false});let flight=0,removed=false;
  h.$('#open-archive').animate=()=>({});h.$('#open-archive').getBoundingClientRect=()=>({left:600,top:30,width:80});h.$('#save-entry').getBoundingClientRect=()=>({left:400,top:500,width:80});
- h.ctx.document.createElement=()=>({style:{},setAttribute(){},animate(frames,options){flight++;assert.equal(options.duration,650);return {finished:Promise.resolve()};},remove(){removed=true;}});h.$('#journal-dialog').append=()=>{};
+ h.ctx.document.createElement=()=>({style:{},setAttribute(){},animate(frames,options){flight++;assert.equal(options.duration,1000);return {finished:Promise.resolve()};},remove(){removed=true;}});h.$('#journal-dialog').append=()=>{};
  h.type('Saved text stays out of the animation');await h.$('#save-entry').onclick();await tick();assert.equal(flight,1);assert.equal(removed,true);
 });

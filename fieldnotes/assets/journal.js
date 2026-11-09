@@ -35,7 +35,7 @@ function entryArchived(entry,version){
  target.animate([{opacity:.4},{opacity:1}],{duration:650,easing:'ease-out'});
  const from=$('#save-entry').getBoundingClientRect(),to=target.getBoundingClientRect();
  const paper=document.createElement('span');paper.className='archive-flight';paper.setAttribute('aria-hidden','true');paper.style.left=(from.left+from.width/2)+'px';paper.style.top=from.top+'px';jdialog.append(paper);
- const animation=paper.animate([{opacity:0,transform:'translate(-50%,0) scale(1)'},{opacity:1,offset:.15,transform:'translate(-50%,-12px) rotate(-6deg) scale(1)'},{opacity:0,transform:`translate(${to.left+to.width/2-from.left-from.width/2}px,${to.top-from.top}px) rotate(8deg) scale(.25)`}],{duration:650,easing:'cubic-bezier(.22,.68,0,1)'});
+ const animation=paper.animate([{opacity:0,transform:'translate(-50%,0) scale(1)'},{opacity:1,offset:.15,transform:'translate(-50%,-12px) rotate(-6deg) scale(1)'},{opacity:1,offset:.8},{opacity:0,transform:`translate(${to.left+to.width/2-from.left-from.width/2}px,${to.top-from.top}px) rotate(8deg) scale(.25)`}],{duration:1000,easing:'cubic-bezier(.4,0,.2,1)'});
  animation.finished.catch(()=>{}).finally(()=>paper.remove());
 }
 
